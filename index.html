@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -8,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -278,6 +277,40 @@
     min-height:240px;
   }
   #reader video{border-radius:var(--radius-md);}
+  .ocr-viewport{
+    position:relative;
+    width:100%;
+    border-radius:var(--radius-md);
+    overflow:hidden;
+    background:#0d1414;
+    min-height:220px;
+  }
+  .ocr-viewport video{
+    width:100%;
+    display:block;
+    border-radius:var(--radius-md);
+  }
+  .ocr-guide{
+    position:absolute;
+    left:12%;
+    right:12%;
+    top:42%;
+    height:16%;
+    border:2.5px solid var(--checked-out);
+    border-radius:8px;
+    box-shadow:0 0 0 999px rgba(0,0,0,0.35);
+    pointer-events:none;
+  }
+  .ocr-guide::after{
+    content:"3桁の数字";
+    position:absolute;
+    top:-22px;
+    left:0;
+    font-size:11px;
+    font-weight:700;
+    color:#fff;
+    text-shadow:0 1px 2px rgba(0,0,0,0.6);
+  }
   .scan-hint{
     text-align:center;
     font-size:12.5px;
@@ -299,6 +332,52 @@
   .pill.out{background:var(--checked-out-tint);color:var(--checked-out);}
   .pill.in{background:var(--available-tint);color:var(--available);}
   .pill.neutral{background:var(--surface-alt);color:var(--ink-soft);}
+
+  .pin-display{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:16px;
+  }
+  .pin-box{
+    width:38px;height:46px;
+    border:1.5px solid var(--border);
+    border-radius:var(--radius-sm);
+    background:var(--surface-alt);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--font-mono);
+    font-size:20px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .pin-box.filled{
+    border-color:var(--primary);
+    background:var(--primary-tint);
+    color:var(--primary-dark);
+  }
+  .keypad{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+  }
+  .keypad button{
+    padding:16px 0;
+    font-size:20px;
+    font-weight:700;
+    font-family:var(--font-mono);
+    border-radius:var(--radius-md);
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .keypad button:active{background:var(--primary-tint);border-color:var(--primary);}
+  .keypad button.key-back{
+    color:var(--ink-soft);
+    font-size:16px;
+  }
 
   /* tag chip signature element */
   .tag-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
@@ -442,6 +521,25 @@
     cursor:pointer;
     box-shadow:var(--shadow-1);
   }
+  .group-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:13.5px;
+    color:var(--primary-dark);
+    margin:16px 2px 8px;
+    padding-bottom:6px;
+    border-bottom:1.5px solid var(--border);
+  }
+  .group-header:first-child{margin-top:0;}
+  .group-header .group-count{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--ink-faint);
+    font-weight:500;
+  }
   .eq-card .row1{
     display:flex;
     justify-content:space-between;
@@ -580,12 +678,32 @@
 
     <div id="scan-step2" style="display:none;">
       <div class="session-info" id="session-info"></div>
-      <div class="card" style="padding:10px;">
-        <select id="camera-select" style="margin-bottom:8px;display:none;"></select>
-        <div id="reader"></div>
-        <div id="camera-error" style="display:none;color:var(--danger);font-size:12.5px;padding:10px 2px 0;"></div>
+
+      <div class="card">
+        <h2 style="margin-bottom:14px;">コード番号を入力（3桁の数字）</h2>
+        <div class="pin-display" id="pin-display">
+          <span class="pin-box"></span><span class="pin-box"></span><span class="pin-box"></span>
+        </div>
+        <div class="keypad" id="keypad"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="ghost-btn" onclick="keypadClear()">クリア</button>
+          <button class="primary-btn" style="margin-top:0;" onclick="submitManualCode()">追加する</button>
+        </div>
       </div>
-      <div class="scan-hint">機材のコードにカメラを向けてください（連続読み込み可）</div>
+
+      <button class="ghost-btn" style="margin-bottom:14px;" onclick="toggleCameraSection()">
+        <span id="camera-toggle-label">カメラで数字を読み取る場合はこちら（OCR）</span>
+      </button>
+      <div class="card" id="camera-card" style="padding:10px;display:none;">
+        <select id="camera-select" style="margin-bottom:8px;display:none;"></select>
+        <div class="ocr-viewport" id="ocr-viewport">
+          <video id="ocr-video" autoplay playsinline muted></video>
+          <div class="ocr-guide"></div>
+        </div>
+        <canvas id="ocr-canvas" style="display:none;"></canvas>
+        <div id="camera-error" style="display:none;color:var(--danger);font-size:12.5px;padding:10px 2px 0;"></div>
+        <div id="ocr-status" class="scan-hint">3桁の数字を枠の中に合わせてください</div>
+      </div>
       <div class="tag-list" id="tag-list"></div>
       <div class="empty-note" id="tag-empty">まだ読み込んだ機材がありません</div>
       <button class="ghost-btn" style="margin-top:12px;" onclick="cancelScanStep()">中止して戻る</button>
@@ -608,6 +726,15 @@
       <button class="active" data-f="all" onclick="setFilter('all')">すべて</button>
       <button data-f="在庫有" onclick="setFilter('在庫有')">在庫有</button>
       <button data-f="貸出中" onclick="setFilter('貸出中')">貸出中</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+      <label style="font-size:12.5px;font-weight:700;color:var(--ink-soft);white-space:nowrap;">並び替え</label>
+      <select id="sort-select" onchange="renderEquipList()" style="flex:1;">
+        <option value="none">登録順</option>
+        <option value="person">担当者順</option>
+        <option value="status_date">状態順（チェック日付順）</option>
+        <option value="date_desc">チェック日付順（新しい順）</option>
+      </select>
     </div>
     <div id="equip-list"></div>
   </main>
@@ -673,7 +800,8 @@
   <div class="modal">
     <h3>新規機材登録</h3>
     <label class="field-label">コード番号</label>
-    <input type="text" id="add-eq-code" placeholder="例）EQ-0012">
+    <input type="text" id="add-eq-code" placeholder="例）001" inputmode="numeric" maxlength="3" autocomplete="off">
+    <div style="font-size:11.5px;color:var(--ink-faint);margin-top:4px;">3桁の数字で入力してください</div>
     <label class="field-label">機材名</label>
     <input type="text" id="add-eq-name" placeholder="例）血圧計 No.2">
     <div class="actions">
@@ -727,13 +855,61 @@ let session = {
   pending: []           // [{code,name,isNew}]
 };
 
-let html5QrCode = null;
-let scannerRunning = false;
-let cameraList = [];
-let currentCameraId = null;
+let ocrStream = null;
+let ocrWorker = null;
+let ocrWorkerReady = false;
+let ocrActive = false;
+let ocrBusy = false;
+let ocrIntervalId = null;
+let ocrCameraList = [];
+let ocrCurrentDeviceId = null;
+let lastOcrCode = null;
+let lastOcrAt = 0;
+
+/* ============ CONFIG ============ */
+// Googleスプレッドシートと連携する場合は、Apps ScriptをWebアプリとしてデプロイして
+// 発行されたURL（.../exec で終わるもの）をここに貼り付けてください。
+// 空のままなら、このアプリ内蔵のストレージ（端末をまたいで共有）がそのまま使われます。
+const CONFIG = {
+  SHEETS_API_URL: 'https://script.google.com/macros/s/AKfycbwyJdieHCwUNnrxEx2ZiGhqYdp8u106-flD2jaZ95M60jvNXHl4uDVq8bXOee38w56V/exec'
+};
+const SHEET_HEADERS = ['コード番号','機材','状態','チェック日付','貸出内容','担当者','返却予定日'];
+function recordToSheetObj(r){
+  return {
+    'コード番号': r.code, '機材': r.name, '状態': r.status,
+    'チェック日付': r.checkDate, '貸出内容': r.loanDetails,
+    '担当者': r.personInCharge, '返却予定日': r.returnDueDate
+  };
+}
+function sheetObjToRecord(o){
+  return {
+    code: String(o['コード番号']!=null ? o['コード番号'] : ''),
+    name: o['機材']||'',
+    status: o['状態']||'',
+    checkDate: o['チェック日付']||'',
+    loanDetails: o['貸出内容']||'',
+    personInCharge: o['担当者']||'',
+    returnDueDate: o['返却予定日']||''
+  };
+}
 
 /* ============ STORAGE HELPERS ============ */
+function sheetsEnabled(){ return !!(CONFIG.SHEETS_API_URL && CONFIG.SHEETS_API_URL.trim()); }
+
 async function loadData(){
+  if(sheetsEnabled()){
+    try{
+      const res = await fetch(CONFIG.SHEETS_API_URL + '?action=getAll');
+      const data = await res.json();
+      masterList = (data.equipment||[]).map(sheetObjToRecord).filter(r=>r.code);
+      staffList = (data.staff||[]).filter(Boolean);
+      return;
+    }catch(e){
+      toast('スプレッドシートの読み込みに失敗しました。通信をご確認ください');
+      masterList = []; staffList = [];
+      return;
+    }
+  }
   try{
     const r = await window.storage.get('equipment-master', true);
     masterList = r && r.value ? JSON.parse(r.value) : [];
@@ -744,11 +920,31 @@ async function loadData(){
   }catch(e){ staffList = []; }
 }
 async function saveMaster(){
+  if(sheetsEnabled()){
+    try{
+      await fetch(CONFIG.SHEETS_API_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({ action:'saveEquipment', data: masterList.map(recordToSheetObj) })
+      });
+    }catch(e){ toast('スプレッドシートへの保存に失敗しました。通信をご確認ください'); }
+    return;
+  }
   try{
     await window.storage.set('equipment-master', JSON.stringify(masterList), true);
   }catch(e){ toast('保存に失敗しました。通信を確認してください'); }
 }
 async function saveStaff(){
+  if(sheetsEnabled()){
+    try{
+      await fetch(CONFIG.SHEETS_API_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({ action:'saveStaff', data: staffList })
+      });
+    }catch(e){ /* non-critical */ }
+    return;
+  }
   try{
     await window.storage.set('staff-list', JSON.stringify(staffList), true);
   }catch(e){ /* non-critical */ }
@@ -799,8 +995,9 @@ function switchView(name){
     b.classList.toggle('active', b.dataset.view===name);
   });
   if(name==='view-list'){ renderEquipList(); }
+  const inScanStep2 = document.getElementById('scan-step2').style.display !== 'none';
   document.getElementById('complete-bar').style.display =
-    (name==='view-scan' && session.pending.length>0 && scannerRunning) ? 'block' : 'none';
+    (name==='view-scan' && session.pending.length>0 && inScanStep2) ? 'block' : 'none';
 }
 
 /* ============ HEADER STATS ============ */
@@ -891,12 +1088,16 @@ function startScanStep(){
   session.returnDate = document.getElementById('input-return-date').value || '';
   session.loanDetail = document.getElementById('input-loan-detail').value || '';
   session.pending = [];
+  pinValue = '';
   document.getElementById('scan-step1').style.display = 'none';
   document.getElementById('scan-step2').style.display = 'block';
+  document.getElementById('camera-card').style.display = 'none';
+  document.getElementById('camera-toggle-label').textContent = 'カメラで数字を読み取る場合はこちら（OCR）';
   renderSessionInfo();
+  renderKeypad();
+  renderPinDisplay();
   renderTagList();
   updateCompleteBar();
-  initScanner();
 }
 function renderSessionInfo(){
   const wrap = document.getElementById('session-info');
@@ -908,109 +1109,117 @@ function renderSessionInfo(){
     ${session.status==='out' && session.returnDate ? `<span class="pill neutral">返却予定 ${esc(session.returnDate)}</span>` : ''}
   `;
 }
-async function initScanner(){
+async function initOcrCamera(){
   const errorEl = document.getElementById('camera-error');
   const selectEl = document.getElementById('camera-select');
+  const statusEl = document.getElementById('ocr-status');
   errorEl.style.display = 'none';
   errorEl.innerHTML = '';
   selectEl.style.display = 'none';
   selectEl.innerHTML = '';
-  document.getElementById('reader').innerHTML = '';
 
   if(window.location.protocol === 'file:'){
     errorEl.innerHTML = `<div>このファイルを直接開いているため（file://）、ブラウザがカメラアクセスをブロックしている可能性が高いです。簡易サーバーを使って http://localhost 経由で開くか、Webサーバーにアップロードして https:// のURLから開いてください。</div>`;
     errorEl.style.display = 'block';
-    updateCompleteBar();
     return;
   }
   if(!window.isSecureContext){
-    errorEl.innerHTML = `<div>このページが安全な接続（HTTPS）で開かれていないため、カメラを使用できません。ファイルをダブルクリックして直接開いている場合は、Webサーバーにアップロードして https:// のURLから開くか、パソコンでは localhost 経由で開いてください。</div>`;
+    errorEl.innerHTML = `<div>このページが安全な接続（HTTPS）で開かれていないため、カメラを使用できません。Webサーバーにアップロードして https:// のURLから開くか、パソコンでは localhost 経由で開いてください。</div>`;
     errorEl.style.display = 'block';
-    updateCompleteBar();
     return;
   }
   if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
     errorEl.innerHTML = `<div>お使いのブラウザはカメラ機能に対応していません。Chrome、Safari、Edgeなどの最新版でお試しください。</div>`;
     errorEl.style.display = 'block';
-    updateCompleteBar();
     return;
   }
 
-  document.getElementById('reader').innerHTML = '<div style="color:#fff;padding:20px;font-size:13px;">カメラを準備しています…</div>';
-  html5QrCode = new Html5Qrcode("reader");
+  statusEl.textContent = 'カメラを準備しています…';
 
   try{
-    cameraList = await Html5Qrcode.getCameras();
+    // Request permission once so device labels become available, then enumerate.
+    const probe = await navigator.mediaDevices.getUserMedia({ video: true });
+    probe.getTracks().forEach(t=>t.stop());
+    const all = await navigator.mediaDevices.enumerateDevices();
+    ocrCameraList = all.filter(d=>d.kind==='videoinput');
   }catch(e){
-    cameraList = [];
+    showOcrError(e);
+    return;
   }
 
-  if(cameraList && cameraList.length){
-    if(cameraList.length > 1){
-      selectEl.style.display = 'block';
-      cameraList.forEach((cam, idx)=>{
-        const opt = document.createElement('option');
-        opt.value = cam.id;
-        opt.textContent = cam.label || `カメラ ${idx+1}`;
-        selectEl.appendChild(opt);
+  if(ocrCameraList.length > 1){
+    selectEl.style.display = 'block';
+    selectEl.innerHTML = '';
+    ocrCameraList.forEach((cam, idx)=>{
+      const opt = document.createElement('option');
+      opt.value = cam.deviceId;
+      opt.textContent = cam.label || `カメラ ${idx+1}`;
+      selectEl.appendChild(opt);
+    });
+    selectEl.onchange = ()=> attachCameraStream(selectEl.value);
+  }
+
+  let preferred = null;
+  try{
+    const stored = await window.storage.get('preferred-camera-id', false);
+    if(stored && stored.value && ocrCameraList.find(c=>c.deviceId===stored.value)){
+      preferred = stored.value;
+    }
+  }catch(e){ /* no stored preference yet */ }
+  if(!preferred && ocrCameraList.length){
+    const rearMatch = ocrCameraList.find(c => /back|rear|environment|背面/i.test(c.label||''));
+    preferred = rearMatch ? rearMatch.deviceId : ocrCameraList[ocrCameraList.length-1].deviceId;
+  }
+  if(preferred) selectEl.value = preferred;
+  await attachCameraStream(preferred);
+
+  if(!ocrWorkerReady){
+    statusEl.textContent = 'OCRエンジンを準備しています（初回のみ時間がかかります）…';
+    try{
+      ocrWorker = await Tesseract.createWorker('eng');
+      await ocrWorker.setParameters({
+        tessedit_char_whitelist: '0123456789',
+        tessedit_pageseg_mode: '7'
       });
-      selectEl.onchange = ()=> startWithDevice(selectEl.value);
-    }
-    let preferred = null;
-    try{
-      const stored = await window.storage.get('preferred-camera-id', false);
-      if(stored && stored.value && cameraList.find(c=>c.id===stored.value)){
-        preferred = stored.value;
-      }
-    }catch(e){ /* no stored preference yet */ }
-    if(!preferred){
-      const rearMatch = cameraList.find(c => /back|rear|environment|背面/i.test(c.label||''));
-      preferred = rearMatch ? rearMatch.id : cameraList[cameraList.length-1].id;
-    }
-    selectEl.value = preferred;
-    await startWithDevice(preferred);
-  } else {
-    // Fallback for browsers where device enumeration fails: try a generic constraint directly
-    try{
-      await html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 240, height: 240 } },
-        onScanSuccess,
-        ()=>{}
-      );
-      scannerRunning = true;
-      updateCompleteBar();
+      ocrWorkerReady = true;
     }catch(e){
-      showCameraError(e);
+      statusEl.textContent = 'OCRエンジンの読み込みに失敗しました。通信環境をご確認のうえ再試行してください。';
+      return;
     }
   }
+
+  statusEl.textContent = '3桁の数字を枠の中に合わせてください';
+  ocrActive = true;
+  if(ocrIntervalId) clearInterval(ocrIntervalId);
+  ocrIntervalId = setInterval(ocrTick, 1200);
 }
 
-async function startWithDevice(deviceId){
+async function attachCameraStream(deviceId){
   const errorEl = document.getElementById('camera-error');
   errorEl.style.display = 'none';
   try{
-    if(scannerRunning){
-      await html5QrCode.stop();
-      scannerRunning = false;
+    if(ocrStream){
+      ocrStream.getTracks().forEach(t=>t.stop());
+      ocrStream = null;
     }
-    await html5QrCode.start(
-      { deviceId: { exact: deviceId } },
-      { fps: 10, qrbox: { width: 240, height: 240 } },
-      onScanSuccess,
-      ()=>{}
-    );
-    scannerRunning = true;
-    currentCameraId = deviceId;
-    updateCompleteBar();
-    try{ await window.storage.set('preferred-camera-id', deviceId, false); }catch(e){ /* non-critical */ }
+    const constraints = deviceId
+      ? { video: { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } } }
+      : { video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } };
+    ocrStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('ocr-video');
+    video.srcObject = ocrStream;
+    await video.play().catch(()=>{});
+    ocrCurrentDeviceId = deviceId;
+    if(deviceId){
+      try{ await window.storage.set('preferred-camera-id', deviceId, false); }catch(e){ /* non-critical */ }
+    }
   }catch(e){
-    showCameraError(e);
+    showOcrError(e);
   }
 }
 
-function showCameraError(e){
-  scannerRunning = false;
+function showOcrError(e){
+  ocrActive = false;
   const errorEl = document.getElementById('camera-error');
   const name = e && e.name ? e.name : '';
   let msg = 'カメラを起動できませんでした。';
@@ -1021,11 +1230,60 @@ function showCameraError(e){
   } else if(name === 'NotReadableError'){
     msg = 'カメラが他のアプリで使用中の可能性があります。他のアプリやタブを閉じてから再度お試しください。';
   }
-  document.getElementById('reader').innerHTML = '';
-  errorEl.innerHTML = `<div>${msg}</div><button class="ghost-btn" style="margin-top:8px;" onclick="initScanner()">再試行</button><div style="font-size:11px;color:var(--ink-faint);margin-top:8px;">詳細: ${esc(name||'unknown')} ${esc((e&&e.message)||'')}</div>`;
+  errorEl.innerHTML = `<div>${msg}</div><button class="ghost-btn" style="margin-top:8px;" onclick="initOcrCamera()">再試行</button><div style="font-size:11px;color:var(--ink-faint);margin-top:8px;">詳細: ${esc(name||'unknown')} ${esc((e&&e.message)||'')}</div>`;
   errorEl.style.display = 'block';
-  updateCompleteBar();
 }
+
+async function ocrTick(){
+  if(!ocrActive || ocrBusy) return;
+  const video = document.getElementById('ocr-video');
+  if(!video || !video.videoWidth) return;
+  ocrBusy = true;
+  const statusEl = document.getElementById('ocr-status');
+  try{
+    const canvas = document.getElementById('ocr-canvas');
+    // Crop to the same region highlighted by the on-screen guide box.
+    const vw = video.videoWidth, vh = video.videoHeight;
+    const cropX = vw * 0.12, cropY = vh * 0.42, cropW = vw * 0.76, cropH = vh * 0.16;
+    canvas.width = cropW;
+    canvas.height = cropH;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+    // Simple grayscale + threshold preprocessing to help digit recognition.
+    const imgData = ctx.getImageData(0, 0, cropW, cropH);
+    const px = imgData.data;
+    for(let i=0; i<px.length; i+=4){
+      const lum = 0.299*px[i] + 0.587*px[i+1] + 0.114*px[i+2];
+      const v = lum > 140 ? 255 : 0;
+      px[i] = px[i+1] = px[i+2] = v;
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    statusEl.textContent = '読み取り中…';
+    const { data } = await ocrWorker.recognize(canvas);
+    const digits = ((data && data.text) || '').replace(/\D/g, '');
+
+    if(digits.length === 3){
+      const now = Date.now();
+      if(digits === lastOcrCode && (now - lastOcrAt) < 4000){
+        // same tag still in view, avoid re-processing / re-toasting
+      } else {
+        lastOcrCode = digits;
+        lastOcrAt = now;
+        statusEl.textContent = `読み取り成功: ${digits}`;
+        onScanSuccess(digits);
+      }
+    } else {
+      statusEl.textContent = '3桁の数字を枠の中に合わせてください';
+    }
+  }catch(e){
+    // transient recognition errors are non-fatal; just try again next tick
+  } finally {
+    ocrBusy = false;
+  }
+}
+
 function onScanSuccess(decodedText){
   const code = (decodedText||'').trim();
   if(!code) return;
@@ -1038,11 +1296,83 @@ function onScanSuccess(decodedText){
     addPending(code, existing.name, false);
     beep(); vibrate();
   } else {
-    if(html5QrCode) html5QrCode.pause(true);
+    ocrActive = false;
     pendingNewEquipCode = code;
     document.getElementById('new-eq-code').textContent = code;
     document.getElementById('new-eq-name').value = '';
     openModalEl('overlay-new-eq');
+  }
+}
+let pinValue = '';
+function renderKeypad(){
+  const kp = document.getElementById('keypad');
+  kp.innerHTML = '';
+  const keys = ['1','2','3','4','5','6','7','8','9','','0','back'];
+  keys.forEach(k=>{
+    const btn = document.createElement('button');
+    if(k===''){ btn.style.visibility='hidden'; }
+    else if(k==='back'){
+      btn.className = 'key-back';
+      btn.textContent = '⌫';
+      btn.onclick = keypadBackspace;
+    } else {
+      btn.textContent = k;
+      btn.onclick = ()=> keypadPress(k);
+    }
+    kp.appendChild(btn);
+  });
+}
+function renderPinDisplay(){
+  const boxes = document.querySelectorAll('#pin-display .pin-box');
+  boxes.forEach((box, idx)=>{
+    box.textContent = pinValue[idx] || '';
+    box.classList.toggle('filled', !!pinValue[idx]);
+  });
+}
+function keypadPress(digit){
+  if(pinValue.length >= 6) return;
+  pinValue += digit;
+  renderPinDisplay();
+  if(pinValue.length === 3){
+    submitManualCode();
+  }
+}
+function keypadBackspace(){
+  pinValue = pinValue.slice(0, -1);
+  renderPinDisplay();
+}
+function keypadClear(){
+  pinValue = '';
+  renderPinDisplay();
+}
+function submitManualCode(){
+  const raw = pinValue.trim();
+  if(!raw) return;
+  if(!/^\d{3}$/.test(raw)){
+    toast('コードは3桁の数字で入力してください');
+    return;
+  }
+  onScanSuccess(raw);
+  keypadClear();
+}
+function toggleCameraSection(){
+  const card = document.getElementById('camera-card');
+  const label = document.getElementById('camera-toggle-label');
+  const isHidden = card.style.display === 'none';
+  card.style.display = isHidden ? 'block' : 'none';
+  label.textContent = isHidden ? 'カメラを閉じる' : 'カメラで数字を読み取る場合はこちら（OCR）';
+  if(isHidden){
+    initOcrCamera();
+  } else {
+    stopOcrCamera();
+  }
+}
+function stopOcrCamera(){
+  ocrActive = false;
+  if(ocrIntervalId){ clearInterval(ocrIntervalId); ocrIntervalId = null; }
+  if(ocrStream){
+    ocrStream.getTracks().forEach(t=>t.stop());
+    ocrStream = null;
   }
 }
 function addPending(code, name, isNew){
@@ -1083,7 +1413,8 @@ function updateCompleteBar(){
   const n = session.pending.length;
   btn.textContent = `チェック完了（${n}件）`;
   btn.disabled = n===0;
-  bar.style.display = (scannerRunning && document.getElementById('view-scan').classList.contains('active')) ? 'block' : 'none';
+  const inScanStep2 = document.getElementById('scan-step2').style.display !== 'none';
+  bar.style.display = (inScanStep2 && document.getElementById('view-scan').classList.contains('active')) ? 'block' : 'none';
 }
 
 function confirmNewEquip(){
@@ -1095,11 +1426,17 @@ function confirmNewEquip(){
   });
   addPending(code, name, true);
   closeModal('overlay-new-eq');
-  if(html5QrCode) html5QrCode.resume();
+  resumeOcrIfOpen();
 }
 function cancelNewEquip(){
   closeModal('overlay-new-eq');
-  if(html5QrCode) html5QrCode.resume();
+  resumeOcrIfOpen();
+}
+function resumeOcrIfOpen(){
+  const card = document.getElementById('camera-card');
+  if(card && card.style.display !== 'none' && ocrWorkerReady){
+    ocrActive = true;
+  }
 }
 
 async function completeSession(){
@@ -1131,14 +1468,10 @@ function cancelScanStep(){
   stopScannerAndReset();
 }
 function stopScannerAndReset(){
-  const inst = html5QrCode;
-  if(inst && scannerRunning){
-    inst.stop().then(()=> inst.clear()).catch(()=>{});
-  }
-  scannerRunning = false;
-  html5QrCode = null;
-  cameraList = [];
-  currentCameraId = null;
+  stopOcrCamera();
+  ocrCameraList = [];
+  ocrCurrentDeviceId = null;
+  lastOcrCode = null;
   session.pending = [];
   document.getElementById('scan-step2').style.display = 'none';
   document.getElementById('scan-step1').style.display = 'block';
@@ -1147,7 +1480,11 @@ function stopScannerAndReset(){
   document.getElementById('camera-select').innerHTML = '';
   document.getElementById('camera-error').style.display = 'none';
   document.getElementById('camera-error').innerHTML = '';
-  document.getElementById('reader').innerHTML = '';
+  document.getElementById('camera-card').style.display = 'none';
+  document.getElementById('camera-toggle-label').textContent = 'カメラで数字を読み取る場合はこちら（OCR）';
+  const video = document.getElementById('ocr-video');
+  if(video) video.srcObject = null;
+  pinValue = '';
   // reset status selection but keep the staff member selected for convenience
   session.status = null;
   document.getElementById('btn-status-out').classList.remove('sel-out');
@@ -1175,13 +1512,37 @@ function renderEquipList(){
   if(q){
     rows = rows.filter(r=> (r.code||'').toLowerCase().includes(q) || (r.name||'').toLowerCase().includes(q));
   }
+  const sortMode = document.getElementById('sort-select').value;
+  if(sortMode === 'person'){
+    rows.sort((a,b)=> (a.personInCharge||'').localeCompare((b.personInCharge||''), 'ja') || (a.code||'').localeCompare(b.code||''));
+  } else if(sortMode === 'status_date'){
+    rows.sort((a,b)=>{
+      const s = (a.status||'').localeCompare(b.status||'', 'ja');
+      if(s !== 0) return s;
+      return (b.checkDate||'').localeCompare(a.checkDate||'');
+    });
+  } else if(sortMode === 'date_desc'){
+    rows.sort((a,b)=> (b.checkDate||'').localeCompare(a.checkDate||''));
+  }
   const wrap = document.getElementById('equip-list');
   wrap.innerHTML = '';
   if(rows.length===0){
     wrap.innerHTML = '<div class="empty-note">該当する機材がありません。右上の＋から新規登録するか、出入庫タブでスキャンしてください。</div>';
     return;
   }
+  let lastGroup = undefined;
   rows.forEach(r=>{
+    if(sortMode === 'person'){
+      const groupKey = r.personInCharge || '（担当者未設定）';
+      if(groupKey !== lastGroup){
+        lastGroup = groupKey;
+        const count = rows.filter(x=>(x.personInCharge||'（担当者未設定）')===groupKey).length;
+        const header = document.createElement('div');
+        header.className = 'group-header';
+        header.innerHTML = `${esc(groupKey)} <span class="group-count">${count}件</span>`;
+        wrap.appendChild(header);
+      }
+    }
     const badgeClass = r.status==='貸出中' ? 'out' : 'avail';
     const el = document.createElement('div');
     el.className = 'eq-card';
@@ -1213,6 +1574,7 @@ async function confirmAddEquip(){
   const code = document.getElementById('add-eq-code').value.trim();
   const name = document.getElementById('add-eq-name').value.trim();
   if(!code || !name){ toast('コード番号と機材名を入力してください'); return; }
+  if(!/^\d{3}$/.test(code)){ toast('コード番号は3桁の数字で入力してください'); return; }
   if(masterList.find(r=>r.code===code)){ toast('このコードは既に登録されています'); return; }
   masterList.push({code, name, status:'在庫有', checkDate:'', loanDetails:'', personInCharge:'', returnDueDate:''});
   await saveMaster();
@@ -1298,3 +1660,4 @@ init();
 </script>
 </body>
 </html>
+
