@@ -559,11 +559,15 @@ function renderCurrentCard(){
     }).join('');
     $('cur-name').textContent = '同時に複数記録中です。終わったらもう一度タップして解除してください。';
     $('cur-name').style.color = '#fff';
+    $('cur-name').style.fontSize = '11.5px';
+    $('cur-name').style.fontWeight = '600';
   } else {
     card.classList.add('idle');
     chipsBox.innerHTML = '';
     $('cur-name').textContent = '下から今行っている業務をタップしてください（複数同時選択できます）';
     $('cur-name').style.color = 'var(--muted)';
+    $('cur-name').style.fontSize = '';
+    $('cur-name').style.fontWeight = '';
   }
 }
 
@@ -1267,3 +1271,4 @@ init();
 </script>
 </body>
 </html>
+
