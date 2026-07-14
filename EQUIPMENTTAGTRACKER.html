@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>機材タグトラッカー | 出入庫管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg:#F2F4EF;
+    --surface:#FFFFFF;
+    --surface-alt:#E7ECE6;
+    --ink:#1C2624;
+    --ink-soft:#5B6864;
+    --ink-faint:#8B9793;
+    --border:#D9DFD8;
+    --primary:#235E6F;
+    --primary-dark:#173F4B;
+    --primary-tint:#DDEAEC;
+    --available:#3F8F5F;
+    --available-tint:#E1F0E5;
+    --checked-out:#C97A2B;
+    --checked-out-tint:#F6E7D6;
+    --danger:#B93C3C;
+    --danger-tint:#F6DEDE;
+    --radius-sm:8px;
+    --radius-md:14px;
+    --radius-lg:22px;
+    --shadow-1:0 1px 2px rgba(28,38,36,0.06), 0 1px 1px rgba(28,38,36,0.04);
+    --shadow-2:0 8px 24px rgba(28,38,36,0.12);
+    --font-display:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;
+    --font-body:'Noto Sans JP','Hiragino Sans',sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    -webkit-tap-highlight-color:transparent;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  button{font-family:inherit;}
+  ::selection{background:var(--primary-tint);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+  button:focus-visible, input:focus-visible, select:focus-visible, .chip:focus-visible{
+    outline:2.5px solid var(--primary);
+    outline-offset:2px;
+  }
+
+  #app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+
+  /* HEADER */
+  header.top{
+    padding:20px 18px 14px;
+    background:linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color:#fff;
+    border-radius:0 0 var(--radius-lg) var(--radius-lg);
+    box-shadow:var(--shadow-2);
+  }
+  header.top .eyebrow{
+    font-size:11px;
+    letter-spacing:0.14em;
+    font-weight:700;
+    opacity:0.72;
+    text-transform:uppercase;
+  }
+  header.top h1{
+    font-family:var(--font-display);
+    font-weight:900;
+    font-size:22px;
+    margin:2px 0 12px;
+    letter-spacing:0.01em;
+  }
+  .stat-row{
+    display:flex;
+    gap:10px;
+  }
+  .stat-card{
+    flex:1;
+    background:rgba(255,255,255,0.12);
+    border-radius:var(--radius-md);
+    padding:10px 12px;
+    backdrop-filter:blur(2px);
+  }
+  .stat-card .num{
+    font-family:var(--font-mono);
+    font-size:22px;
+    font-weight:700;
+    line-height:1.1;
+  }
+  .stat-card .lbl{
+    font-size:11px;
+    opacity:0.8;
+    margin-top:2px;
+  }
+
+  /* TABS */
+  nav.tabs{
+    display:flex;
+    gap:6px;
+    padding:14px 16px 0;
+  }
+  nav.tabs button{
+    flex:1;
+    border:none;
+    background:transparent;
+    color:var(--ink-soft);
+    font-weight:700;
+    font-size:14.5px;
+    padding:10px 8px;
+    border-radius:var(--radius-md) var(--radius-md) 0 0;
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+    transition:color .15s ease;
+  }
+  nav.tabs button.active{
+    color:var(--primary-dark);
+    border-bottom:3px solid var(--primary);
+  }
+
+  main{
+    flex:1;
+    padding:16px 16px 110px;
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .card{
+    background:var(--surface);
+    border-radius:var(--radius-lg);
+    padding:18px;
+    box-shadow:var(--shadow-1);
+    border:1px solid var(--border);
+    margin-bottom:14px;
+  }
+  .card h2{
+    font-family:var(--font-display);
+    font-size:15px;
+    font-weight:700;
+    margin:0 0 12px;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .card h2 .step-no{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--primary-tint);
+    color:var(--primary-dark);
+    font-family:var(--font-mono);
+    font-size:11px;
+  }
+
+  /* toggle buttons (status) */
+  .toggle-group{
+    display:flex;
+    gap:10px;
+  }
+  .toggle-btn{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    padding:16px 8px;
+    border-radius:var(--radius-md);
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    cursor:pointer;
+    font-weight:700;
+    font-size:14px;
+    color:var(--ink-soft);
+    transition:all .15s ease;
+  }
+  .toggle-btn svg{width:26px;height:26px;stroke:var(--ink-faint);transition:stroke .15s ease;}
+  .toggle-btn.sel-out{border-color:var(--checked-out);background:var(--checked-out-tint);color:var(--checked-out);}
+  .toggle-btn.sel-out svg{stroke:var(--checked-out);}
+  .toggle-btn.sel-in{border-color:var(--available);background:var(--available-tint);color:var(--available);}
+  .toggle-btn.sel-in svg{stroke:var(--available);}
+
+  /* person chips */
+  .chip-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    padding:9px 14px;
+    border-radius:999px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:13.5px;
+    font-weight:500;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .chip.sel{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:#fff;
+    font-weight:700;
+  }
+  .chip.add-new{
+    border-style:dashed;
+    color:var(--primary-dark);
+  }
+
+  label.field-label{
+    display:block;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--ink-soft);
+    margin:14px 0 6px;
+  }
+  input[type=text], input[type=date], select, textarea{
+    width:100%;
+    padding:11px 12px;
+    border-radius:var(--radius-sm);
+    border:1.5px solid var(--border);
+    font-size:15px;
+    font-family:inherit;
+    background:var(--surface);
+    color:var(--ink);
+  }
+
+  .primary-btn{
+    width:100%;
+    padding:15px;
+    border-radius:var(--radius-md);
+    border:none;
+    background:var(--primary);
+    color:#fff;
+    font-weight:700;
+    font-size:15.5px;
+    cursor:pointer;
+    margin-top:16px;
+    box-shadow:var(--shadow-1);
+  }
+  .primary-btn:disabled{
+    background:var(--ink-faint);
+    cursor:not-allowed;
+  }
+  .ghost-btn{
+    width:100%;
+    padding:13px;
+    border-radius:var(--radius-md);
+    border:1.5px solid var(--border);
+    background:transparent;
+    color:var(--ink-soft);
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+  }
+
+  /* SCAN VIEW */
+  #reader{
+    width:100%;
+    border-radius:var(--radius-md);
+    overflow:hidden;
+    background:#0d1414;
+    min-height:240px;
+  }
+  #reader video{border-radius:var(--radius-md);}
+  .ocr-viewport{
+    position:relative;
+    width:100%;
+    border-radius:var(--radius-md);
+    overflow:hidden;
+    background:#0d1414;
+    min-height:220px;
+  }
+  .ocr-viewport video{
+    width:100%;
+    display:block;
+    border-radius:var(--radius-md);
+  }
+  .ocr-guide{
+    position:absolute;
+    left:12%;
+    right:12%;
+    top:42%;
+    height:16%;
+    border:2.5px solid var(--checked-out);
+    border-radius:8px;
+    box-shadow:0 0 0 999px rgba(0,0,0,0.35);
+    pointer-events:none;
+  }
+  .ocr-guide::after{
+    content:"3桁の数字";
+    position:absolute;
+    top:-22px;
+    left:0;
+    font-size:11px;
+    font-weight:700;
+    color:#fff;
+    text-shadow:0 1px 2px rgba(0,0,0,0.6);
+  }
+  .scan-hint{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:10px;
+  }
+  .session-info{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .pill{
+    font-size:11.5px;
+    font-weight:700;
+    padding:5px 10px;
+    border-radius:999px;
+  }
+  .pill.out{background:var(--checked-out-tint);color:var(--checked-out);}
+  .pill.in{background:var(--available-tint);color:var(--available);}
+  .pill.neutral{background:var(--surface-alt);color:var(--ink-soft);}
+
+  .pin-display{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    margin-bottom:16px;
+  }
+  .pin-box{
+    width:38px;height:46px;
+    border:1.5px solid var(--border);
+    border-radius:var(--radius-sm);
+    background:var(--surface-alt);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--font-mono);
+    font-size:20px;
+    font-weight:700;
+    color:var(--ink);
+  }
+  .pin-box.filled{
+    border-color:var(--primary);
+    background:var(--primary-tint);
+    color:var(--primary-dark);
+  }
+  .keypad{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+  }
+  .keypad button{
+    padding:16px 0;
+    font-size:20px;
+    font-weight:700;
+    font-family:var(--font-mono);
+    border-radius:var(--radius-md);
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .keypad button:active{background:var(--primary-tint);border-color:var(--primary);}
+  .keypad button.key-back{
+    color:var(--ink-soft);
+    font-size:16px;
+  }
+
+  .icon-btn-sm{
+    width:32px;height:32px;
+    border-radius:8px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .icon-btn-sm svg{width:15px;height:15px;stroke:var(--ink-soft);}
+  .icon-btn-sm.danger{border-color:var(--danger-tint);background:var(--danger-tint);}
+  .icon-btn-sm.danger svg{stroke:var(--danger);}
+
+  .master-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:12px 14px;
+    margin-bottom:8px;
+    box-shadow:var(--shadow-1);
+  }
+  .master-row-info{display:flex;align-items:center;gap:8px;overflow:hidden;}
+  .master-row-code{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);white-space:nowrap;}
+  .master-row-name{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .master-row-actions{display:flex;gap:6px;}
+
+  /* tag chip signature element */
+  .tag-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+  .tag-item{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--surface);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:10px 14px 10px 26px;
+    box-shadow:var(--shadow-1);
+  }
+  .tag-item::before{
+    content:"";
+    position:absolute;
+    left:10px;
+    top:50%;
+    transform:translateY(-50%);
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--bg);
+    border:1.5px solid var(--border);
+  }
+  .tag-item::after{
+    content:"";
+    position:absolute;
+    left:18px;
+    top:6px;
+    bottom:6px;
+    border-left:1.5px dashed var(--border);
+  }
+  .tag-item .t-code{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--ink-faint);
+  }
+  .tag-item .t-name{
+    font-weight:700;
+    font-size:14px;
+    flex:1;
+  }
+  .tag-item .t-new{
+    font-size:10px;
+    font-weight:700;
+    color:var(--primary-dark);
+    background:var(--primary-tint);
+    padding:2px 6px;
+    border-radius:6px;
+  }
+  .tag-item .t-remove{
+    border:none;
+    background:none;
+    color:var(--ink-faint);
+    font-size:18px;
+    cursor:pointer;
+    padding:2px 6px;
+    line-height:1;
+  }
+  .empty-note{
+    text-align:center;
+    color:var(--ink-faint);
+    font-size:13px;
+    padding:20px 10px;
+  }
+
+  .sticky-bottom{
+    position:fixed;
+    bottom:64px;
+    left:0;right:0;
+    max-width:480px;
+    margin:0 auto;
+    padding:0 16px;
+    z-index:20;
+  }
+  .sticky-bottom .primary-btn{margin-top:0;box-shadow:var(--shadow-2);}
+
+  /* BOTTOM NAV */
+  .bottom-nav{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    max-width:480px;
+    margin:0 auto;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    display:flex;
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+    z-index:30;
+  }
+  .bottom-nav button{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    border:none;
+    background:none;
+    color:var(--ink-faint);
+    font-size:11px;
+    font-weight:700;
+    padding:6px 0;
+    cursor:pointer;
+  }
+  .bottom-nav button svg{width:21px;height:21px;stroke:var(--ink-faint);}
+  .bottom-nav button.active{color:var(--primary);}
+  .bottom-nav button.active svg{stroke:var(--primary);}
+
+  /* LIST VIEW */
+  .list-toolbar{display:flex;gap:8px;margin-bottom:12px;}
+  .list-toolbar input{flex:1;}
+  .icon-btn{
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    border-radius:var(--radius-sm);
+    width:44px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .icon-btn svg{width:19px;height:19px;stroke:var(--ink-soft);}
+  .filter-row{display:flex;gap:6px;margin-bottom:14px;}
+  .filter-row button{
+    flex:1;
+    padding:7px 4px;
+    border-radius:8px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink-soft);
+    cursor:pointer;
+  }
+  .filter-row button.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+  .eq-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:13px 14px;
+    margin-bottom:10px;
+    cursor:pointer;
+    box-shadow:var(--shadow-1);
+  }
+  .group-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:13.5px;
+    color:var(--primary-dark);
+    margin:16px 2px 8px;
+    padding-bottom:6px;
+    border-bottom:1.5px solid var(--border);
+  }
+  .group-header:first-child{margin-top:0;}
+  .group-header .group-count{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--ink-faint);
+    font-weight:500;
+  }
+  .eq-card .row1{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:4px;
+  }
+  .eq-card .code{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--ink-faint);
+  }
+  .eq-card .status-badge{
+    font-size:11px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:999px;
+  }
+  .status-badge.avail{background:var(--available-tint);color:var(--available);}
+  .status-badge.out{background:var(--checked-out-tint);color:var(--checked-out);}
+  .eq-card .name{font-weight:700;font-size:15.5px;margin-bottom:6px;}
+  .eq-card .meta{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:4px 10px;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .eq-card .meta span.k{color:var(--ink-faint);}
+
+  /* MODAL */
+  .overlay{
+    position:fixed;inset:0;
+    background:rgba(20,28,26,0.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    z-index:100;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--surface);
+    width:100%;
+    max-width:400px;
+    border-radius:20px;
+    padding:22px 20px calc(20px + env(safe-area-inset-bottom));
+    max-height:88vh;
+    overflow-y:auto;
+    box-shadow:var(--shadow-2);
+  }
+  .modal h3{
+    font-family:var(--font-display);
+    font-size:17px;
+    margin:0 0 14px;
+  }
+  .modal .actions{display:flex;gap:10px;margin-top:18px;}
+  .modal .actions button{flex:1;}
+  .modal .danger-btn{
+    background:var(--danger-tint);
+    color:var(--danger);
+    border:none;
+    border-radius:var(--radius-md);
+    font-weight:700;
+    padding:13px;
+    cursor:pointer;
+  }
+
+  /* TOAST */
+  #toast{
+    position:fixed;
+    bottom:130px;
+    left:50%;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--ink);
+    color:#fff;
+    padding:11px 18px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:500;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:200;
+    white-space:nowrap;
+    max-width:90%;
+    text-overflow:ellipsis;
+    overflow:hidden;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="top">
+    <div class="eyebrow">EQUIPMENT TAG TRACKER</div>
+    <h1>機材タグトラッカー</h1>
+    <div class="stat-row">
+      <div class="stat-card"><div class="num" id="stat-total">0</div><div class="lbl">登録機材</div></div>
+      <div class="stat-card"><div class="num" id="stat-avail">0</div><div class="lbl">在庫有</div></div>
+      <div class="stat-card"><div class="num" id="stat-out">0</div><div class="lbl">貸出中</div></div>
+    </div>
+  </header>
+
+  <!-- ===== SCAN VIEW ===== -->
+  <main class="view active" id="view-scan">
+
+    <div id="scan-step1">
+      <div class="card">
+        <h2><span class="step-no">1</span>状態を選択</h2>
+        <div class="toggle-group">
+          <button class="toggle-btn" id="btn-status-out" onclick="setStatus('out')">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h9l4 4v12H4z"/><path d="M12 12l5-5m0 0h-4m4 0v4"/></svg>
+            持ち出し
+          </button>
+          <button class="toggle-btn" id="btn-status-in" onclick="setStatus('in')">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h9l4 4v12H4z"/><path d="M17 7l-5 5m0 0H8m4 0V8"/></svg>
+            返却
+          </button>
+        </div>
+
+        <label class="field-label">担当者</label>
+        <div class="chip-wrap" id="staff-chips"></div>
+
+        <div id="checkout-extra" style="display:none;">
+          <label class="field-label">返却予定日</label>
+          <input type="date" id="input-return-date">
+          <label class="field-label">貸出内容（任意）</label>
+          <input type="text" id="input-loan-detail" placeholder="例）夜勤フロアで使用">
+        </div>
+
+        <button class="primary-btn" id="btn-start-scan" disabled onclick="startScanStep()">スキャン開始</button>
+        <div id="step1-hint" style="display:none;text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:8px;"></div>
+      </div>
+    </div>
+
+    <div id="scan-step2" style="display:none;">
+      <div class="session-info" id="session-info"></div>
+
+      <div class="card">
+        <h2 style="margin-bottom:14px;">コード番号を入力（3桁の数字）</h2>
+        <div class="pin-display" id="pin-display">
+          <span class="pin-box"></span><span class="pin-box"></span><span class="pin-box"></span>
+        </div>
+        <div class="keypad" id="keypad"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="ghost-btn" onclick="keypadClear()">クリア</button>
+          <button class="primary-btn" style="margin-top:0;" onclick="submitManualCode()">追加する</button>
+        </div>
+      </div>
+
+      <button class="ghost-btn" style="margin-bottom:14px;" onclick="toggleCameraSection()">
+        <span id="camera-toggle-label">カメラで数字を読み取る場合はこちら（OCR）</span>
+      </button>
+      <div class="card" id="camera-card" style="padding:10px;display:none;">
+        <select id="camera-select" style="margin-bottom:8px;display:none;"></select>
+        <div class="ocr-viewport" id="ocr-viewport">
+          <video id="ocr-video" autoplay playsinline muted></video>
+          <div class="ocr-guide"></div>
+        </div>
+        <canvas id="ocr-canvas" style="display:none;"></canvas>
+        <div id="camera-error" style="display:none;color:var(--danger);font-size:12.5px;padding:10px 2px 0;"></div>
+        <div id="ocr-status" class="scan-hint">3桁の数字を枠の中に合わせてください</div>
+      </div>
+      <div class="tag-list" id="tag-list"></div>
+      <div class="empty-note" id="tag-empty">まだ読み込んだ機材がありません</div>
+      <button class="ghost-btn" style="margin-top:12px;" onclick="cancelScanStep()">中止して戻る</button>
+    </div>
+
+  </main>
+
+  <!-- ===== LIST VIEW ===== -->
+  <main class="view" id="view-list">
+    <div class="list-toolbar">
+      <input type="text" id="search-input" placeholder="コード・機材名で検索" oninput="renderEquipList()">
+      <button class="icon-btn" title="新規機材登録" onclick="openAddModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button class="icon-btn" title="Excel出力" onclick="exportExcel()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v3h16v-3"/></svg>
+      </button>
+    </div>
+    <div class="filter-row" id="filter-row">
+      <button class="active" data-f="all" onclick="setFilter('all')">すべて</button>
+      <button data-f="在庫有" onclick="setFilter('在庫有')">在庫有</button>
+      <button data-f="貸出中" onclick="setFilter('貸出中')">貸出中</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+      <label style="font-size:12.5px;font-weight:700;color:var(--ink-soft);white-space:nowrap;">並び替え</label>
+      <select id="sort-select" onchange="renderEquipList()" style="flex:1;">
+        <option value="none">登録順</option>
+        <option value="person">担当者順</option>
+        <option value="status_date">状態順（チェック日付順）</option>
+        <option value="date_desc">チェック日付順（新しい順）</option>
+      </select>
+    </div>
+    <div id="equip-list"></div>
+  </main>
+
+  <!-- ===== MASTER MANAGEMENT VIEW ===== -->
+  <main class="view" id="view-master">
+    <div class="filter-row" id="master-tab-row">
+      <button class="active" data-mt="staff" onclick="setMasterTab('staff')">担当者</button>
+      <button data-mt="equipment" onclick="setMasterTab('equipment')">機材</button>
+    </div>
+
+    <div id="master-staff-panel">
+      <button class="ghost-btn" style="margin-bottom:14px;" onclick="openAddStaffModalFromMaster()">＋ 担当者を追加</button>
+      <div id="master-staff-list"></div>
+    </div>
+
+    <div id="master-equip-panel" style="display:none;">
+      <button class="ghost-btn" style="margin-bottom:14px;" onclick="openAddModal()">＋ 機材を追加</button>
+      <div id="master-equip-list"></div>
+    </div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="active" data-view="view-scan" onclick="switchView('view-scan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h7v7h-7z"/></svg>
+      入出庫
+    </button>
+    <button data-view="view-list" onclick="switchView('view-list')">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      貸出状況
+    </button>
+    <button data-view="view-master" onclick="switchView('view-master')">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="4" x2="6" y2="20"/><circle cx="6" cy="9" r="2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="15" r="2"/><line x1="18" y1="4" x2="18" y2="20"/><circle cx="18" cy="7" r="2"/></svg>
+      マスタ管理
+    </button>
+  </nav>
+
+  <div class="sticky-bottom" id="complete-bar" style="display:none;">
+    <button class="primary-btn" id="btn-complete" onclick="completeSession()">チェック完了（0件）</button>
+  </div>
+
+</div>
+
+<!-- Add staff modal -->
+<div class="overlay" id="overlay-add-staff">
+  <div class="modal">
+    <h3>担当者を追加</h3>
+    <label class="field-label">担当者名</label>
+    <input type="text" id="add-staff-name" placeholder="例）山田">
+    <div class="actions">
+      <button class="ghost-btn" onclick="closeModal('overlay-add-staff')">キャンセル</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="confirmAddStaff()">追加する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit staff modal -->
+<div class="overlay" id="overlay-edit-staff">
+  <div class="modal">
+    <h3>担当者名を編集</h3>
+    <label class="field-label" style="margin-top:0;">担当者名</label>
+    <input type="text" id="edit-staff-name">
+    <div class="actions">
+      <button class="ghost-btn" onclick="closeModal('overlay-edit-staff')">キャンセル</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="saveEditStaff()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete staff confirm modal -->
+<div class="overlay" id="overlay-confirm-delete-staff" style="z-index:150;">
+  <div class="modal">
+    <h3>この担当者を削除しますか？</h3>
+    <p style="font-size:13px;color:var(--ink-soft);margin:-6px 0 4px;">すでに記録された出入庫データの担当者名はそのまま残ります。</p>
+    <div class="actions">
+      <button class="ghost-btn" onclick="closeModal('overlay-confirm-delete-staff')">キャンセル</button>
+      <button class="danger-btn" style="margin-top:0;" onclick="reallyDeleteStaff()">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="overlay" id="overlay-confirm-delete" style="z-index:150;">
+  <div class="modal">
+    <h3>この機材を削除しますか？</h3>
+    <p style="font-size:13px;color:var(--ink-soft);margin:-6px 0 4px;">この操作は元に戻せません。</p>
+    <div class="actions">
+      <button class="ghost-btn" onclick="closeModal('overlay-confirm-delete')">キャンセル</button>
+      <button class="danger-btn" style="margin-top:0;" onclick="reallyDeleteEquip()">削除する</button>
+    </div>
+  </div>
+</div>
+
+<!-- New equipment modal (unregistered code scanned) -->
+<div class="overlay" id="overlay-new-eq">
+  <div class="modal">
+    <h3>未登録のコードです</h3>
+    <p style="font-size:13px;color:var(--ink-soft);margin:-6px 0 4px;">コード: <span class="t-code" id="new-eq-code" style="font-family:var(--font-mono);"></span></p>
+    <label class="field-label">機材名</label>
+    <input type="text" id="new-eq-name" placeholder="例）体温計 No.3">
+    <div class="actions">
+      <button class="ghost-btn" onclick="cancelNewEquip()">スキップ</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="confirmNewEquip()">登録して追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add equipment modal (manual, from list view) -->
+<div class="overlay" id="overlay-add-eq">
+  <div class="modal">
+    <h3>新規機材登録</h3>
+    <label class="field-label">コード番号</label>
+    <input type="text" id="add-eq-code" placeholder="例）001" inputmode="numeric" maxlength="3" autocomplete="off">
+    <div style="font-size:11.5px;color:var(--ink-faint);margin-top:4px;">3桁の数字で入力してください</div>
+    <label class="field-label">機材名</label>
+    <input type="text" id="add-eq-name" placeholder="例）血圧計 No.2">
+    <div class="actions">
+      <button class="ghost-btn" onclick="closeModal('overlay-add-eq')">キャンセル</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="confirmAddEquip()">登録する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit equipment modal -->
+<div class="overlay" id="overlay-edit-eq">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+      <h3 style="margin:0;">機材情報を編集</h3>
+      <button class="icon-btn-sm danger" title="削除" onclick="deleteEquip()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+      </button>
+    </div>
+    <p style="font-size:12px;color:var(--ink-faint);margin:0 0 4px;font-family:var(--font-mono);" id="edit-eq-code"></p>
+    <label class="field-label">機材名</label>
+    <input type="text" id="edit-eq-name">
+    <label class="field-label">状態</label>
+    <div class="toggle-group">
+      <button class="toggle-btn" id="edit-btn-out" onclick="setEditStatus('貸出中')">貸出中</button>
+      <button class="toggle-btn" id="edit-btn-in" onclick="setEditStatus('在庫有')">在庫有</button>
+    </div>
+    <label class="field-label">担当者</label>
+    <input type="text" id="edit-eq-person">
+    <label class="field-label">返却予定日</label>
+    <input type="date" id="edit-eq-return">
+    <label class="field-label">貸出内容</label>
+    <input type="text" id="edit-eq-loan">
+    <div class="actions">
+      <button class="ghost-btn" onclick="closeModal('overlay-edit-eq')">キャンセル</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="saveEditEquip()">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ============ STATE ============ */
+let masterList = [];      // [{code,name,status,checkDate,loanDetails,personInCharge,returnDueDate}]
+let staffList = [];       // ["山田","佐藤",...]
+let listFilterStatus = 'all';
+let editingCode = null;
+let pendingNewEquipCode = null;
+let editStatusValue = '在庫有';
+
+let session = {
+  status: null,        // 'out' | 'in'
+  person: null,
+  returnDate: '',
+  loanDetail: '',
+  pending: []           // [{code,name,isNew}]
+};
+
+let ocrStream = null;
+let ocrWorker = null;
+let ocrWorkerReady = false;
+let ocrActive = false;
+let ocrBusy = false;
+let ocrIntervalId = null;
+let ocrCameraList = [];
+let ocrCurrentDeviceId = null;
+let lastOcrCode = null;
+let lastOcrAt = 0;
+
+/* ============ CONFIG ============ */
+// Googleスプレッドシートと連携する場合は、Apps ScriptをWebアプリとしてデプロイして
+// 発行されたURL（.../exec で終わるもの）をここに貼り付けてください。
+// 空のままなら、このアプリ内蔵のストレージ（端末をまたいで共有）がそのまま使われます。
+const CONFIG = {
+  SHEETS_API_URL: 'https://script.google.com/macros/s/AKfycbwyJdieHCwUNnrxEx2ZiGhqYdp8u106-flD2jaZ95M60jvNXHl4uDVq8bXOee38w56V/exec'
+};
+const SHEET_HEADERS = ['コード番号','機材','状態','チェック日付','貸出内容','担当者','返却予定日'];
+function recordToSheetObj(r){
+  return {
+    'コード番号': r.code, '機材': r.name, '状態': r.status,
+    'チェック日付': r.checkDate, '貸出内容': r.loanDetails,
+    '担当者': r.personInCharge, '返却予定日': r.returnDueDate
+  };
+}
+function sheetObjToRecord(o){
+  return {
+    code: String(o['コード番号']!=null ? o['コード番号'] : ''),
+    name: o['機材']||'',
+    status: o['状態']||'',
+    checkDate: o['チェック日付']||'',
+    loanDetails: o['貸出内容']||'',
+    personInCharge: o['担当者']||'',
+    returnDueDate: o['返却予定日']||''
+  };
+}
+
+/* ============ STORAGE HELPERS ============ */
+function sheetsEnabled(){ return !!(CONFIG.SHEETS_API_URL && CONFIG.SHEETS_API_URL.trim()); }
+
+async function loadData(){
+  if(sheetsEnabled()){
+    try{
+      const res = await fetch(CONFIG.SHEETS_API_URL + '?action=getAll');
+      const data = await res.json();
+      masterList = (data.equipment||[]).map(sheetObjToRecord).filter(r=>r.code);
+      staffList = (data.staff||[]).filter(Boolean);
+      return;
+    }catch(e){
+      toast('スプレッドシートの読み込みに失敗しました。通信をご確認ください');
+      masterList = []; staffList = [];
+      return;
+    }
+  }
+  try{
+    const r = await window.storage.get('equipment-master', true);
+    masterList = r && r.value ? JSON.parse(r.value) : [];
+  }catch(e){ masterList = []; }
+  try{
+    const r = await window.storage.get('staff-list', true);
+    staffList = r && r.value ? JSON.parse(r.value) : [];
+  }catch(e){ staffList = []; }
+}
+async function saveMaster(){
+  if(sheetsEnabled()){
+    try{
+      await fetch(CONFIG.SHEETS_API_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({ action:'saveEquipment', data: masterList.map(recordToSheetObj) })
+      });
+    }catch(e){ toast('スプレッドシートへの保存に失敗しました。通信をご確認ください'); }
+    return;
+  }
+  try{
+    await window.storage.set('equipment-master', JSON.stringify(masterList), true);
+  }catch(e){ toast('保存に失敗しました。通信を確認してください'); }
+}
+async function saveStaff(){
+  if(sheetsEnabled()){
+    try{
+      await fetch(CONFIG.SHEETS_API_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({ action:'saveStaff', data: staffList })
+      });
+    }catch(e){ /* non-critical */ }
+    return;
+  }
+  try{
+    await window.storage.set('staff-list', JSON.stringify(staffList), true);
+  }catch(e){ /* non-critical */ }
+}
+
+/* ============ UTIL ============ */
+function todayStr(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+function nowStr(){
+  const d = new Date();
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function esc(s){
+  return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+let toastTimer = null;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> el.classList.remove('show'), 2200);
+}
+function vibrate(){ if(navigator.vibrate) navigator.vibrate(60); }
+function beep(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type='sine'; o.frequency.value=880;
+    g.gain.value=0.08;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    setTimeout(()=>{ o.stop(); ctx.close(); }, 90);
+  }catch(e){}
+}
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function openModalEl(id){ document.getElementById(id).classList.add('show'); }
+
+/* ============ NAV ============ */
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  document.querySelectorAll('.bottom-nav button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.view===name);
+  });
+  if(name==='view-list'){ renderEquipList(); }
+  if(name==='view-master'){ setMasterTab(masterTab); }
+  const inScanStep2 = document.getElementById('scan-step2').style.display !== 'none';
+  document.getElementById('complete-bar').style.display =
+    (name==='view-scan' && session.pending.length>0 && inScanStep2) ? 'block' : 'none';
+}
+
+/* ============ HEADER STATS ============ */
+function renderStats(){
+  document.getElementById('stat-total').textContent = masterList.length;
+  document.getElementById('stat-avail').textContent = masterList.filter(r=>r.status==='在庫有').length;
+  document.getElementById('stat-out').textContent = masterList.filter(r=>r.status==='貸出中').length;
+}
+
+/* ============ STEP 1 : STATUS / STAFF ============ */
+function setStatus(v){
+  session.status = v;
+  document.getElementById('btn-status-out').classList.toggle('sel-out', v==='out');
+  document.getElementById('btn-status-in').classList.toggle('sel-in', v==='in');
+  document.getElementById('checkout-extra').style.display = v==='out' ? 'block' : 'none';
+  validateStep1();
+}
+function renderStaffChips(){
+  const wrap = document.getElementById('staff-chips');
+  wrap.innerHTML = '';
+  staffList.forEach(name=>{
+    const c = document.createElement('button');
+    c.className = 'chip' + (session.person===name ? ' sel' : '');
+    c.textContent = name;
+    c.onclick = ()=> selectStaff(name);
+    wrap.appendChild(c);
+  });
+  const add = document.createElement('button');
+  add.className = 'chip add-new';
+  add.textContent = '+ 追加';
+  add.onclick = addNewStaff;
+  wrap.appendChild(add);
+}
+function selectStaff(name){
+  session.person = name;
+  renderStaffChips();
+  validateStep1();
+}
+const PENCIL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+
+let addStaffContext = 'scan';
+let editingStaffName = null;
+
+function addNewStaff(){
+  addStaffContext = 'scan';
+  document.getElementById('add-staff-name').value = '';
+  openModalEl('overlay-add-staff');
+  setTimeout(()=> document.getElementById('add-staff-name').focus(), 50);
+}
+function openAddStaffModalFromMaster(){
+  addStaffContext = 'master';
+  document.getElementById('add-staff-name').value = '';
+  openModalEl('overlay-add-staff');
+  setTimeout(()=> document.getElementById('add-staff-name').focus(), 50);
+}
+async function confirmAddStaff(){
+  const name = document.getElementById('add-staff-name').value.trim();
+  if(!name){ toast('担当者名を入力してください'); return; }
+  if(!staffList.includes(name)){
+    staffList.push(name);
+    await saveStaff();
+  }
+  renderStaffChips();
+  if(addStaffContext === 'scan'){
+    selectStaff(name);
+  }
+  renderMasterStaffList();
+  closeModal('overlay-add-staff');
+}
+
+/* ---- master management ---- */
+let masterTab = 'staff';
+function setMasterTab(tab){
+  masterTab = tab;
+  document.querySelectorAll('#master-tab-row button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.mt===tab);
+  });
+  document.getElementById('master-staff-panel').style.display = tab==='staff' ? 'block' : 'none';
+  document.getElementById('master-equip-panel').style.display = tab==='equipment' ? 'block' : 'none';
+  if(tab==='staff'){ renderMasterStaffList(); } else { renderMasterEquipList(); }
+}
+function renderMasterStaffList(){
+  const wrap = document.getElementById('master-staff-list');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  if(staffList.length===0){
+    wrap.innerHTML = '<div class="empty-note">担当者が登録されていません。「＋ 担当者を追加」から登録してください。</div>';
+    return;
+  }
+  staffList.forEach(name=>{
+    const el = document.createElement('div');
+    el.className = 'master-row';
+    const nameEl = document.createElement('span');
+    nameEl.className = 'master-row-name';
+    nameEl.textContent = name;
+    const actions = document.createElement('div');
+    actions.className = 'master-row-actions';
+    const editBtn = document.createElement('button');
+    editBtn.className = 'icon-btn-sm';
+    editBtn.title = '編集';
+    editBtn.innerHTML = PENCIL_SVG;
+    editBtn.onclick = ()=> openEditStaffModal(name);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'icon-btn-sm danger';
+    delBtn.title = '削除';
+    delBtn.innerHTML = TRASH_SVG;
+    delBtn.onclick = ()=> openDeleteStaffConfirm(name);
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    el.appendChild(nameEl);
+    el.appendChild(actions);
+    wrap.appendChild(el);
+  });
+}
+function renderMasterEquipList(){
+  const wrap = document.getElementById('master-equip-list');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  if(masterList.length===0){
+    wrap.innerHTML = '<div class="empty-note">機材が登録されていません。「＋ 機材を追加」から登録してください。</div>';
+    return;
+  }
+  masterList.forEach(r=>{
+    const el = document.createElement('div');
+    el.className = 'master-row';
+    const info = document.createElement('div');
+    info.className = 'master-row-info';
+    info.innerHTML = `<span class="master-row-code">${esc(r.code)}</span><span class="master-row-name">${esc(r.name)}</span>`;
+    const actions = document.createElement('div');
+    actions.className = 'master-row-actions';
+    const editBtn = document.createElement('button');
+    editBtn.className = 'icon-btn-sm';
+    editBtn.title = '編集';
+    editBtn.innerHTML = PENCIL_SVG;
+    editBtn.onclick = ()=> openEditModal(r.code);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'icon-btn-sm danger';
+    delBtn.title = '削除';
+    delBtn.innerHTML = TRASH_SVG;
+    delBtn.onclick = ()=>{ editingCode = r.code; deleteEquip(); };
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    el.appendChild(info);
+    el.appendChild(actions);
+    wrap.appendChild(el);
+  });
+}
+function openEditStaffModal(name){
+  editingStaffName = name;
+  document.getElementById('edit-staff-name').value = name;
+  openModalEl('overlay-edit-staff');
+}
+async function saveEditStaff(){
+  const newName = document.getElementById('edit-staff-name').value.trim();
+  if(!newName){ toast('担当者名を入力してください'); return; }
+  if(newName !== editingStaffName && staffList.includes(newName)){ toast('その名前はすでに登録されています'); return; }
+  const idx = staffList.indexOf(editingStaffName);
+  if(idx !== -1) staffList[idx] = newName;
+  if(newName !== editingStaffName){
+    let changed = false;
+    masterList.forEach(r=>{ if(r.personInCharge === editingStaffName){ r.personInCharge = newName; changed = true; } });
+    if(changed) await saveMaster();
+  }
+  await saveStaff();
+  renderStaffChips();
+  renderMasterStaffList();
+  closeModal('overlay-edit-staff');
+  toast('保存しました');
+}
+function openDeleteStaffConfirm(name){
+  editingStaffName = name;
+  openModalEl('overlay-confirm-delete-staff');
+}
+async function reallyDeleteStaff(){
+  staffList = staffList.filter(n=>n!==editingStaffName);
+  await saveStaff();
+  renderStaffChips();
+  renderMasterStaffList();
+  closeModal('overlay-confirm-delete-staff');
+  toast('削除しました');
+}
+
+function validateStep1(){
+  const needsReturnDate = session.status === 'out';
+  const hasReturnDate = !!document.getElementById('input-return-date').value;
+  const ok = session.status && session.person && (!needsReturnDate || hasReturnDate);
+  document.getElementById('btn-start-scan').disabled = !ok;
+
+  const hint = document.getElementById('step1-hint');
+  if(ok){
+    hint.style.display = 'none';
+  } else {
+    let msg = '';
+    if(!session.status) msg = '状態（持ち出し／返却）を選択してください';
+    else if(!session.person) msg = '担当者を選択してください';
+    else if(needsReturnDate && !hasReturnDate) msg = '返却予定日を入力してください';
+    hint.textContent = msg;
+    hint.style.display = msg ? 'block' : 'none';
+  }
+}
+// Some mobile browsers only emit 'change' (not 'input') when a native date picker value is set,
+// so listen for both events to keep the Start button in sync.
+document.addEventListener('input', (e)=>{
+  if(e.target.id==='input-return-date' || e.target.id==='input-loan-detail'){
+    validateStep1();
+  }
+});
+document.addEventListener('change', (e)=>{
+  if(e.target.id==='input-return-date' || e.target.id==='input-loan-detail'){
+    validateStep1();
+  }
+});
+
+/* ============ STEP 2 : SCAN ============ */
+function startScanStep(){
+  session.returnDate = document.getElementById('input-return-date').value || '';
+  session.loanDetail = document.getElementById('input-loan-detail').value || '';
+  session.pending = [];
+  pinValue = '';
+  document.getElementById('scan-step1').style.display = 'none';
+  document.getElementById('scan-step2').style.display = 'block';
+  document.getElementById('camera-card').style.display = 'none';
+  document.getElementById('camera-toggle-label').textContent = 'カメラで数字を読み取る場合はこちら（OCR）';
+  renderSessionInfo();
+  renderKeypad();
+  renderPinDisplay();
+  renderTagList();
+  updateCompleteBar();
+}
+function renderSessionInfo(){
+  const wrap = document.getElementById('session-info');
+  const pillClass = session.status==='out' ? 'out' : 'in';
+  const pillText = session.status==='out' ? '持ち出し' : '返却';
+  wrap.innerHTML = `
+    <span class="pill ${pillClass}">${pillText}</span>
+    <span class="pill neutral">${esc(session.person)}</span>
+    ${session.status==='out' && session.returnDate ? `<span class="pill neutral">返却予定 ${esc(session.returnDate)}</span>` : ''}
+  `;
+}
+async function initOcrCamera(){
+  const errorEl = document.getElementById('camera-error');
+  const selectEl = document.getElementById('camera-select');
+  const statusEl = document.getElementById('ocr-status');
+  errorEl.style.display = 'none';
+  errorEl.innerHTML = '';
+  selectEl.style.display = 'none';
+  selectEl.innerHTML = '';
+
+  if(window.location.protocol === 'file:'){
+    errorEl.innerHTML = `<div>このファイルを直接開いているため（file://）、ブラウザがカメラアクセスをブロックしている可能性が高いです。簡易サーバーを使って http://localhost 経由で開くか、Webサーバーにアップロードして https:// のURLから開いてください。</div>`;
+    errorEl.style.display = 'block';
+    return;
+  }
+  if(!window.isSecureContext){
+    errorEl.innerHTML = `<div>このページが安全な接続（HTTPS）で開かれていないため、カメラを使用できません。Webサーバーにアップロードして https:// のURLから開くか、パソコンでは localhost 経由で開いてください。</div>`;
+    errorEl.style.display = 'block';
+    return;
+  }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    errorEl.innerHTML = `<div>お使いのブラウザはカメラ機能に対応していません。Chrome、Safari、Edgeなどの最新版でお試しください。</div>`;
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  statusEl.textContent = 'カメラを準備しています…';
+
+  try{
+    // Request permission once so device labels become available, then enumerate.
+    const probe = await navigator.mediaDevices.getUserMedia({ video: true });
+    probe.getTracks().forEach(t=>t.stop());
+    const all = await navigator.mediaDevices.enumerateDevices();
+    ocrCameraList = all.filter(d=>d.kind==='videoinput');
+  }catch(e){
+    showOcrError(e);
+    return;
+  }
+
+  if(ocrCameraList.length > 1){
+    selectEl.style.display = 'block';
+    selectEl.innerHTML = '';
+    ocrCameraList.forEach((cam, idx)=>{
+      const opt = document.createElement('option');
+      opt.value = cam.deviceId;
+      opt.textContent = cam.label || `カメラ ${idx+1}`;
+      selectEl.appendChild(opt);
+    });
+    selectEl.onchange = ()=> attachCameraStream(selectEl.value);
+  }
+
+  let preferred = null;
+  try{
+    const stored = await window.storage.get('preferred-camera-id', false);
+    if(stored && stored.value && ocrCameraList.find(c=>c.deviceId===stored.value)){
+      preferred = stored.value;
+    }
+  }catch(e){ /* no stored preference yet */ }
+  if(!preferred && ocrCameraList.length){
+    const rearMatch = ocrCameraList.find(c => /back|rear|environment|背面/i.test(c.label||''));
+    preferred = rearMatch ? rearMatch.deviceId : ocrCameraList[ocrCameraList.length-1].deviceId;
+  }
+  if(preferred) selectEl.value = preferred;
+  await attachCameraStream(preferred);
+
+  if(!ocrWorkerReady){
+    statusEl.textContent = 'OCRエンジンを準備しています（初回のみ時間がかかります）…';
+    try{
+      ocrWorker = await Tesseract.createWorker('eng');
+      await ocrWorker.setParameters({
+        tessedit_char_whitelist: '0123456789',
+        tessedit_pageseg_mode: '7'
+      });
+      ocrWorkerReady = true;
+    }catch(e){
+      statusEl.textContent = 'OCRエンジンの読み込みに失敗しました。通信環境をご確認のうえ再試行してください。';
+      return;
+    }
+  }
+
+  statusEl.textContent = '3桁の数字を枠の中に合わせてください';
+  ocrActive = true;
+  if(ocrIntervalId) clearInterval(ocrIntervalId);
+  ocrIntervalId = setInterval(ocrTick, 1200);
+}
+
+async function attachCameraStream(deviceId){
+  const errorEl = document.getElementById('camera-error');
+  errorEl.style.display = 'none';
+  try{
+    if(ocrStream){
+      ocrStream.getTracks().forEach(t=>t.stop());
+      ocrStream = null;
+    }
+    const constraints = deviceId
+      ? { video: { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } } }
+      : { video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } };
+    ocrStream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('ocr-video');
+    video.srcObject = ocrStream;
+    await video.play().catch(()=>{});
+    ocrCurrentDeviceId = deviceId;
+    if(deviceId){
+      try{ await window.storage.set('preferred-camera-id', deviceId, false); }catch(e){ /* non-critical */ }
+    }
+  }catch(e){
+    showOcrError(e);
+  }
+}
+
+function showOcrError(e){
+  ocrActive = false;
+  const errorEl = document.getElementById('camera-error');
+  const name = e && e.name ? e.name : '';
+  let msg = 'カメラを起動できませんでした。';
+  if(name === 'NotAllowedError'){
+    msg = 'カメラの使用が許可されていません。ブラウザやOSの設定でこのサイトのカメラアクセスを許可してください。';
+  } else if(name === 'NotFoundError' || name === 'OverconstrainedError'){
+    msg = '指定したカメラが見つかりませんでした。上のリストから別のカメラを選んでみてください。';
+  } else if(name === 'NotReadableError'){
+    msg = 'カメラが他のアプリで使用中の可能性があります。他のアプリやタブを閉じてから再度お試しください。';
+  }
+  errorEl.innerHTML = `<div>${msg}</div><button class="ghost-btn" style="margin-top:8px;" onclick="initOcrCamera()">再試行</button><div style="font-size:11px;color:var(--ink-faint);margin-top:8px;">詳細: ${esc(name||'unknown')} ${esc((e&&e.message)||'')}</div>`;
+  errorEl.style.display = 'block';
+}
+
+async function ocrTick(){
+  if(!ocrActive || ocrBusy) return;
+  const video = document.getElementById('ocr-video');
+  if(!video || !video.videoWidth) return;
+  ocrBusy = true;
+  const statusEl = document.getElementById('ocr-status');
+  try{
+    const canvas = document.getElementById('ocr-canvas');
+    // Crop to the same region highlighted by the on-screen guide box.
+    const vw = video.videoWidth, vh = video.videoHeight;
+    const cropX = vw * 0.12, cropY = vh * 0.42, cropW = vw * 0.76, cropH = vh * 0.16;
+    canvas.width = cropW;
+    canvas.height = cropH;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+    // Simple grayscale + threshold preprocessing to help digit recognition.
+    const imgData = ctx.getImageData(0, 0, cropW, cropH);
+    const px = imgData.data;
+    for(let i=0; i<px.length; i+=4){
+      const lum = 0.299*px[i] + 0.587*px[i+1] + 0.114*px[i+2];
+      const v = lum > 140 ? 255 : 0;
+      px[i] = px[i+1] = px[i+2] = v;
+    }
+    ctx.putImageData(imgData, 0, 0);
+
+    statusEl.textContent = '読み取り中…';
+    const { data } = await ocrWorker.recognize(canvas);
+    const digits = ((data && data.text) || '').replace(/\D/g, '');
+
+    if(digits.length === 3){
+      const now = Date.now();
+      if(digits === lastOcrCode && (now - lastOcrAt) < 4000){
+        // same tag still in view, avoid re-processing / re-toasting
+      } else {
+        lastOcrCode = digits;
+        lastOcrAt = now;
+        statusEl.textContent = `読み取り成功: ${digits}`;
+        onScanSuccess(digits);
+      }
+    } else {
+      statusEl.textContent = '3桁の数字を枠の中に合わせてください';
+    }
+  }catch(e){
+    // transient recognition errors are non-fatal; just try again next tick
+  } finally {
+    ocrBusy = false;
+  }
+}
+
+function onScanSuccess(decodedText){
+  const code = (decodedText||'').trim();
+  if(!code) return;
+  if(session.pending.find(p=>p.code===code)){
+    toast(`スキャン済みです: ${code}`);
+    return;
+  }
+  const existing = masterList.find(r=>r.code===code);
+  if(existing){
+    addPending(code, existing.name, false);
+    beep(); vibrate();
+  } else {
+    ocrActive = false;
+    pendingNewEquipCode = code;
+    document.getElementById('new-eq-code').textContent = code;
+    document.getElementById('new-eq-name').value = '';
+    openModalEl('overlay-new-eq');
+  }
+}
+let pinValue = '';
+function renderKeypad(){
+  const kp = document.getElementById('keypad');
+  kp.innerHTML = '';
+  const keys = ['1','2','3','4','5','6','7','8','9','','0','back'];
+  keys.forEach(k=>{
+    const btn = document.createElement('button');
+    if(k===''){ btn.style.visibility='hidden'; }
+    else if(k==='back'){
+      btn.className = 'key-back';
+      btn.textContent = '⌫';
+      btn.onclick = keypadBackspace;
+    } else {
+      btn.textContent = k;
+      btn.onclick = ()=> keypadPress(k);
+    }
+    kp.appendChild(btn);
+  });
+}
+function renderPinDisplay(){
+  const boxes = document.querySelectorAll('#pin-display .pin-box');
+  boxes.forEach((box, idx)=>{
+    box.textContent = pinValue[idx] || '';
+    box.classList.toggle('filled', !!pinValue[idx]);
+  });
+}
+function keypadPress(digit){
+  if(pinValue.length >= 6) return;
+  pinValue += digit;
+  renderPinDisplay();
+  if(pinValue.length === 3){
+    submitManualCode();
+  }
+}
+function keypadBackspace(){
+  pinValue = pinValue.slice(0, -1);
+  renderPinDisplay();
+}
+function keypadClear(){
+  pinValue = '';
+  renderPinDisplay();
+}
+function submitManualCode(){
+  const raw = pinValue.trim();
+  if(!raw) return;
+  if(!/^\d{3}$/.test(raw)){
+    toast('コードは3桁の数字で入力してください');
+    return;
+  }
+  onScanSuccess(raw);
+  keypadClear();
+}
+function toggleCameraSection(){
+  const card = document.getElementById('camera-card');
+  const label = document.getElementById('camera-toggle-label');
+  const isHidden = card.style.display === 'none';
+  card.style.display = isHidden ? 'block' : 'none';
+  label.textContent = isHidden ? 'カメラを閉じる' : 'カメラで数字を読み取る場合はこちら（OCR）';
+  if(isHidden){
+    initOcrCamera();
+  } else {
+    stopOcrCamera();
+  }
+}
+function stopOcrCamera(){
+  ocrActive = false;
+  if(ocrIntervalId){ clearInterval(ocrIntervalId); ocrIntervalId = null; }
+  if(ocrStream){
+    ocrStream.getTracks().forEach(t=>t.stop());
+    ocrStream = null;
+  }
+}
+function addPending(code, name, isNew){
+  session.pending.push({code, name, isNew});
+  renderTagList();
+  updateCompleteBar();
+}
+function renderTagList(){
+  const list = document.getElementById('tag-list');
+  const empty = document.getElementById('tag-empty');
+  list.innerHTML = '';
+  if(session.pending.length===0){
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    session.pending.forEach((p, idx)=>{
+      const el = document.createElement('div');
+      el.className = 'tag-item';
+      el.innerHTML = `
+        <div style="flex:1;">
+          <div class="t-name">${esc(p.name)} ${p.isNew ? '<span class="t-new">新規</span>' : ''}</div>
+          <div class="t-code">${esc(p.code)}</div>
+        </div>
+        <button class="t-remove" onclick="removePending(${idx})">×</button>
+      `;
+      list.appendChild(el);
+    });
+  }
+}
+function removePending(idx){
+  session.pending.splice(idx,1);
+  renderTagList();
+  updateCompleteBar();
+}
+function updateCompleteBar(){
+  const bar = document.getElementById('complete-bar');
+  const btn = document.getElementById('btn-complete');
+  const n = session.pending.length;
+  btn.textContent = `チェック完了（${n}件）`;
+  btn.disabled = n===0;
+  const inScanStep2 = document.getElementById('scan-step2').style.display !== 'none';
+  bar.style.display = (inScanStep2 && document.getElementById('view-scan').classList.contains('active')) ? 'block' : 'none';
+}
+
+function confirmNewEquip(){
+  const name = document.getElementById('new-eq-name').value.trim();
+  if(!name){ toast('機材名を入力してください'); return; }
+  const code = pendingNewEquipCode;
+  masterList.push({
+    code, name, status:'在庫有', checkDate:'', loanDetails:'', personInCharge:'', returnDueDate:''
+  });
+  addPending(code, name, true);
+  closeModal('overlay-new-eq');
+  resumeOcrIfOpen();
+}
+function cancelNewEquip(){
+  closeModal('overlay-new-eq');
+  resumeOcrIfOpen();
+}
+function resumeOcrIfOpen(){
+  const card = document.getElementById('camera-card');
+  if(card && card.style.display !== 'none' && ocrWorkerReady){
+    ocrActive = true;
+  }
+}
+
+async function completeSession(){
+  if(session.pending.length===0) return;
+  const isOut = session.status==='out';
+  session.pending.forEach(p=>{
+    let rec = masterList.find(r=>r.code===p.code);
+    if(!rec){
+      rec = {code:p.code, name:p.name, status:'', checkDate:'', loanDetails:'', personInCharge:'', returnDueDate:''};
+      masterList.push(rec);
+    }
+    rec.status = isOut ? '貸出中' : '在庫有';
+    rec.checkDate = nowStr();
+    rec.personInCharge = session.person;
+    if(isOut){
+      rec.loanDetails = session.loanDetail || '';
+      rec.returnDueDate = session.returnDate || '';
+    } else {
+      rec.loanDetails = '';
+      rec.returnDueDate = '';
+    }
+  });
+  await saveMaster();
+  renderStats();
+  toast(`${session.pending.length}件更新しました`);
+  stopScannerAndReset();
+}
+function cancelScanStep(){
+  stopScannerAndReset();
+}
+function stopScannerAndReset(){
+  stopOcrCamera();
+  ocrCameraList = [];
+  ocrCurrentDeviceId = null;
+  lastOcrCode = null;
+  session.pending = [];
+  document.getElementById('scan-step2').style.display = 'none';
+  document.getElementById('scan-step1').style.display = 'block';
+  document.getElementById('complete-bar').style.display = 'none';
+  document.getElementById('camera-select').style.display = 'none';
+  document.getElementById('camera-select').innerHTML = '';
+  document.getElementById('camera-error').style.display = 'none';
+  document.getElementById('camera-error').innerHTML = '';
+  document.getElementById('camera-card').style.display = 'none';
+  document.getElementById('camera-toggle-label').textContent = 'カメラで数字を読み取る場合はこちら（OCR）';
+  const video = document.getElementById('ocr-video');
+  if(video) video.srcObject = null;
+  pinValue = '';
+  // reset status selection but keep the staff member selected for convenience
+  session.status = null;
+  document.getElementById('btn-status-out').classList.remove('sel-out');
+  document.getElementById('btn-status-in').classList.remove('sel-in');
+  document.getElementById('checkout-extra').style.display = 'none';
+  document.getElementById('input-return-date').value = '';
+  document.getElementById('input-loan-detail').value = '';
+  validateStep1();
+}
+
+/* ============ LIST VIEW ============ */
+function setFilter(f){
+  listFilterStatus = f;
+  document.querySelectorAll('#filter-row button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.f===f);
+  });
+  renderEquipList();
+}
+function renderEquipList(){
+  const q = (document.getElementById('search-input').value||'').trim().toLowerCase();
+  let rows = masterList.slice();
+  if(listFilterStatus!=='all'){
+    rows = rows.filter(r=>r.status===listFilterStatus);
+  }
+  if(q){
+    rows = rows.filter(r=> (r.code||'').toLowerCase().includes(q) || (r.name||'').toLowerCase().includes(q));
+  }
+  const sortMode = document.getElementById('sort-select').value;
+  if(sortMode === 'person'){
+    rows.sort((a,b)=> (a.personInCharge||'').localeCompare((b.personInCharge||''), 'ja') || (a.code||'').localeCompare(b.code||''));
+  } else if(sortMode === 'status_date'){
+    rows.sort((a,b)=>{
+      const s = (a.status||'').localeCompare(b.status||'', 'ja');
+      if(s !== 0) return s;
+      return (b.checkDate||'').localeCompare(a.checkDate||'');
+    });
+  } else if(sortMode === 'date_desc'){
+    rows.sort((a,b)=> (b.checkDate||'').localeCompare(a.checkDate||''));
+  }
+  const wrap = document.getElementById('equip-list');
+  wrap.innerHTML = '';
+  if(rows.length===0){
+    wrap.innerHTML = '<div class="empty-note">該当する機材がありません。右上の＋から新規登録するか、出入庫タブでスキャンしてください。</div>';
+    return;
+  }
+  let lastGroup = undefined;
+  rows.forEach(r=>{
+    if(sortMode === 'person'){
+      const groupKey = r.personInCharge || '（担当者未設定）';
+      if(groupKey !== lastGroup){
+        lastGroup = groupKey;
+        const count = rows.filter(x=>(x.personInCharge||'（担当者未設定）')===groupKey).length;
+        const header = document.createElement('div');
+        header.className = 'group-header';
+        header.innerHTML = `${esc(groupKey)} <span class="group-count">${count}件</span>`;
+        wrap.appendChild(header);
+      }
+    }
+    const badgeClass = r.status==='貸出中' ? 'out' : 'avail';
+    const el = document.createElement('div');
+    el.className = 'eq-card';
+    el.onclick = ()=> openEditModal(r.code);
+    el.innerHTML = `
+      <div class="row1">
+        <span class="code">${esc(r.code)}</span>
+        <span class="status-badge ${badgeClass}">${esc(r.status||'未設定')}</span>
+      </div>
+      <div class="name">${esc(r.name)}</div>
+      <div class="meta">
+        <div><span class="k">チェック日：</span>${esc(r.checkDate||'-')}</div>
+        <div><span class="k">担当者：</span>${esc(r.personInCharge||'-')}</div>
+        ${r.status==='貸出中' ? `<div><span class="k">返却予定：</span>${esc(r.returnDueDate||'-')}</div>` : ''}
+        ${r.loanDetails ? `<div><span class="k">貸出内容：</span>${esc(r.loanDetails)}</div>` : ''}
+      </div>
+    `;
+    wrap.appendChild(el);
+  });
+}
+
+/* ---- add equipment (manual) ---- */
+function openAddModal(){
+  document.getElementById('add-eq-code').value = '';
+  document.getElementById('add-eq-name').value = '';
+  openModalEl('overlay-add-eq');
+}
+async function confirmAddEquip(){
+  const code = document.getElementById('add-eq-code').value.trim();
+  const name = document.getElementById('add-eq-name').value.trim();
+  if(!code || !name){ toast('コード番号と機材名を入力してください'); return; }
+  if(!/^\d{3}$/.test(code)){ toast('コード番号は3桁の数字で入力してください'); return; }
+  if(masterList.find(r=>r.code===code)){ toast('このコードは既に登録されています'); return; }
+  masterList.push({code, name, status:'在庫有', checkDate:'', loanDetails:'', personInCharge:'', returnDueDate:''});
+  await saveMaster();
+  renderStats();
+  renderEquipList();
+  renderMasterEquipList();
+  closeModal('overlay-add-eq');
+  toast('登録しました');
+}
+
+/* ---- edit equipment ---- */
+function openEditModal(code){
+  const r = masterList.find(x=>x.code===code);
+  if(!r) return;
+  editingCode = code;
+  document.getElementById('edit-eq-code').textContent = code;
+  document.getElementById('edit-eq-name').value = r.name||'';
+  document.getElementById('edit-eq-person').value = r.personInCharge||'';
+  document.getElementById('edit-eq-return').value = r.returnDueDate||'';
+  document.getElementById('edit-eq-loan').value = r.loanDetails||'';
+  setEditStatus(r.status==='貸出中' ? '貸出中' : '在庫有');
+  openModalEl('overlay-edit-eq');
+}
+function setEditStatus(v){
+  editStatusValue = v;
+  document.getElementById('edit-btn-out').classList.toggle('sel-out', v==='貸出中');
+  document.getElementById('edit-btn-in').classList.toggle('sel-in', v==='在庫有');
+}
+async function saveEditEquip(){
+  const r = masterList.find(x=>x.code===editingCode);
+  if(!r) return;
+  r.name = document.getElementById('edit-eq-name').value.trim() || r.name;
+  r.status = editStatusValue;
+  r.personInCharge = document.getElementById('edit-eq-person').value.trim();
+  r.returnDueDate = editStatusValue==='貸出中' ? document.getElementById('edit-eq-return').value : '';
+  r.loanDetails = editStatusValue==='貸出中' ? document.getElementById('edit-eq-loan').value.trim() : '';
+  await saveMaster();
+  renderStats();
+  renderEquipList();
+  renderMasterEquipList();
+  closeModal('overlay-edit-eq');
+  toast('保存しました');
+}
+function deleteEquip(){
+  openModalEl('overlay-confirm-delete');
+}
+async function reallyDeleteEquip(){
+  masterList = masterList.filter(x=>x.code!==editingCode);
+  await saveMaster();
+  renderStats();
+  renderEquipList();
+  renderMasterEquipList();
+  closeModal('overlay-confirm-delete');
+  closeModal('overlay-edit-eq');
+  toast('削除しました');
+}
+
+/* ---- excel export ---- */
+function exportExcel(){
+  if(masterList.length===0){ toast('出力する機材データがありません'); return; }
+  const rows = masterList.map(r=>({
+    'コード番号': r.code,
+    '機材': r.name,
+    '状態': r.status,
+    'チェック日付': r.checkDate,
+    '貸出内容': r.loanDetails,
+    '担当者': r.personInCharge,
+    '返却予定日': r.returnDueDate
+  }));
+  const headers = ['コード番号','機材','状態','チェック日付','貸出内容','担当者','返却予定日'];
+  const ws = XLSX.utils.json_to_sheet(rows, {header:headers});
+  ws['!cols'] = headers.map(()=>({wch:16}));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '機材一覧');
+  XLSX.writeFile(wb, `機材出入庫管理_${todayStr()}.xlsx`);
+}
+
+/* ============ INIT ============ */
+async function init(){
+  await loadData();
+  renderStats();
+  renderStaffChips();
+  validateStep1();
+}
+init();
+</script>
+</body>
+</html>
