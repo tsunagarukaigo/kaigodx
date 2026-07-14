@@ -379,6 +379,36 @@
     font-size:16px;
   }
 
+  .icon-btn-sm{
+    width:32px;height:32px;
+    border-radius:8px;
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .icon-btn-sm svg{width:15px;height:15px;stroke:var(--ink-soft);}
+  .icon-btn-sm.danger{border-color:var(--danger-tint);background:var(--danger-tint);}
+  .icon-btn-sm.danger svg{stroke:var(--danger);}
+
+  .master-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    padding:12px 14px;
+    margin-bottom:8px;
+    box-shadow:var(--shadow-1);
+  }
+  .master-row-info{display:flex;align-items:center;gap:8px;overflow:hidden;}
+  .master-row-code{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-faint);white-space:nowrap;}
+  .master-row-name{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .master-row-actions{display:flex;gap:6px;}
+
   /* tag chip signature element */
   .tag-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
   .tag-item{
@@ -739,14 +769,36 @@
     <div id="equip-list"></div>
   </main>
 
+  <!-- ===== MASTER MANAGEMENT VIEW ===== -->
+  <main class="view" id="view-master">
+    <div class="filter-row" id="master-tab-row">
+      <button class="active" data-mt="staff" onclick="setMasterTab('staff')">担当者</button>
+      <button data-mt="equipment" onclick="setMasterTab('equipment')">機材</button>
+    </div>
+
+    <div id="master-staff-panel">
+      <button class="ghost-btn" style="margin-bottom:14px;" onclick="openAddStaffModalFromMaster()">＋ 担当者を追加</button>
+      <div id="master-staff-list"></div>
+    </div>
+
+    <div id="master-equip-panel" style="display:none;">
+      <button class="ghost-btn" style="margin-bottom:14px;" onclick="openAddModal()">＋ 機材を追加</button>
+      <div id="master-equip-list"></div>
+    </div>
+  </main>
+
   <nav class="bottom-nav">
     <button class="active" data-view="view-scan" onclick="switchView('view-scan')">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h7v7h-7z"/></svg>
-      出入庫
+      入出庫
     </button>
     <button data-view="view-list" onclick="switchView('view-list')">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-      機材一覧
+      貸出状況
+    </button>
+    <button data-view="view-master" onclick="switchView('view-master')">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="4" x2="6" y2="20"/><circle cx="6" cy="9" r="2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="15" r="2"/><line x1="18" y1="4" x2="18" y2="20"/><circle cx="18" cy="7" r="2"/></svg>
+      マスタ管理
     </button>
   </nav>
 
@@ -765,6 +817,31 @@
     <div class="actions">
       <button class="ghost-btn" onclick="closeModal('overlay-add-staff')">キャンセル</button>
       <button class="primary-btn" style="margin-top:0;" onclick="confirmAddStaff()">追加する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit staff modal -->
+<div class="overlay" id="overlay-edit-staff">
+  <div class="modal">
+    <h3>担当者名を編集</h3>
+    <label class="field-label" style="margin-top:0;">担当者名</label>
+    <input type="text" id="edit-staff-name">
+    <div class="actions">
+      <button class="ghost-btn" onclick="closeModal('overlay-edit-staff')">キャンセル</button>
+      <button class="primary-btn" style="margin-top:0;" onclick="saveEditStaff()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete staff confirm modal -->
+<div class="overlay" id="overlay-confirm-delete-staff" style="z-index:150;">
+  <div class="modal">
+    <h3>この担当者を削除しますか？</h3>
+    <p style="font-size:13px;color:var(--ink-soft);margin:-6px 0 4px;">すでに記録された出入庫データの担当者名はそのまま残ります。</p>
+    <div class="actions">
+      <button class="ghost-btn" onclick="closeModal('overlay-confirm-delete-staff')">キャンセル</button>
+      <button class="danger-btn" style="margin-top:0;" onclick="reallyDeleteStaff()">削除する</button>
     </div>
   </div>
 </div>
@@ -814,8 +891,13 @@
 <!-- Edit equipment modal -->
 <div class="overlay" id="overlay-edit-eq">
   <div class="modal">
-    <h3>機材情報を編集</h3>
-    <p style="font-size:12px;color:var(--ink-faint);margin:-8px 0 4px;font-family:var(--font-mono);" id="edit-eq-code"></p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+      <h3 style="margin:0;">機材情報を編集</h3>
+      <button class="icon-btn-sm danger" title="削除" onclick="deleteEquip()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+      </button>
+    </div>
+    <p style="font-size:12px;color:var(--ink-faint);margin:0 0 4px;font-family:var(--font-mono);" id="edit-eq-code"></p>
     <label class="field-label">機材名</label>
     <input type="text" id="edit-eq-name">
     <label class="field-label">状態</label>
@@ -830,7 +912,7 @@
     <label class="field-label">貸出内容</label>
     <input type="text" id="edit-eq-loan">
     <div class="actions">
-      <button class="danger-btn" onclick="deleteEquip()">削除</button>
+      <button class="ghost-btn" onclick="closeModal('overlay-edit-eq')">キャンセル</button>
       <button class="primary-btn" style="margin-top:0;" onclick="saveEditEquip()">保存</button>
     </div>
   </div>
@@ -995,6 +1077,7 @@ function switchView(name){
     b.classList.toggle('active', b.dataset.view===name);
   });
   if(name==='view-list'){ renderEquipList(); }
+  if(name==='view-master'){ setMasterTab(masterTab); }
   const inScanStep2 = document.getElementById('scan-step2').style.display !== 'none';
   document.getElementById('complete-bar').style.display =
     (name==='view-scan' && session.pending.length>0 && inScanStep2) ? 'block' : 'none';
@@ -1036,7 +1119,20 @@ function selectStaff(name){
   renderStaffChips();
   validateStep1();
 }
+const PENCIL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
+
+let addStaffContext = 'scan';
+let editingStaffName = null;
+
 function addNewStaff(){
+  addStaffContext = 'scan';
+  document.getElementById('add-staff-name').value = '';
+  openModalEl('overlay-add-staff');
+  setTimeout(()=> document.getElementById('add-staff-name').focus(), 50);
+}
+function openAddStaffModalFromMaster(){
+  addStaffContext = 'master';
   document.getElementById('add-staff-name').value = '';
   openModalEl('overlay-add-staff');
   setTimeout(()=> document.getElementById('add-staff-name').focus(), 50);
@@ -1049,9 +1145,125 @@ async function confirmAddStaff(){
     await saveStaff();
   }
   renderStaffChips();
-  selectStaff(name);
+  if(addStaffContext === 'scan'){
+    selectStaff(name);
+  }
+  renderMasterStaffList();
   closeModal('overlay-add-staff');
 }
+
+/* ---- master management ---- */
+let masterTab = 'staff';
+function setMasterTab(tab){
+  masterTab = tab;
+  document.querySelectorAll('#master-tab-row button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.mt===tab);
+  });
+  document.getElementById('master-staff-panel').style.display = tab==='staff' ? 'block' : 'none';
+  document.getElementById('master-equip-panel').style.display = tab==='equipment' ? 'block' : 'none';
+  if(tab==='staff'){ renderMasterStaffList(); } else { renderMasterEquipList(); }
+}
+function renderMasterStaffList(){
+  const wrap = document.getElementById('master-staff-list');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  if(staffList.length===0){
+    wrap.innerHTML = '<div class="empty-note">担当者が登録されていません。「＋ 担当者を追加」から登録してください。</div>';
+    return;
+  }
+  staffList.forEach(name=>{
+    const el = document.createElement('div');
+    el.className = 'master-row';
+    const nameEl = document.createElement('span');
+    nameEl.className = 'master-row-name';
+    nameEl.textContent = name;
+    const actions = document.createElement('div');
+    actions.className = 'master-row-actions';
+    const editBtn = document.createElement('button');
+    editBtn.className = 'icon-btn-sm';
+    editBtn.title = '編集';
+    editBtn.innerHTML = PENCIL_SVG;
+    editBtn.onclick = ()=> openEditStaffModal(name);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'icon-btn-sm danger';
+    delBtn.title = '削除';
+    delBtn.innerHTML = TRASH_SVG;
+    delBtn.onclick = ()=> openDeleteStaffConfirm(name);
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    el.appendChild(nameEl);
+    el.appendChild(actions);
+    wrap.appendChild(el);
+  });
+}
+function renderMasterEquipList(){
+  const wrap = document.getElementById('master-equip-list');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+  if(masterList.length===0){
+    wrap.innerHTML = '<div class="empty-note">機材が登録されていません。「＋ 機材を追加」から登録してください。</div>';
+    return;
+  }
+  masterList.forEach(r=>{
+    const el = document.createElement('div');
+    el.className = 'master-row';
+    const info = document.createElement('div');
+    info.className = 'master-row-info';
+    info.innerHTML = `<span class="master-row-code">${esc(r.code)}</span><span class="master-row-name">${esc(r.name)}</span>`;
+    const actions = document.createElement('div');
+    actions.className = 'master-row-actions';
+    const editBtn = document.createElement('button');
+    editBtn.className = 'icon-btn-sm';
+    editBtn.title = '編集';
+    editBtn.innerHTML = PENCIL_SVG;
+    editBtn.onclick = ()=> openEditModal(r.code);
+    const delBtn = document.createElement('button');
+    delBtn.className = 'icon-btn-sm danger';
+    delBtn.title = '削除';
+    delBtn.innerHTML = TRASH_SVG;
+    delBtn.onclick = ()=>{ editingCode = r.code; deleteEquip(); };
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    el.appendChild(info);
+    el.appendChild(actions);
+    wrap.appendChild(el);
+  });
+}
+function openEditStaffModal(name){
+  editingStaffName = name;
+  document.getElementById('edit-staff-name').value = name;
+  openModalEl('overlay-edit-staff');
+}
+async function saveEditStaff(){
+  const newName = document.getElementById('edit-staff-name').value.trim();
+  if(!newName){ toast('担当者名を入力してください'); return; }
+  if(newName !== editingStaffName && staffList.includes(newName)){ toast('その名前はすでに登録されています'); return; }
+  const idx = staffList.indexOf(editingStaffName);
+  if(idx !== -1) staffList[idx] = newName;
+  if(newName !== editingStaffName){
+    let changed = false;
+    masterList.forEach(r=>{ if(r.personInCharge === editingStaffName){ r.personInCharge = newName; changed = true; } });
+    if(changed) await saveMaster();
+  }
+  await saveStaff();
+  renderStaffChips();
+  renderMasterStaffList();
+  closeModal('overlay-edit-staff');
+  toast('保存しました');
+}
+function openDeleteStaffConfirm(name){
+  editingStaffName = name;
+  openModalEl('overlay-confirm-delete-staff');
+}
+async function reallyDeleteStaff(){
+  staffList = staffList.filter(n=>n!==editingStaffName);
+  await saveStaff();
+  renderStaffChips();
+  renderMasterStaffList();
+  closeModal('overlay-confirm-delete-staff');
+  toast('削除しました');
+}
+
 function validateStep1(){
   const needsReturnDate = session.status === 'out';
   const hasReturnDate = !!document.getElementById('input-return-date').value;
@@ -1580,6 +1792,7 @@ async function confirmAddEquip(){
   await saveMaster();
   renderStats();
   renderEquipList();
+  renderMasterEquipList();
   closeModal('overlay-add-eq');
   toast('登録しました');
 }
@@ -1613,6 +1826,7 @@ async function saveEditEquip(){
   await saveMaster();
   renderStats();
   renderEquipList();
+  renderMasterEquipList();
   closeModal('overlay-edit-eq');
   toast('保存しました');
 }
@@ -1624,6 +1838,7 @@ async function reallyDeleteEquip(){
   await saveMaster();
   renderStats();
   renderEquipList();
+  renderMasterEquipList();
   closeModal('overlay-confirm-delete');
   closeModal('overlay-edit-eq');
   toast('削除しました');
@@ -1660,4 +1875,3 @@ init();
 </script>
 </body>
 </html>
-
