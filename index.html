@@ -23,15 +23,22 @@ button,input{font:inherit;color:inherit}
 /* header */
 .top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 16px;border-bottom:1px solid var(--line)}
 .top h1{font-size:16px;font-weight:600;margin:0}
-.conf{border:1px solid #fff;border-radius:4px;padding:2px 10px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
+.conf{border:1px solid var(--line2);border-radius:4px;padding:2px 10px;font-size:12px;font-weight:400;color:var(--muted);white-space:nowrap}
+.confLink{text-decoration:none}
+.confLink:hover .conf{color:#bdbdbd;border-color:#666}
 .btn{background:#fff;color:#000;border:0;border-radius:6px;padding:8px 14px;font-weight:600;cursor:pointer}
 .btn:hover{background:#d8d8d8}
+.btn.out{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.btn.out:hover{background:#1a1a1a;border-color:#888}
+.btn.out:disabled{opacity:.4;cursor:not-allowed}
+.btn.out:disabled:hover{background:transparent;border-color:var(--line2)}
 .btn:focus-visible,.ghost:focus-visible,.opt input:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .ghost{background:transparent;border:1px solid var(--line2);border-radius:5px;padding:2px 8px;font-size:12px;cursor:pointer;color:var(--text)}
 .ghost:hover{border-color:#888}
 .fname{color:var(--muted);font-size:12px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stats{margin-left:auto;color:var(--muted);font-size:12px;text-align:right}
-.stats b{color:var(--text);font-weight:600}
+.stats b{color:var(--text);font-weight:600;font-size:16px}
+.stats .sa{margin-left:4px}
 #msg{flex-basis:100%;color:#ff8a80;font-size:12px;display:none}
 
 /* main */
@@ -157,11 +164,12 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 
 <header class="top">
   <h1>全国サービス事業所マップ</h1>
-  <a href="https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html" target="_blank"><span class="conf">介護サービス情報の公表システムデータのオープンデータ_CSV対応版</span></a>
-  <button class="btn" id="importBtn" type="button">CSVを読み込む</button>
+  <a class="confLink" href="https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html" target="_blank" rel="noopener"><span class="conf">介護サービス情報の公表システムデータのオープンデータ</span></a>
+  <button class="btn" id="importBtn" type="button">CSV読込(複数選択)</button>
   <input type="file" id="file" multiple accept=".csv,.txt" accept=".xlsx,.xlsm,.xls,.csv" hidden>
   <span class="fname" id="fname">未取り込み</span>
   <div class="stats" id="stats"></div>
+  <button class="btn out" id="exportBtn" type="button" disabled>CSV出力</button>
   <div id="msg" role="alert"></div>
 </header>
 
@@ -183,10 +191,10 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
       <button class="ghost" type="button" id="zin" aria-label="拡大">+</button>
       <button class="ghost" type="button" id="zout" aria-label="縮小">−</button>
     </div>
-    <div class="note" id="note">● 緯度経度から表示　○ 緯度経度なし（住所・都道府県から概略位置）</div>
+    <div class="note" id="note"></div>
     <div class="empty" id="empty">
       <p>CSVを読み込むと、事業所が地図に表示されます</p>
-      <button class="btn" type="button" id="importBtn2">CSVを読み込む</button>
+      <button class="btn" type="button" id="importBtn2">CSV読込(複数選択)</button>
     </div>
     <div class="tip" id="tip"></div>
   </section>
@@ -368,7 +376,7 @@ function placeAll(list){
 let all=[],visible=[],plotted=[];
 let chartAnim=0,chartPrev=new Map(),prefAgg=[],aggRows=[],allByPref=new Map(),viewMode='dist',aggSort='n';
 const FONT='system-ui,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif';
-const NOTE_DIST='● 緯度経度から表示　○ 緯度経度なし（住所・都道府県から概略位置）';
+const NOTE_DIST='';
 const NOTE_PREF='棒の高さ＝条件に合う件数（色はサービス種類）';
 const SHORT=n=>n==='北海道'?n:n.replace(/[都府県]$/,''); const pct=v=>(v*100).toFixed(1)+'%';
 const PREFCODE=new Map(geo.map(g=>[g.pref,parseInt(String(g.code).slice(0,2),10)||99]));
@@ -392,7 +400,7 @@ function buildAgg(){const m=new Map(),idx=new Map(svcList.map((s,i)=>[s.name,i])
 function sortedAgg(){return aggRows.slice().sort(aggSort==='code'?(a,b)=>a.code-b.code:(a,b)=>b.n-a.n||a.code-b.code)}
 function renderChart(){const pane=$('chartPane');cancelAnimationFrame(chartAnim);if(!all.length){pane.innerHTML='<p class="cmsg">CSVを読み込むとグラフが表示されます</p>';return;}if(viewMode==='rank'){const rows=rankGroups().slice(0,50);if(!rows.length){pane.innerHTML='<p class="cmsg">条件に合う事業所がありません</p>';return;}const max=rows[0].n;pane.innerHTML='<div class="chead"><b>法人別 事業所数ランキング</b><span>上位50法人 ／ 条件に合う '+visible.length.toLocaleString()+' 件</span></div>'+rows.map((a,i)=>`<div class="rankrow"><div class="rn">${i+1}</div><div class="rname" title="${esc(a.name)}">${esc(a.name)}</div><div class="rankbar"><i style="width:${(a.n/max*100).toFixed(2)}%"></i></div><div class="ranknum">${a.n.toLocaleString()}件</div></div>`).join('');return;}if(viewMode!=='graph')return;const rows=sortedAgg();if(!rows.length){pane.innerHTML='<p class="cmsg">条件に合う事業所がありません</p>';return;}const max=Math.max(1,...rows.map(a=>a.n));pane.innerHTML='<div class="chead"><b>都道府県別 件数</b><span>条件に合う '+visible.length.toLocaleString()+' 件（色はサービス種類）</span></div>'+rows.map(a=>`<div class="crow"><div class="nm">${esc(a.name||'（都道府県不明）')}</div><div class="cbar"><div class="bar" style="width:0">${a.segs.map(([ci,c])=>`<i class="svcseg" data-svc="${esc(svcList[ci]?.name||'')}" data-count="${c}" data-pref="${esc(a.name||'不明')}" style="flex:${c} 1 0;background:${svcList[ci]?.color||'#888'}"></i>`).join('')}</div><span class="cnum">0</span></div></div>`).join('');const els=[...pane.querySelectorAll('.crow')].map((el,i)=>({bar:el.querySelector('.bar'),num:el.querySelector('.cnum'),n:rows[i].n,name:rows[i].name,from:chartPrev.get(rows[i].name)||0}));const paint=(e,t)=>{const cur=e.from+(e.n-e.from)*(1-Math.pow(1-t,3));e.bar.style.width=(cur/max*86).toFixed(2)+'%';e.num.textContent=Math.round(cur).toLocaleString();chartPrev.set(e.name,cur)};if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){els.forEach(e=>paint(e,1));return}const STAG=18,DUR=850,t0=performance.now();els.forEach(e=>paint(e,0));const step=now=>{const el=now-t0;els.forEach((e,i)=>paint(e,Math.max(0,Math.min(1,(el-i*STAG)/DUR))));if(el<DUR+els.length*STAG)chartAnim=requestAnimationFrame(step)};chartAnim=requestAnimationFrame(step);}
 function renderAgg(){const sec=$('aggSec');if(viewMode==='dist'||viewMode==='graph'||viewMode==='rank'){sec.hidden=true;return}sec.hidden=false;const total=visible.length,rows=sortedAgg(),maxShare=Math.max(.0001,...rows.map(a=>a.share));$('aggBody').innerHTML=rows.length?rows.map((a,i)=>`<tr><td class="n">${i+1}</td><td class="nw">${esc(a.name||'（都道府県不明）')}</td><td class="r"><b>${a.n.toLocaleString()}</b></td><td class="r">${pct(a.share)}</td><td><div class="pb"><i style="width:${(a.share/maxShare*100).toFixed(1)}%"></i></div></td><td class="r ref">${a.all.toLocaleString()}</td><td class="r ref">${a.all?pct(a.n/a.all):'—'}</td></tr>`).join(''):'<tr><td colspan="7" style="color:var(--muted);padding:18px">条件に合う事業所がありません</td></tr>';$('aggFoot').innerHTML=`<tr><td></td><td>合計</td><td class="r">${total.toLocaleString()}</td><td class="r">${total?'100.0%':'—'}</td><td></td><td class="r ref">${all.length.toLocaleString()}</td><td class="r ref">${all.length?pct(total/all.length):'—'}</td></tr>`}
-function renderStats(){if(!all.length){$('stats').innerHTML='';return}if(viewMode!=='dist'){$('stats').innerHTML=`該当 <b>${visible.length.toLocaleString()}</b> / 全 ${all.length.toLocaleString()} 件`;return}const ap=plotted.filter(f=>f.kind==='approx').length,ex=plotted.length-ap;$('stats').innerHTML=`表示 <b>${visible.length.toLocaleString()}</b> / 全 ${all.length.toLocaleString()} 件　地図 <b>${plotted.length.toLocaleString()}</b>（● ${ex.toLocaleString()} ○ ${ap.toLocaleString()}）`;}
+function renderStats(){const eb=$('exportBtn');if(eb)eb.disabled=!visible.length;if(!all.length){$('stats').innerHTML='';return}$('stats').innerHTML=`条件対象事業所数 <b>${visible.length.toLocaleString()}</b> 件<span class="sa">（全 ${all.length.toLocaleString()} 件中）</span>`;}
 let rankExpanded=new Set();
 function rankGroups(){
   const UNK='（法人名不明）', m=new Map();
@@ -747,6 +755,21 @@ $('aggSec').addEventListener('click',e=>{const th=e.target.closest('th[data-sort
 $('importBtn').onclick=$('importBtn2').onclick=()=>$('file').click();
 $('file').onchange=e=>{const fs=[...e.target.files];if(fs.length)loadFiles(fs);e.target.value=''};
 window.addEventListener('dragover',e=>e.preventDefault());window.addEventListener('drop',e=>{e.preventDefault();const fs=[...e.dataTransfer.files].filter(f=>/\.(csv|txt)$/i.test(f.name));if(fs.length)loadFiles(fs)});
+const EXPORT_COLS=[['都道府県名','pref'],['市区町村名','city'],['事業所名','name'],['事業所名カナ','kana'],['サービスの種類','svc'],['住所','addr'],['方書（ビル名等）','bldg'],['電話番号','tel'],['FAX番号','fax'],['法人番号','corp'],['法人の名称','parent'],['事業所番号','no'],['利用可能曜日','days'],['利用可能曜日特記事項','daysNote'],['定員','cap'],['URL','url']];
+const csvCell=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+function exportCsv(){
+  if(!visible.length)return;
+  const lines=[EXPORT_COLS.map(c=>csvCell(c[0])).join(',')];
+  for(const f of visible)lines.push(EXPORT_COLS.map(c=>csvCell(f[c[1]])).join(','));
+  const blob=new Blob(['\ufeff'+lines.join('\r\n')+'\r\n'],{type:'text/csv;charset=utf-8'});
+  const d=new Date(),p=n=>String(n).padStart(2,'0');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`事業所リスト_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}.csv`;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+$('exportBtn').onclick=exportCsv;
 function showMsg(t){const m=$('msg');m.textContent=t||'';m.style.display=t?'block':'none'}
 async function loadFiles(files){showMsg('');if(typeof XLSX==='undefined'){showMsg('CSV読み込みライブラリを読み込めませんでした。インターネット接続を確認してください。');return}try{let items=[];for(const file of files){const wb=XLSX.read(await file.arrayBuffer(),{type:'array',codepage:65001,raw:true});for(const name of wb.SheetNames){const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:'',raw:true});const got=parseRows(rows);if(got){items=items.concat(got);break}}}if(!items.length){showMsg('CSVのヘッダー（事業所名・サービスの種類など）が見つかりませんでした。');return}hover=pinned=null;setupData(items,false);$('fname').textContent=files.map(f=>f.name).join(' / ');$('empty').style.display='none';applyFilters();goTo(rectView(REGIONS['全国']),false)}catch(err){console.error(err);showMsg('CSV取り込みに失敗しました：'+(err?.message||err))}}
 
