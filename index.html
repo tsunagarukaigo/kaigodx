@@ -40,6 +40,7 @@ button,input{font:inherit;color:inherit}
 .stats b{color:var(--text);font-weight:600;font-size:16px}
 .stats .sa{margin-left:4px}
 #msg{flex-basis:100%;color:#ff8a80;font-size:12px;display:none}
+#msg.info{color:#a5d6a7}
 
 /* main */
 main{display:grid;grid-template-columns:300px minmax(0,1fr);border-bottom:1px solid var(--line)}
@@ -225,6 +226,7 @@ button,input,label,a,summary{touch-action:manipulation}
   <h1>全国サービス事業所マップ</h1>
   <a class="confLink" href="https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html" target="_blank" rel="noopener"><span class="conf">介護サービス情報の公表システムデータのオープンデータ</span></a>
   <button class="btn" id="importBtn" type="button">CSV読込(複数選択)</button>
+  <button class="btn out" id="addBtn" type="button" disabled>CSV追加読込</button>
   <input type="file" id="file" multiple accept=".csv,.txt,.zip,text/csv,text/plain,application/vnd.ms-excel,application/zip,application/x-zip-compressed" hidden>
   <span class="fname" id="fname">未取り込み</span>
   <div class="stats" id="stats"></div>
@@ -474,7 +476,7 @@ function buildAgg(){const m=new Map(),idx=new Map(svcList.map((s,i)=>[s.name,i])
 function sortedAgg(){return aggRows.slice().sort(aggSort==='code'?(a,b)=>a.code-b.code:(a,b)=>b.n-a.n||a.code-b.code)}
 function renderChart(){const pane=$('chartPane');cancelAnimationFrame(chartAnim);if(!all.length){pane.innerHTML='<p class="cmsg">CSVを読み込むとグラフが表示されます</p>';return;}if(viewMode==='rank'){const rows=rankGroups().slice(0,50);if(!rows.length){pane.innerHTML='<p class="cmsg">条件に合う事業所がありません</p>';return;}rankCache=rows;const max=rows[0].n;pane.innerHTML='<div class="chead"><b>法人別 事業所数ランキング</b><span>上位50法人 ／ 条件に合う '+visible.length.toLocaleString()+' 件（色はサービス種類・タップ／ホバーで内訳）</span></div>'+rows.map((a,i)=>`<div class="rankrow" data-ri="${i}"><div class="rn">${i+1}</div><div class="rname" title="${esc(a.name)}">${esc(a.name)}</div><div class="rankbar"><div class="fill" style="width:${(a.n/max*100).toFixed(2)}%">${a.svcs.map(x=>`<i class="svcseg" data-svc="${esc(x.svc)}" style="flex:${x.c} 1 0;background:${x.color}"></i>`).join('')}</div></div><div class="ranknum">${a.n.toLocaleString()}件</div></div>`).join('');return;}if(viewMode!=='graph')return;const rows=sortedAgg();if(!rows.length){pane.innerHTML='<p class="cmsg">条件に合う事業所がありません</p>';return;}const max=Math.max(1,...rows.map(a=>a.n));pane.innerHTML='<div class="chead"><b>都道府県別 件数</b><span>条件に合う '+visible.length.toLocaleString()+' 件（色はサービス種類）</span></div>'+rows.map(a=>`<div class="crow"><div class="nm">${esc(a.name||'（都道府県不明）')}</div><div class="cbar"><div class="bar" style="width:0">${a.segs.map(([ci,c])=>`<i class="svcseg" data-svc="${esc(svcList[ci]?.name||'')}" data-count="${c}" data-pref="${esc(a.name||'不明')}" style="flex:${c} 1 0;background:${svcList[ci]?.color||'#888'}"></i>`).join('')}</div><span class="cnum">0</span></div></div>`).join('');const els=[...pane.querySelectorAll('.crow')].map((el,i)=>({bar:el.querySelector('.bar'),num:el.querySelector('.cnum'),n:rows[i].n,name:rows[i].name,from:chartPrev.get(rows[i].name)||0}));const paint=(e,t)=>{const cur=e.from+(e.n-e.from)*(1-Math.pow(1-t,3));e.bar.style.width=(cur/max*86).toFixed(2)+'%';e.num.textContent=Math.round(cur).toLocaleString();chartPrev.set(e.name,cur)};if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){els.forEach(e=>paint(e,1));return}const STAG=18,DUR=850,t0=performance.now();els.forEach(e=>paint(e,0));const step=now=>{const el=now-t0;els.forEach((e,i)=>paint(e,Math.max(0,Math.min(1,(el-i*STAG)/DUR))));if(el<DUR+els.length*STAG)chartAnim=requestAnimationFrame(step)};chartAnim=requestAnimationFrame(step);}
 function renderAgg(){const sec=$('aggSec');if(viewMode==='dist'||viewMode==='graph'||viewMode==='rank'){sec.hidden=true;return}sec.hidden=false;const total=visible.length,rows=sortedAgg(),maxShare=Math.max(.0001,...rows.map(a=>a.share));$('aggBody').innerHTML=rows.length?rows.map((a,i)=>`<tr><td class="n">${i+1}</td><td class="nw">${esc(a.name||'（都道府県不明）')}</td><td class="r"><b>${a.n.toLocaleString()}</b></td><td class="r">${pct(a.share)}</td><td><div class="pb"><i style="width:${(a.share/maxShare*100).toFixed(1)}%"></i></div></td><td class="r ref">${a.all.toLocaleString()}</td><td class="r ref">${a.all?pct(a.n/a.all):'—'}</td></tr>`).join(''):'<tr><td colspan="7" style="color:var(--muted);padding:18px">条件に合う事業所がありません</td></tr>';$('aggFoot').innerHTML=`<tr><td></td><td>合計</td><td class="r">${total.toLocaleString()}</td><td class="r">${total?'100.0%':'—'}</td><td></td><td class="r ref">${all.length.toLocaleString()}</td><td class="r ref">${all.length?pct(total/all.length):'—'}</td></tr>`}
-function renderStats(){const eb=$('exportBtn');if(eb)eb.disabled=!visible.length;if(!all.length){$('stats').innerHTML='';return}$('stats').innerHTML=`条件対象事業所数 <b>${visible.length.toLocaleString()}</b> 件<span class="sa">（全 ${all.length.toLocaleString()} 件中）</span>`;}
+function renderStats(){const eb=$('exportBtn');if(eb)eb.disabled=!visible.length;const ab=$('addBtn');if(ab)ab.disabled=!all.length;if(!all.length){$('stats').innerHTML='';return}$('stats').innerHTML=`条件対象事業所数 <b>${visible.length.toLocaleString()}</b> 件<span class="sa">（全 ${all.length.toLocaleString()} 件中）</span>`;}
 let rankExpanded=new Set();
 function rankGroups(){
   const UNK='（法人名不明）', m=new Map();
@@ -829,8 +831,9 @@ function focusFacility(f){
 function setMode(m){viewMode=m;hover=pinned=null;document.querySelectorAll('#views [data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===m)));$('note').textContent=m==='pref'?NOTE_PREF:NOTE_DIST;$('lgNote').textContent=m!=='dist'?'数字は該当件数':'数字は地図上の件数';wrap.classList.toggle('graph',m==='graph'||m==='rank');if(m==='graph')chartPrev.clear();cv.style.cursor='grab';applyFilters()}
 $('views').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b&&b.dataset.view!==viewMode)runHeavy('表示を切り替え中…',()=>setMode(b.dataset.view))});
 $('aggSec').addEventListener('click',e=>{const th=e.target.closest('th[data-sort]');if(!th)return;aggSort=th.dataset.sort;renderAgg()});
-$('importBtn').onclick=$('importBtn2').onclick=()=>$('file').click();
-$('file').onchange=e=>{const fs=[...e.target.files];if(fs.length)loadFiles(fs);e.target.value=''};
+$('importBtn').onclick=$('importBtn2').onclick=()=>{addMode=false;$('file').click()};
+$('addBtn').onclick=()=>{addMode=true;$('file').click()};
+$('file').onchange=e=>{const fs=[...e.target.files],add=addMode;addMode=false;if(fs.length)loadFiles(fs,add);e.target.value=''};
 window.addEventListener('dragover',e=>e.preventDefault());window.addEventListener('drop',e=>{e.preventDefault();const fs=[...e.dataTransfer.files].filter(f=>/\.(csv|txt|zip)$/i.test(f.name));if(fs.length)loadFiles(fs)});
 const EXPORT_COLS=[['都道府県名','pref'],['市区町村名','city'],['事業所名','name'],['事業所名カナ','kana'],['サービスの種類','svc'],['住所','addr'],['方書（ビル名等）','bldg'],['電話番号','tel'],['FAX番号','fax'],['法人番号','corp'],['法人の名称','parent'],['事業所番号','no'],['利用可能曜日','days'],['利用可能曜日特記事項','daysNote'],['定員','cap'],['URL','url']];
 const csvCell=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
@@ -847,7 +850,9 @@ function exportCsv(){
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 $('exportBtn').onclick=exportCsv;
-function showMsg(t){const m=$('msg');m.textContent=t||'';m.style.display=t?'block':'none'}
+function showMsg(t){const m=$('msg');m.classList.remove('info');m.textContent=t||'';m.style.display=t?'block':'none'}
+let infoT=0;
+function showInfo(t){const m=$('msg');m.classList.add('info');m.textContent=t;m.style.display='block';clearTimeout(infoT);infoT=setTimeout(()=>{if(m.classList.contains('info')){m.style.display='none';m.textContent=''}},12000)}
 async function readCsvBuffer(ab){
   let utf8=true; try{ new TextDecoder('utf-8',{fatal:true}).decode(ab); }catch(e){ utf8=false; }
   const wb=utf8 ? XLSX.read(ab,{type:'array',codepage:65001,raw:true}) : XLSX.read(new TextDecoder('shift_jis').decode(ab),{type:'string',raw:true});
@@ -855,6 +860,7 @@ async function readCsvBuffer(ab){
   return null;
 }
 /* ---------- Now Loading 表示 ---------- */
+let loadedNames=[],addMode=false;
 const HEAVY_ROWS=50000;   // これ以上の件数では、絞り込み・切替時にも表示する
 let ldCount=0;
 const nextPaint=()=>new Promise(res=>{let done=false;const f=()=>{if(!done){done=true;res()}};requestAnimationFrame(()=>setTimeout(f,0));setTimeout(f,120)});
@@ -871,7 +877,7 @@ async function runHeavy(label,fn){
   showLoading(label);
   try{await nextPaint();fn();await nextPaint()}finally{hideLoading()}
 }
-async function loadFiles(files){
+async function loadFiles(files,add){
   showMsg('');
   if(typeof XLSX==='undefined'){showMsg('CSV読み込みライブラリを読み込めませんでした。インターネット接続を確認してください。');return}
   const prevName=$('fname').textContent;
@@ -893,10 +899,17 @@ async function loadFiles(files){
       if(got){ for(const it of got) items.push(it); } else skipped.push(jobs[i].label);
     }
     if(!items.length){showMsg(jobs.length?'CSVのヘッダー（事業所名・サービスの種類など）が見つかりませんでした。':'ZIPの中にCSVファイルが見つかりませんでした。');$('fname').textContent=prevName;return}
-    setLoading('事業所データを整理中… '+items.length.toLocaleString()+' 件',jobs.length>1?1:undefined);await tick();hover=pinned=null;setupData(items,false);
-    $('fname').textContent=files.map(f=>f.name).join(' / ')+(jobs.length>files.length?'（CSV '+(jobs.length-skipped.length)+' ファイル）':'');
-    $('empty').style.display='none';setLoading('地図・一覧を描画中…');await tick();applyFilters();goTo(rectView(REGIONS['全国']),false);await tick();
+    const append=!!add&&all.length>0, before=all.length;
+    setLoading((append?'既存データと統合中… ':'事業所データを整理中… ')+items.length.toLocaleString()+' 件',jobs.length>1?1:undefined);await tick();hover=pinned=null;
+    const oldS=new Set(svcList.map(x=>x.name)),oldP=new Set(prefList.map(x=>x.name));
+    setupData(items,append);
+    if(append){ if(selSvc.size) svcList.forEach(x=>{if(!oldS.has(x.name))selSvc.add(x.name)}); if(selPref.size) prefList.forEach(x=>{if(!oldP.has(x.name))selPref.add(x.name)}); buildFilters(); }
+    const names=files.map(f=>f.name).join(' / ')+(jobs.length>files.length?'（CSV '+(jobs.length-skipped.length)+' ファイル）':'');
+    loadedNames=append?loadedNames.concat(names):[names];
+    $('fname').textContent=loadedNames.join(' ＋ '); $('fname').title=loadedNames.join('\n');
+    $('empty').style.display='none';setLoading('地図・一覧を描画中…');await tick();applyFilters();if(!append)goTo(rectView(REGIONS['全国']),false);await tick();
     if(skipped.length)showMsg('ヘッダーを認識できず読み込めなかったファイル：'+skipped.join('、'));
+    else if(append){const added=all.length-before;showInfo('追加しました：新規 '+added.toLocaleString()+' 件'+(items.length>added?'（重複 '+(items.length-added).toLocaleString()+' 件は除外）':'')+' ／ 合計 '+all.length.toLocaleString()+' 件')}
   }catch(err){console.error(err);showMsg('取り込みに失敗しました：'+(err?.message||err));$('fname').textContent=prevName}finally{hideLoading()}
 }
 
