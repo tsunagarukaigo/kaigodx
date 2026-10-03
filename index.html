@@ -157,7 +157,66 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .chartTip{position:fixed;display:none;z-index:20;background:rgba(8,8,8,.96);border:1px solid #555;color:#fff;padding:8px 10px;border-radius:5px;font-size:12px;line-height:1.5;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.5)}
 .svcseg{cursor:pointer}
 .rankrow{display:grid;grid-template-columns:3em 15em minmax(0,1fr) 4em;align-items:center;gap:10px;height:30px;cursor:pointer}.rankrow:hover{background:#161616}.rankrow.open{background:#1a1a1a}
-.rankrow .rn{color:#888;text-align:right}.rankrow .rname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rankbar{height:18px;background:#222;border:1px solid #333;position:relative}.rankbar i{display:block;height:100%;background:#fff}.ranknum{text-align:right;font-weight:700}.ranklist{margin-top:18px}.rankgroup>td{padding:0!important;border-bottom:1px solid var(--line2)}.rankhead{display:grid;grid-template-columns:3em 15em 1fr auto;gap:10px;align-items:center;padding:11px 10px;cursor:pointer}.rankhead:hover{background:#151515}.rankhead .arrow{width:1em;color:#aaa}.rankhead .rn{color:#888;text-align:right}.rankhead .rname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rankhead .rnum{font-weight:700;white-space:nowrap}.ranksites{display:none;padding:0 12px 12px 38px;background:#0b0b0b}.rankgroup.open .ranksites{display:block}.ranksite{display:grid;grid-template-columns:7em 1fr 11em;gap:10px;align-items:center;padding:7px 0;border-top:1px solid #1c1c1c;font-size:12px}.ranksite .svc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ranksite .addr{color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ranksite .mappos{text-align:center;color:#aaa}
+.rankrow .rn{color:#888;text-align:right}.rankrow .rname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rankbar{height:18px;background:#222;border:1px solid #333;position:relative}.rankbar .fill{display:flex;height:100%}.rankbar .fill i{display:block;height:100%;min-width:1px}.ranknum{text-align:right;font-weight:700}.ranklist{margin-top:18px}.rankgroup>td{padding:0!important;border-bottom:1px solid var(--line2)}.rankhead{display:grid;grid-template-columns:3em 15em 1fr auto;gap:10px;align-items:center;padding:11px 10px;cursor:pointer}.rankhead:hover{background:#151515}.rankhead .arrow{width:1em;color:#aaa}.rankhead .rn{color:#888;text-align:right}.rankhead .rname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rankhead .rnum{font-weight:700;white-space:nowrap}.ranksites{display:none;padding:0 12px 12px 38px;background:#0b0b0b}.rankgroup.open .ranksites{display:block}.ranksite{display:grid;grid-template-columns:7em 1fr 11em;gap:10px;align-items:center;padding:7px 0;border-top:1px solid #1c1c1c;font-size:12px}.ranksite .svc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ranksite .addr{color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ranksite .mappos{text-align:center;color:#aaa}
+
+/* ---- tooltip / touch ---- */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,input,label,a,summary{touch-action:manipulation}
+.chartTip{max-width:min(340px,calc(100vw - 16px))}
+.tw{-webkit-overflow-scrolling:touch}
+@media (max-height:520px){:root{--mapH:clamp(300px,80vh,860px)}}
+
+/* ---- smartphone (iOS Safari / Android Chrome) ---- */
+@media (max-width:860px){
+  .top{padding:10px 12px;gap:8px 10px}
+  .top h1{font-size:15px;flex-basis:100%}
+  .conf{display:inline-block;white-space:normal;line-height:1.4}
+  .fname{flex:1 1 0;min-width:0;max-width:none}
+  .stats{flex:1 1 0;min-width:0;margin-left:0;text-align:left}
+  .stats .sa{display:block;margin-left:0}
+  .btn{padding:10px 14px}
+  .search{font-size:16px;padding:9px 10px}
+  .grp{max-height:260px}
+  .opt{padding:6px 2px;font-size:13px}
+  .opt input{width:18px;height:18px}
+  .ghost{padding:6px 10px}
+  #mapWrap{height:64vh;height:64svh;min-height:380px}
+  .views{left:10px;right:10px}
+  .views button{flex:1 1 0;padding:9px 2px;font-size:12px;white-space:nowrap}
+  .regions{top:54px}
+  .chart{padding:58px 12px 16px}
+  .zoom .ghost{width:40px;height:40px}
+  .list{padding:12px 10px 20px}
+  .rankrow{grid-template-columns:2em minmax(0,1fr) auto;grid-template-areas:"rn name num" ". bar bar";height:auto;gap:3px 8px;padding:5px 0}
+  .rankrow .rn{grid-area:rn}.rankrow .rname{grid-area:name}.rankrow .rankbar{grid-area:bar}.rankrow .ranknum{grid-area:num}
+  .rankhead{grid-template-columns:1.2em 1.8em minmax(0,1fr) auto;gap:6px;padding:12px 6px}
+  .ranksites{padding:0 8px 10px}
+  .ranksite{grid-template-columns:4.5em minmax(0,1fr);gap:2px 8px}
+  .ranksite .svc{grid-column:2}
+  footer{padding:6px 10px 8px}
+  .legend{max-height:52px}
+}
+@media (max-width:420px){
+  .crow{grid-template-columns:5.4em minmax(0,1fr);gap:6px}
+  .crow .nm{font-size:12px}
+  .views button{font-size:11.5px}
+}
+
+/* ---- Now Loading ---- */
+.ld{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.ld[hidden]{display:none}
+.ldbox{display:flex;flex-direction:column;align-items:center;gap:12px;padding:26px 34px;background:#0b0b0b;border:1px solid var(--line2);border-radius:12px;min-width:230px;max-width:calc(100vw - 32px);text-align:center}
+.spin{width:46px;height:46px;border:4px solid #2e2e2e;border-top-color:#fff;border-radius:50%;animation:ldspin .85s linear infinite;will-change:transform}
+@keyframes ldspin{to{transform:rotate(360deg)}}
+.ldt{font-size:16px;font-weight:600;letter-spacing:.04em}
+.ldt .dots i{font-style:normal;animation:lddot 1.2s infinite both}
+.ldt .dots i:nth-child(2){animation-delay:.2s}
+.ldt .dots i:nth-child(3){animation-delay:.4s}
+@keyframes lddot{0%,20%{opacity:.15}50%{opacity:1}100%{opacity:.15}}
+.lds{font-size:12px;color:var(--muted);min-height:1.4em;overflow-wrap:anywhere}
+.ldbar{width:100%;height:4px;background:#222;border-radius:2px;overflow:hidden}
+.ldbar i{display:block;height:100%;width:0;background:#fff;transition:width .2s}
+@media (prefers-reduced-motion:reduce){.spin{animation-duration:2.4s}.ldt .dots i{animation:none;opacity:1}}
 </style>
 </head>
 <body>
@@ -166,7 +225,7 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   <h1>全国サービス事業所マップ</h1>
   <a class="confLink" href="https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html" target="_blank" rel="noopener"><span class="conf">介護サービス情報の公表システムデータのオープンデータ</span></a>
   <button class="btn" id="importBtn" type="button">CSV読込(複数選択)</button>
-  <input type="file" id="file" multiple accept=".csv,.txt" accept=".xlsx,.xlsm,.xls,.csv" hidden>
+  <input type="file" id="file" multiple accept=".csv,.txt,.zip,text/csv,text/plain,application/vnd.ms-excel,application/zip,application/x-zip-compressed" hidden>
   <span class="fname" id="fname">未取り込み</span>
   <div class="stats" id="stats"></div>
   <button class="btn out" id="exportBtn" type="button" disabled>CSV出力</button>
@@ -231,7 +290,17 @@ td.r,th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   <div class="legend" id="legend"></div>
 </footer>
 
+<div class="ld" id="loading" role="status" aria-live="polite" hidden>
+  <div class="ldbox">
+    <div class="spin" aria-hidden="true"></div>
+    <div class="ldt">Now Loading<span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></div>
+    <div class="lds" id="ldSub"></div>
+    <div class="ldbar" id="ldBarWrap" hidden><i id="ldBar"></i></div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 (function(){
 'use strict';
@@ -298,14 +367,19 @@ const cityAgg = new Map();
 
 /* ---------- CSV 取り込み ---------- */
 const cell=(r,i)=>(i>=0&&r[i]!=null)?r[i]:'';
+const PREF_RE=/^(北海道|東京都|京都府|大阪府|青森県|岩手県|宮城県|秋田県|山形県|福島県|茨城県|栃木県|群馬県|埼玉県|千葉県|神奈川県|新潟県|富山県|石川県|福井県|山梨県|長野県|岐阜県|静岡県|愛知県|三重県|滋賀県|兵庫県|奈良県|和歌山県|鳥取県|島根県|岡山県|広島県|山口県|徳島県|香川県|愛媛県|高知県|福岡県|佐賀県|長崎県|熊本県|大分県|宮崎県|鹿児島県|沖縄県)/;
+let _pbc=null;
+function prefByCode(c2){ if(!_pbc){ _pbc=new Map(); for(const g of geo){ const k=String(g.code).slice(0,2); if(!_pbc.has(k)) _pbc.set(k,g.pref); } } return _pbc.get(c2); }
 function parseRows(rows){
   const clean=v=>String(v==null?'':v).replace(/^\ufeff/,'').trim();
   let hi=-1, col=null;
-  const aliases={pref:['都道府県名','都道府県'],city:['市区町村名','市区町村'],svc:['サービスの種類','サービス種類','サービス種別'],name:['事業所名','事業所名（取引先名）','取引先名'],addr:['住所','事業所住所'],parent:['法人の名称','法人名','親取引先'],no:['事業所番号','事業所番号（指定番号）'],lat:['緯度'],lon:['経度'],tel:['電話番号','事業所電話番号','事業所の電話番号','電話','TEL','Tel'],kana:['事業所名カナ','事業所名（カナ）'],bldg:['方書（ビル名等）','方書(ビル名等)','方書'],fax:['FAX番号','FAX','ＦＡＸ番号'],corp:['法人番号'],days:['利用可能曜日'],daysNote:['利用可能曜日特記事項'],cap:['定員'],url:['URL','ＵＲＬ','事業所URL','ホームページ']};
-  for(let i=0;i<Math.min(rows.length,80);i++){ const r=rows[i].map(clean); const find=a=>a.map(x=>r.findIndex(c=>c===x)).find(x=>x>=0)??-1; const svc=find(aliases.svc), name=find(aliases.name); if(svc>=0&&name>=0){ col={pref:find(aliases.pref),city:find(aliases.city),svc,name,addr:find(aliases.addr),parent:find(aliases.parent),no:find(aliases.no),lat:find(aliases.lat),lon:find(aliases.lon),tel:find(aliases.tel),kana:find(aliases.kana),bldg:find(aliases.bldg),fax:find(aliases.fax),corp:find(aliases.corp),days:find(aliases.days),daysNote:find(aliases.daysNote),cap:find(aliases.cap),url:find(aliases.url)}; hi=i; break; }}
+  const aliases={pref:['都道府県名','都道府県'],city:['市区町村名','市区町村'],svc:['サービスの種類','サービス種類','サービス種別'],name:['事業所名','事業所名（取引先名）','取引先名','事業所の名称'],addr:['住所','事業所住所'],parent:['法人の名称','法人名','親取引先'],no:['事業所番号','事業所番号（指定番号）'],lat:['緯度','事業所緯度'],lon:['経度','事業所経度'],tel:['電話番号','事業所電話番号','事業所の電話番号','電話','TEL','Tel'],kana:['事業所名カナ','事業所名（カナ）','事業所の名称_かな'],bldg:['方書（ビル名等）','方書(ビル名等)','方書'],fax:['FAX番号','FAX','ＦＡＸ番号','事業所FAX番号'],corp:['法人番号'],days:['利用可能曜日'],daysNote:['利用可能曜日特記事項','利用可能曜日特記事項（留意事項）'],cap:['定員'],url:['URL','ＵＲＬ','事業所URL','ホームページ'],cityFull:['事業所住所（市区町村）'],addr2:['事業所住所（番地以降）'],hrWd:['利用可能な時間帯（平日）'],hrSat:['利用可能な時間帯（土曜）'],hrSun:['利用可能な時間帯（日曜）'],hrHol:['利用可能な時間帯（祝日）'],closed:['定休日'],areaCode:['都道府県コード又は市区町村コード']};
+  for(let i=0;i<Math.min(rows.length,80);i++){ const r=rows[i].map(clean); const find=a=>a.map(x=>r.findIndex(c=>c===x)).find(x=>x>=0)??-1; const svc=find(aliases.svc), name=find(aliases.name); if(svc>=0&&name>=0){ col={pref:find(aliases.pref),city:find(aliases.city),svc,name,addr:find(aliases.addr),parent:find(aliases.parent),no:find(aliases.no),lat:find(aliases.lat),lon:find(aliases.lon),tel:find(aliases.tel),kana:find(aliases.kana),bldg:find(aliases.bldg),fax:find(aliases.fax),corp:find(aliases.corp),days:find(aliases.days),daysNote:find(aliases.daysNote),cap:find(aliases.cap),url:find(aliases.url),cityFull:find(aliases.cityFull),addr2:find(aliases.addr2),hrWd:find(aliases.hrWd),hrSat:find(aliases.hrSat),hrSun:find(aliases.hrSun),hrHol:find(aliases.hrHol),closed:find(aliases.closed),areaCode:find(aliases.areaCode)}; hi=i; break; }}
   if(hi<0)return null;
   const out=[];
-  for(let i=hi+1;i<rows.length;i++){ const r=rows[i]; const name=clean(cell(r,col.name)); if(!name)continue; const pref=clean(cell(r,col.pref)); const city=clean(cell(r,col.city)); const svc=clean(cell(r,col.svc))||'（未設定）'; const addr=clean(cell(r,col.addr)); const parent=clean(cell(r,col.parent)); const no=clean(cell(r,col.no)); const tel=clean(cell(r,col.tel)); const ex={kana:clean(cell(r,col.kana)),bldg:clean(cell(r,col.bldg)),fax:clean(cell(r,col.fax)),corp:clean(cell(r,col.corp)),days:clean(cell(r,col.days)),daysNote:clean(cell(r,col.daysNote)),cap:clean(cell(r,col.cap)),url:clean(cell(r,col.url)),latS:clean(cell(r,col.lat)),lonS:clean(cell(r,col.lon))}; const lat=parseFloat(String(cell(r,col.lat)).replace(',','.')); const lon=parseFloat(String(cell(r,col.lon)).replace(',','.')); out.push({pref,city,svc,name,addr,tel,...ex,parent,no,lat:Number.isFinite(lat)?lat:null,lon:Number.isFinite(lon)?lon:null,prods:[],tools:[],owner:''}); }
+  for(let i=hi+1;i<rows.length;i++){ const r=rows[i]; const name=clean(cell(r,col.name)); if(!name)continue; let pref=clean(cell(r,col.pref)); let city=clean(cell(r,col.city)); const svc=clean(cell(r,col.svc))||'（未設定）'; let addr=clean(cell(r,col.addr)); const parent=clean(cell(r,col.parent)); const no=clean(cell(r,col.no)); const tel=clean(cell(r,col.tel)); const ex={kana:clean(cell(r,col.kana)),bldg:clean(cell(r,col.bldg)),fax:clean(cell(r,col.fax)),corp:clean(cell(r,col.corp)),days:clean(cell(r,col.days)),daysNote:clean(cell(r,col.daysNote)),cap:clean(cell(r,col.cap)),url:clean(cell(r,col.url)),latS:clean(cell(r,col.lat)),lonS:clean(cell(r,col.lon))}; if(col.cityFull>=0){ const cf=clean(cell(r,col.cityFull)), a2=clean(cell(r,col.addr2)), pm=PREF_RE.exec(cf); if(!pref) pref=pm?pm[0]:(prefByCode(clean(cell(r,col.areaCode)).slice(0,2))||''); if(!city) city=pm?cf.slice(pm[0].length):cf; if(!addr) addr=cf+a2; }
+    if(col.hrWd>=0||col.closed>=0){ const hr=[['平日',col.hrWd],['土',col.hrSat],['日',col.hrSun],['祝',col.hrHol]].map(([l,c])=>{const v=clean(cell(r,c));return v?l+' '+v:''}).filter(Boolean).join('　'); if(!ex.days) ex.days=hr; const cl=clean(cell(r,col.closed)); ex.daysNote=[cl?'定休日：'+cl:'',ex.daysNote].filter(Boolean).join('　'); }
+    const lat=parseFloat(String(cell(r,col.lat)).replace(',','.')); const lon=parseFloat(String(cell(r,col.lon)).replace(',','.')); out.push({pref,city,svc,name,addr,tel,...ex,parent,no,lat:Number.isFinite(lat)?lat:null,lon:Number.isFinite(lon)?lon:null,prods:[],tools:[],owner:''}); }
   return out;
 }
 /* ---------- 位置の割り当て ---------- */
@@ -373,7 +447,7 @@ function placeAll(list){
 }
 
 /* ---------- 状態 ---------- */
-let all=[],visible=[],plotted=[];
+let all=[],visible=[],plotted=[],rankCache=[];
 let chartAnim=0,chartPrev=new Map(),prefAgg=[],aggRows=[],allByPref=new Map(),viewMode='dist',aggSort='n';
 const FONT='system-ui,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif';
 const NOTE_DIST='';
@@ -383,7 +457,7 @@ const PREFCODE=new Map(geo.map(g=>[g.pref,parseInt(String(g.code).slice(0,2),10)
 let svcList=[],prefList=[],selSvc=new Set(),selPref=new Set(),listLimit=200;
 function setupData(items,append=false){
   const combined=append?all.concat(items):items,seen=new Set(),clean=[];
-  for(const f of combined){const key=f.no||[f.pref,f.city,f.name,f.addr,f.svc].join('|');if(seen.has(key))continue;seen.add(key);clean.push(f);}
+  for(const f of combined){const key=f.no?f.no+'|'+f.svc:[f.pref,f.city,f.name,f.addr,f.svc].join('|');if(seen.has(key))continue;seen.add(key);clean.push(f);}
   const sc=new Map(),pc=new Map(); for(const f of clean){sc.set(f.svc,(sc.get(f.svc)||0)+1);pc.set(f.pref||'（不明）',(pc.get(f.pref||'（不明）')||0)+1);f.prodsDisp='—';f.toolsDisp='—';f.hay=norm([f.pref,f.parent,f.name,f.kana,f.addr,f.bldg,f.svc,f.no,f.corp].join(' ')).toLowerCase();}
   const oldS=new Set(selSvc),oldP=new Set(selPref); svcList=[...sc].map(([name,n])=>({name,n})).sort((a,b)=>b.n-a.n); svcList.forEach((x,i)=>x.color=x.name==='（未設定）'?'#8a8a8a':colorFor(i));
   const cmap=new Map(svcList.map(x=>[x.name,x.color])); clean.forEach(f=>f.color=cmap.get(f.svc)||'#888');
@@ -398,12 +472,13 @@ function buildFilters(){
 function applyFilters(){const q=norm($('q').value).toLowerCase();visible=all.filter(f=>(!selSvc.size||selSvc.has(f.svc))&&(!selPref.size||selPref.has(f.pref))&&(!q||f.hay.includes(q)));plotted=visible.filter(f=>f.kind!=='none');if(hover&&!plotted.includes(hover))hover=null;if(pinned&&!plotted.includes(pinned))pinned=null;listLimit=200;buildAgg();renderAgg();renderChart();renderStats();renderList();renderLegend();updateTip();schedule();}
 function buildAgg(){const m=new Map(),idx=new Map(svcList.map((s,i)=>[s.name,i]));for(const f of visible){const key=f.prefOf||'';let a=m.get(key);if(!a){a={name:key,n:0,svc:new Map(),isPref:true};m.set(key,a)}a.n++;const ci=idx.get(f.svc);a.svc.set(ci,(a.svc.get(ci)||0)+1)}const total=visible.length;aggRows=[...m.values()].map(a=>{a.segs=[...a.svc].sort((p,q)=>p[0]-q[0]);a.share=total?a.n/total:0;a.all=allByPref.get(a.name)||0;a.code=PREFCODE.get(a.name)||99;const info=prefInfo.get(a.name);if(info){a.x=info.cx;a.y=info.cy}return a});prefAgg=aggRows.filter(a=>a.x!=null).sort((a,b)=>a.y-b.y)}
 function sortedAgg(){return aggRows.slice().sort(aggSort==='code'?(a,b)=>a.code-b.code:(a,b)=>b.n-a.n||a.code-b.code)}
-function renderChart(){const pane=$('chartPane');cancelAnimationFrame(chartAnim);if(!all.length){pane.innerHTML='<p class="cmsg">CSVを読み込むとグラフが表示されます</p>';return;}if(viewMode==='rank'){const rows=rankGroups().slice(0,50);if(!rows.length){pane.innerHTML='<p class="cmsg">条件に合う事業所がありません</p>';return;}const max=rows[0].n;pane.innerHTML='<div class="chead"><b>法人別 事業所数ランキング</b><span>上位50法人 ／ 条件に合う '+visible.length.toLocaleString()+' 件</span></div>'+rows.map((a,i)=>`<div class="rankrow"><div class="rn">${i+1}</div><div class="rname" title="${esc(a.name)}">${esc(a.name)}</div><div class="rankbar"><i style="width:${(a.n/max*100).toFixed(2)}%"></i></div><div class="ranknum">${a.n.toLocaleString()}件</div></div>`).join('');return;}if(viewMode!=='graph')return;const rows=sortedAgg();if(!rows.length){pane.innerHTML='<p class="cmsg">条件に合う事業所がありません</p>';return;}const max=Math.max(1,...rows.map(a=>a.n));pane.innerHTML='<div class="chead"><b>都道府県別 件数</b><span>条件に合う '+visible.length.toLocaleString()+' 件（色はサービス種類）</span></div>'+rows.map(a=>`<div class="crow"><div class="nm">${esc(a.name||'（都道府県不明）')}</div><div class="cbar"><div class="bar" style="width:0">${a.segs.map(([ci,c])=>`<i class="svcseg" data-svc="${esc(svcList[ci]?.name||'')}" data-count="${c}" data-pref="${esc(a.name||'不明')}" style="flex:${c} 1 0;background:${svcList[ci]?.color||'#888'}"></i>`).join('')}</div><span class="cnum">0</span></div></div>`).join('');const els=[...pane.querySelectorAll('.crow')].map((el,i)=>({bar:el.querySelector('.bar'),num:el.querySelector('.cnum'),n:rows[i].n,name:rows[i].name,from:chartPrev.get(rows[i].name)||0}));const paint=(e,t)=>{const cur=e.from+(e.n-e.from)*(1-Math.pow(1-t,3));e.bar.style.width=(cur/max*86).toFixed(2)+'%';e.num.textContent=Math.round(cur).toLocaleString();chartPrev.set(e.name,cur)};if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){els.forEach(e=>paint(e,1));return}const STAG=18,DUR=850,t0=performance.now();els.forEach(e=>paint(e,0));const step=now=>{const el=now-t0;els.forEach((e,i)=>paint(e,Math.max(0,Math.min(1,(el-i*STAG)/DUR))));if(el<DUR+els.length*STAG)chartAnim=requestAnimationFrame(step)};chartAnim=requestAnimationFrame(step);}
+function renderChart(){const pane=$('chartPane');cancelAnimationFrame(chartAnim);if(!all.length){pane.innerHTML='<p class="cmsg">CSVを読み込むとグラフが表示されます</p>';return;}if(viewMode==='rank'){const rows=rankGroups().slice(0,50);if(!rows.length){pane.innerHTML='<p class="cmsg">条件に合う事業所がありません</p>';return;}rankCache=rows;const max=rows[0].n;pane.innerHTML='<div class="chead"><b>法人別 事業所数ランキング</b><span>上位50法人 ／ 条件に合う '+visible.length.toLocaleString()+' 件（色はサービス種類・タップ／ホバーで内訳）</span></div>'+rows.map((a,i)=>`<div class="rankrow" data-ri="${i}"><div class="rn">${i+1}</div><div class="rname" title="${esc(a.name)}">${esc(a.name)}</div><div class="rankbar"><div class="fill" style="width:${(a.n/max*100).toFixed(2)}%">${a.svcs.map(x=>`<i class="svcseg" data-svc="${esc(x.svc)}" style="flex:${x.c} 1 0;background:${x.color}"></i>`).join('')}</div></div><div class="ranknum">${a.n.toLocaleString()}件</div></div>`).join('');return;}if(viewMode!=='graph')return;const rows=sortedAgg();if(!rows.length){pane.innerHTML='<p class="cmsg">条件に合う事業所がありません</p>';return;}const max=Math.max(1,...rows.map(a=>a.n));pane.innerHTML='<div class="chead"><b>都道府県別 件数</b><span>条件に合う '+visible.length.toLocaleString()+' 件（色はサービス種類）</span></div>'+rows.map(a=>`<div class="crow"><div class="nm">${esc(a.name||'（都道府県不明）')}</div><div class="cbar"><div class="bar" style="width:0">${a.segs.map(([ci,c])=>`<i class="svcseg" data-svc="${esc(svcList[ci]?.name||'')}" data-count="${c}" data-pref="${esc(a.name||'不明')}" style="flex:${c} 1 0;background:${svcList[ci]?.color||'#888'}"></i>`).join('')}</div><span class="cnum">0</span></div></div>`).join('');const els=[...pane.querySelectorAll('.crow')].map((el,i)=>({bar:el.querySelector('.bar'),num:el.querySelector('.cnum'),n:rows[i].n,name:rows[i].name,from:chartPrev.get(rows[i].name)||0}));const paint=(e,t)=>{const cur=e.from+(e.n-e.from)*(1-Math.pow(1-t,3));e.bar.style.width=(cur/max*86).toFixed(2)+'%';e.num.textContent=Math.round(cur).toLocaleString();chartPrev.set(e.name,cur)};if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){els.forEach(e=>paint(e,1));return}const STAG=18,DUR=850,t0=performance.now();els.forEach(e=>paint(e,0));const step=now=>{const el=now-t0;els.forEach((e,i)=>paint(e,Math.max(0,Math.min(1,(el-i*STAG)/DUR))));if(el<DUR+els.length*STAG)chartAnim=requestAnimationFrame(step)};chartAnim=requestAnimationFrame(step);}
 function renderAgg(){const sec=$('aggSec');if(viewMode==='dist'||viewMode==='graph'||viewMode==='rank'){sec.hidden=true;return}sec.hidden=false;const total=visible.length,rows=sortedAgg(),maxShare=Math.max(.0001,...rows.map(a=>a.share));$('aggBody').innerHTML=rows.length?rows.map((a,i)=>`<tr><td class="n">${i+1}</td><td class="nw">${esc(a.name||'（都道府県不明）')}</td><td class="r"><b>${a.n.toLocaleString()}</b></td><td class="r">${pct(a.share)}</td><td><div class="pb"><i style="width:${(a.share/maxShare*100).toFixed(1)}%"></i></div></td><td class="r ref">${a.all.toLocaleString()}</td><td class="r ref">${a.all?pct(a.n/a.all):'—'}</td></tr>`).join(''):'<tr><td colspan="7" style="color:var(--muted);padding:18px">条件に合う事業所がありません</td></tr>';$('aggFoot').innerHTML=`<tr><td></td><td>合計</td><td class="r">${total.toLocaleString()}</td><td class="r">${total?'100.0%':'—'}</td><td></td><td class="r ref">${all.length.toLocaleString()}</td><td class="r ref">${all.length?pct(total/all.length):'—'}</td></tr>`}
 function renderStats(){const eb=$('exportBtn');if(eb)eb.disabled=!visible.length;if(!all.length){$('stats').innerHTML='';return}$('stats').innerHTML=`条件対象事業所数 <b>${visible.length.toLocaleString()}</b> 件<span class="sa">（全 ${all.length.toLocaleString()} 件中）</span>`;}
 let rankExpanded=new Set();
 function rankGroups(){
   const UNK='（法人名不明）', m=new Map();
+  const svcMap=new Map(svcList.map((x,i)=>[x.name,{color:x.color,o:i}]));
   visible.forEach(f=>{
     const corp=(f.corp||'').replace(/[\s\-－ー]/g,'');
     const k=corp?'c:'+corp:(f.parent?'n:'+f.parent:'u');
@@ -414,7 +489,9 @@ function rankGroups(){
     const cnt=new Map();
     g.items.forEach(f=>{if(f.parent)cnt.set(f.parent,(cnt.get(f.parent)||0)+1)});
     const name=[...cnt.entries()].sort((x,y)=>y[1]-x[1])[0]?.[0]||UNK;
-    return {key:g.key,corp:g.corp,name,items:g.items,n:g.items.length};
+    const sc=new Map(); g.items.forEach(f=>sc.set(f.svc,(sc.get(f.svc)||0)+1));
+    const svcs=[...sc].map(([sv,c])=>{const mm=svcMap.get(sv);return {svc:sv,c,color:mm?mm.color:'#888',o:mm?mm.o:999}}).sort((p,q)=>p.o-q.o);
+    return {key:g.key,corp:g.corp,name,items:g.items,n:g.items.length,svcs};
   }).sort((a,b)=>{
     const au=a.name===UNK, bu=b.name===UNK;
     if(au!==bu)return au?1:-1;
@@ -750,11 +827,11 @@ function focusFacility(f){
 
 /* ---------- 画面イベント ---------- */
 function setMode(m){viewMode=m;hover=pinned=null;document.querySelectorAll('#views [data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===m)));$('note').textContent=m==='pref'?NOTE_PREF:NOTE_DIST;$('lgNote').textContent=m!=='dist'?'数字は該当件数':'数字は地図上の件数';wrap.classList.toggle('graph',m==='graph'||m==='rank');if(m==='graph')chartPrev.clear();cv.style.cursor='grab';applyFilters()}
-$('views').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b&&b.dataset.view!==viewMode)setMode(b.dataset.view)});
+$('views').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b&&b.dataset.view!==viewMode)runHeavy('表示を切り替え中…',()=>setMode(b.dataset.view))});
 $('aggSec').addEventListener('click',e=>{const th=e.target.closest('th[data-sort]');if(!th)return;aggSort=th.dataset.sort;renderAgg()});
 $('importBtn').onclick=$('importBtn2').onclick=()=>$('file').click();
 $('file').onchange=e=>{const fs=[...e.target.files];if(fs.length)loadFiles(fs);e.target.value=''};
-window.addEventListener('dragover',e=>e.preventDefault());window.addEventListener('drop',e=>{e.preventDefault();const fs=[...e.dataTransfer.files].filter(f=>/\.(csv|txt)$/i.test(f.name));if(fs.length)loadFiles(fs)});
+window.addEventListener('dragover',e=>e.preventDefault());window.addEventListener('drop',e=>{e.preventDefault();const fs=[...e.dataTransfer.files].filter(f=>/\.(csv|txt|zip)$/i.test(f.name));if(fs.length)loadFiles(fs)});
 const EXPORT_COLS=[['都道府県名','pref'],['市区町村名','city'],['事業所名','name'],['事業所名カナ','kana'],['サービスの種類','svc'],['住所','addr'],['方書（ビル名等）','bldg'],['電話番号','tel'],['FAX番号','fax'],['法人番号','corp'],['法人の名称','parent'],['事業所番号','no'],['利用可能曜日','days'],['利用可能曜日特記事項','daysNote'],['定員','cap'],['URL','url']];
 const csvCell=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
 function exportCsv(){
@@ -771,15 +848,82 @@ function exportCsv(){
 }
 $('exportBtn').onclick=exportCsv;
 function showMsg(t){const m=$('msg');m.textContent=t||'';m.style.display=t?'block':'none'}
-async function loadFiles(files){showMsg('');if(typeof XLSX==='undefined'){showMsg('CSV読み込みライブラリを読み込めませんでした。インターネット接続を確認してください。');return}try{let items=[];for(const file of files){const wb=XLSX.read(await file.arrayBuffer(),{type:'array',codepage:65001,raw:true});for(const name of wb.SheetNames){const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:'',raw:true});const got=parseRows(rows);if(got){items=items.concat(got);break}}}if(!items.length){showMsg('CSVのヘッダー（事業所名・サービスの種類など）が見つかりませんでした。');return}hover=pinned=null;setupData(items,false);$('fname').textContent=files.map(f=>f.name).join(' / ');$('empty').style.display='none';applyFilters();goTo(rectView(REGIONS['全国']),false)}catch(err){console.error(err);showMsg('CSV取り込みに失敗しました：'+(err?.message||err))}}
+async function readCsvBuffer(ab){
+  let utf8=true; try{ new TextDecoder('utf-8',{fatal:true}).decode(ab); }catch(e){ utf8=false; }
+  const wb=utf8 ? XLSX.read(ab,{type:'array',codepage:65001,raw:true}) : XLSX.read(new TextDecoder('shift_jis').decode(ab),{type:'string',raw:true});
+  for(const name of wb.SheetNames){ const rows=XLSX.utils.sheet_to_json(wb.Sheets[name],{header:1,defval:'',raw:true}); const got=parseRows(rows); if(got) return got; }
+  return null;
+}
+/* ---------- Now Loading 表示 ---------- */
+const HEAVY_ROWS=50000;   // これ以上の件数では、絞り込み・切替時にも表示する
+let ldCount=0;
+const nextPaint=()=>new Promise(res=>{let done=false;const f=()=>{if(!done){done=true;res()}};requestAnimationFrame(()=>setTimeout(f,0));setTimeout(f,120)});
+const tick=nextPaint;
+function setLoading(sub,ratio){
+  $('ldSub').textContent=sub||'';
+  const w=$('ldBarWrap');
+  if(typeof ratio==='number'){w.hidden=false;$('ldBar').style.width=Math.max(0,Math.min(100,ratio*100)).toFixed(0)+'%'}else w.hidden=true;
+}
+function showLoading(sub,ratio){ldCount++;setLoading(sub,ratio);$('loading').hidden=false}
+function hideLoading(){ldCount=Math.max(0,ldCount-1);if(!ldCount)$('loading').hidden=true}
+async function runHeavy(label,fn){
+  if(all.length<HEAVY_ROWS||ldCount>0){fn();return}
+  showLoading(label);
+  try{await nextPaint();fn();await nextPaint()}finally{hideLoading()}
+}
+async function loadFiles(files){
+  showMsg('');
+  if(typeof XLSX==='undefined'){showMsg('CSV読み込みライブラリを読み込めませんでした。インターネット接続を確認してください。');return}
+  const prevName=$('fname').textContent;
+  showLoading('ファイルを準備中…');
+  try{
+    const jobs=[];
+    for(const file of files){
+      if(/\.zip$/i.test(file.name)){
+        if(typeof JSZip==='undefined'){showMsg('ZIP解凍ライブラリを読み込めませんでした。インターネット接続を確認してください。');$('fname').textContent=prevName;return}
+        $('fname').textContent='ZIPを展開中… '+file.name; setLoading('ZIPを展開中… '+file.name); await tick();
+        const zip=await JSZip.loadAsync(await file.arrayBuffer());
+        zip.forEach((p,entry)=>{ if(entry.dir||/(^|\/)(__MACOSX\/|\._)/.test(p)||!/\.(csv|txt)$/i.test(p))return; jobs.push({label:file.name+' / '+p.split('/').pop(),get:()=>entry.async('arraybuffer')}); });
+      }else jobs.push({label:file.name,get:()=>file.arrayBuffer()});
+    }
+    const items=[],skipped=[];
+    for(let i=0;i<jobs.length;i++){
+      $('fname').textContent='読み込み中… '+(i+1)+' / '+jobs.length+' ファイル'; setLoading('ファイルを読み込み中… '+(i+1)+' / '+jobs.length+'　'+jobs[i].label,jobs.length>1?i/jobs.length:undefined); await tick();
+      const got=await readCsvBuffer(await jobs[i].get());
+      if(got){ for(const it of got) items.push(it); } else skipped.push(jobs[i].label);
+    }
+    if(!items.length){showMsg(jobs.length?'CSVのヘッダー（事業所名・サービスの種類など）が見つかりませんでした。':'ZIPの中にCSVファイルが見つかりませんでした。');$('fname').textContent=prevName;return}
+    setLoading('事業所データを整理中… '+items.length.toLocaleString()+' 件',jobs.length>1?1:undefined);await tick();hover=pinned=null;setupData(items,false);
+    $('fname').textContent=files.map(f=>f.name).join(' / ')+(jobs.length>files.length?'（CSV '+(jobs.length-skipped.length)+' ファイル）':'');
+    $('empty').style.display='none';setLoading('地図・一覧を描画中…');await tick();applyFilters();goTo(rectView(REGIONS['全国']),false);await tick();
+    if(skipped.length)showMsg('ヘッダーを認識できず読み込めなかったファイル：'+skipped.join('、'));
+  }catch(err){console.error(err);showMsg('取り込みに失敗しました：'+(err?.message||err));$('fname').textContent=prevName}finally{hideLoading()}
+}
 
 
-function bulk(group,on){const list=group==='svc'?svcList:prefList,set=group==='svc'?selSvc:selPref;set.clear();if(on)list.forEach(x=>set.add(x.name));document.querySelectorAll('input[data-g="'+group+'"]') .forEach(c=>c.checked=on);applyFilters()}
+function bulk(group,on){const list=group==='svc'?svcList:prefList,set=group==='svc'?selSvc:selPref;set.clear();if(on)list.forEach(x=>set.add(x.name));document.querySelectorAll('input[data-g="'+group+'"]') .forEach(c=>c.checked=on);runHeavy('絞り込み中…',applyFilters)}
 document.querySelectorAll('[data-all]').forEach(b=>b.onclick=()=>bulk(b.dataset.all,true));document.querySelectorAll('[data-none]').forEach(b=>b.onclick=()=>bulk(b.dataset.none,false));
-$('filters').addEventListener('change',e=>{const c=e.target.closest('input[data-g]');if(!c)return;const list=c.dataset.g==='svc'?svcList:prefList,set=c.dataset.g==='svc'?selSvc:selPref,name=list[+c.dataset.i].name;if(c.checked)set.add(name);else set.delete(name);applyFilters()});
-let qt=0;$('q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(applyFilters,150)});
+$('filters').addEventListener('change',e=>{const c=e.target.closest('input[data-g]');if(!c)return;const list=c.dataset.g==='svc'?svcList:prefList,set=c.dataset.g==='svc'?selSvc:selPref,name=list[+c.dataset.i].name;if(c.checked)set.add(name);else set.delete(name);runHeavy('絞り込み中…',applyFilters)});
+let qt=0;$('q').addEventListener('input',()=>{clearTimeout(qt);qt=setTimeout(()=>runHeavy('検索中…',applyFilters),150)});
 $('rows').addEventListener('click',e=>{const rg=e.target.closest('[data-rank-group]');if(rg&&viewMode==='rank'){const name=rg.dataset.rankGroup;rankExpanded.has(name)?rankExpanded.delete(name):rankExpanded.add(name);renderList();return}if(e.target.closest('a'))return;const tr=e.target.closest('tr[data-i]');if(tr)focusFacility(visible[+tr.dataset.i])});$('more').addEventListener('click',e=>{const b=e.target.closest('[data-more]');if(!b)return;listLimit=b.dataset.more==='all'?visible.length:listLimit+200;renderList()});
-const chartTip=document.createElement('div');chartTip.className='chartTip';document.body.appendChild(chartTip);$('chartPane').addEventListener('mousemove',e=>{const x=e.target.closest('.svcseg');if(!x){chartTip.style.display='none';return}chartTip.innerHTML='<b>'+esc(x.dataset.pref)+'</b><br>'+esc(x.dataset.svc)+'：<b>'+Number(x.dataset.count).toLocaleString()+'件</b>';chartTip.style.left=(e.clientX+14)+'px';chartTip.style.top=(e.clientY+14)+'px';chartTip.style.display='block'});$('chartPane').addEventListener('mouseleave',()=>chartTip.style.display='none');
+const chartTip=document.createElement('div');chartTip.className='chartTip';document.body.appendChild(chartTip);function showChartTip(e){
+  const row=e.target.closest('.rankrow[data-ri]'),seg=e.target.closest('.svcseg');
+  let html='';
+  if(row&&rankCache[+row.dataset.ri]){
+    const a=rankCache[+row.dataset.ri],hs=seg?seg.dataset.svc:null,MAXL=14;
+    html='<b>'+esc(a.name)+'</b><br>合計 <b>'+a.n.toLocaleString()+'件</b><br>'+a.svcs.slice(0,MAXL).map(x=>`<span style="white-space:nowrap${x.svc===hs?';font-weight:700;text-decoration:underline':''}"><i class="dot" style="background:${x.color}"></i>${esc(x.svc)}：${x.c.toLocaleString()}件</span>`).join('<br>');
+    if(a.svcs.length>MAXL){const rest=a.svcs.slice(MAXL);html+='<br>ほか '+rest.length+'種類 '+rest.reduce((t,x)=>t+x.c,0).toLocaleString()+'件';}
+  }else if(seg&&seg.dataset.pref!=null){
+    html='<b>'+esc(seg.dataset.pref)+'</b><br>'+esc(seg.dataset.svc)+'：<b>'+Number(seg.dataset.count).toLocaleString()+'件</b>';
+  }else{chartTip.style.display='none';return}
+  chartTip.innerHTML=html;chartTip.style.display='block';
+  const m=8,w=chartTip.offsetWidth,h=chartTip.offsetHeight,vw=document.documentElement.clientWidth,vh=window.innerHeight;
+  let x=e.clientX+14,y=e.clientY+14;
+  if(x+w>vw-m)x=e.clientX-14-w;
+  if(y+h>vh-m)y=e.clientY-14-h;
+  chartTip.style.left=Math.max(m,x)+'px';chartTip.style.top=Math.max(m,y)+'px';
+}
+$('chartPane').addEventListener('mousemove',showChartTip);$('chartPane').addEventListener('click',showChartTip);$('chartPane').addEventListener('mouseleave',()=>chartTip.style.display='none');window.addEventListener('scroll',()=>{chartTip.style.display='none'},{passive:true});
 if ('ResizeObserver' in window) new ResizeObserver(resize).observe(wrap); else window.addEventListener('resize', resize);
 resize();
 renderStats(); renderList(); renderLegend();
