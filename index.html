@@ -221,6 +221,29 @@ button,input,label,a,summary{touch-action:manipulation}
 </style>
 </head>
 <body>
+<div id="bootErr" style="display:none;position:fixed;left:0;right:0;top:0;z-index:999;background:#7a1f1f;color:#fff;font:12px/1.5 -apple-system,sans-serif;padding:8px 12px;white-space:pre-wrap;word-break:break-all"></div>
+<noscript><div style="background:#7a1f1f;color:#fff;font:13px/1.6 sans-serif;padding:12px">JavaScriptが実行できないため、地図を表示できません。HTMLファイルをプレビュー（ファイルアプリ・メール・チャットの添付表示など）ではなく、Safariで https のURLとして開いてください。</div></noscript>
+<script>
+(function(){
+  var box=document.getElementById('bootErr'),msgs=[];
+  function add(m){
+    msgs.push(m);
+    box.textContent='【表示エラー】この画面のスクリーンショットを共有してください（タップで閉じる）\n'+msgs.join('\n')+'\n環境: '+navigator.userAgent;
+    box.style.display='block';
+  }
+  box.onclick=function(){box.style.display='none'};
+  window.addEventListener('error',function(e){
+    var t=e.target;
+    if(t&&t!==window&&t.tagName==='SCRIPT'){add('外部ライブラリを読み込めません（CSV/ZIPの読込が使えません）：'+(t.src||''));return}
+    add('JSエラー：'+(e.message||'')+(e.lineno?' ('+e.lineno+':'+e.colno+')':''));
+  },true);
+  window.addEventListener('unhandledrejection',function(e){add('エラー：'+((e.reason&&e.reason.message)||e.reason))});
+  window.addEventListener('load',function(){
+    if(!window.__map)add('スクリプトが最後まで実行されませんでした（古いiOS、またはJavaScript制限の可能性）');
+    if(typeof Path2D==='undefined')add('このブラウザはPath2D（地図の描画機能）に対応していません');
+  });
+})();
+</script>
 
 <header class="top">
   <h1>全国サービス事業所マップ</h1>
@@ -262,10 +285,10 @@ button,input,label,a,summary{touch-action:manipulation}
 </main>
 
 <section class="list agg" id="aggSec" hidden>
-  <h2>都道府県別 集計<small id="aggNote">導入％ ＝ 都道府県の合計数 ÷ 総数（条件で絞り込んだ全体の件数）。「県内」列は参考値で、その都道府県の全事業所に対する割合です。</small></h2>
+  <h2>都道府県別 集計<small id="aggNote">割合％ ＝ 都道府県の事業所数 ÷ 条件対象の事業所数（絞り込んだ全体）。「介護サービス総数」「総数に占める割合」は参考値で、読み込んだ全データのうちその都道府県の事業所数と、そのうち条件対象の割合です。</small></h2>
   <div class="tw">
     <table>
-      <thead><tr><th>#</th><th>都道府県</th><th>法人名</th><th>事業所名</th><th>サービス種類</th><th>事業所住所</th><th>事業所番号</th><th>地図</th></tr></thead>
+      <thead><tr><th>#</th><th data-sort="code" title="クリックで都道府県コード順">都道府県</th><th class="r" data-sort="n" title="クリックで事業所数の多い順">事業所数</th><th class="r">割合%</th><th>グラフ</th><th class="r ref">介護サービス総数</th><th class="r ref">総数に占める割合</th></tr></thead>
       <tbody id="aggBody"></tbody>
       <tfoot id="aggFoot"></tfoot>
     </table>
@@ -370,6 +393,7 @@ const cityAgg = new Map();
 /* ---------- CSV 取り込み ---------- */
 const cell=(r,i)=>(i>=0&&r[i]!=null)?r[i]:'';
 const PREF_RE=/^(北海道|東京都|京都府|大阪府|青森県|岩手県|宮城県|秋田県|山形県|福島県|茨城県|栃木県|群馬県|埼玉県|千葉県|神奈川県|新潟県|富山県|石川県|福井県|山梨県|長野県|岐阜県|静岡県|愛知県|三重県|滋賀県|兵庫県|奈良県|和歌山県|鳥取県|島根県|岡山県|広島県|山口県|徳島県|香川県|愛媛県|高知県|福岡県|佐賀県|長崎県|熊本県|大分県|宮崎県|鹿児島県|沖縄県)/;
+function fixCorp(v){const t=String(v==null?'':v).normalize('NFKC').trim();return /^\d{1,12}$/.test(t)?t.padStart(13,'0'):v}
 let _pbc=null;
 function prefByCode(c2){ if(!_pbc){ _pbc=new Map(); for(const g of geo){ const k=String(g.code).slice(0,2); if(!_pbc.has(k)) _pbc.set(k,g.pref); } } return _pbc.get(c2); }
 function parseRows(rows){
@@ -379,7 +403,7 @@ function parseRows(rows){
   for(let i=0;i<Math.min(rows.length,80);i++){ const r=rows[i].map(clean); const find=a=>a.map(x=>r.findIndex(c=>c===x)).find(x=>x>=0)??-1; const svc=find(aliases.svc), name=find(aliases.name); if(svc>=0&&name>=0){ col={pref:find(aliases.pref),city:find(aliases.city),svc,name,addr:find(aliases.addr),parent:find(aliases.parent),no:find(aliases.no),lat:find(aliases.lat),lon:find(aliases.lon),tel:find(aliases.tel),kana:find(aliases.kana),bldg:find(aliases.bldg),fax:find(aliases.fax),corp:find(aliases.corp),days:find(aliases.days),daysNote:find(aliases.daysNote),cap:find(aliases.cap),url:find(aliases.url),cityFull:find(aliases.cityFull),addr2:find(aliases.addr2),hrWd:find(aliases.hrWd),hrSat:find(aliases.hrSat),hrSun:find(aliases.hrSun),hrHol:find(aliases.hrHol),closed:find(aliases.closed),areaCode:find(aliases.areaCode)}; hi=i; break; }}
   if(hi<0)return null;
   const out=[];
-  for(let i=hi+1;i<rows.length;i++){ const r=rows[i]; const name=clean(cell(r,col.name)); if(!name)continue; let pref=clean(cell(r,col.pref)); let city=clean(cell(r,col.city)); const svc=clean(cell(r,col.svc))||'（未設定）'; let addr=clean(cell(r,col.addr)); const parent=clean(cell(r,col.parent)); const no=clean(cell(r,col.no)); const tel=clean(cell(r,col.tel)); const ex={kana:clean(cell(r,col.kana)),bldg:clean(cell(r,col.bldg)),fax:clean(cell(r,col.fax)),corp:clean(cell(r,col.corp)),days:clean(cell(r,col.days)),daysNote:clean(cell(r,col.daysNote)),cap:clean(cell(r,col.cap)),url:clean(cell(r,col.url)),latS:clean(cell(r,col.lat)),lonS:clean(cell(r,col.lon))}; if(col.cityFull>=0){ const cf=clean(cell(r,col.cityFull)), a2=clean(cell(r,col.addr2)), pm=PREF_RE.exec(cf); if(!pref) pref=pm?pm[0]:(prefByCode(clean(cell(r,col.areaCode)).slice(0,2))||''); if(!city) city=pm?cf.slice(pm[0].length):cf; if(!addr) addr=cf+a2; }
+  for(let i=hi+1;i<rows.length;i++){ const r=rows[i]; const name=clean(cell(r,col.name)); if(!name)continue; let pref=clean(cell(r,col.pref)); let city=clean(cell(r,col.city)); const svc=clean(cell(r,col.svc))||'（未設定）'; let addr=clean(cell(r,col.addr)); const parent=clean(cell(r,col.parent)); const no=clean(cell(r,col.no)); const tel=clean(cell(r,col.tel)); const ex={kana:clean(cell(r,col.kana)),bldg:clean(cell(r,col.bldg)),fax:clean(cell(r,col.fax)),corp:fixCorp(clean(cell(r,col.corp))),days:clean(cell(r,col.days)),daysNote:clean(cell(r,col.daysNote)),cap:clean(cell(r,col.cap)),url:clean(cell(r,col.url)),latS:clean(cell(r,col.lat)),lonS:clean(cell(r,col.lon))}; if(col.cityFull>=0){ const cf=clean(cell(r,col.cityFull)), a2=clean(cell(r,col.addr2)), pm=PREF_RE.exec(cf); if(!pref) pref=pm?pm[0]:(prefByCode(clean(cell(r,col.areaCode)).slice(0,2))||''); if(!city) city=pm?cf.slice(pm[0].length):cf; if(!addr) addr=cf+a2; }
     if(col.hrWd>=0||col.closed>=0){ const hr=[['平日',col.hrWd],['土',col.hrSat],['日',col.hrSun],['祝',col.hrHol]].map(([l,c])=>{const v=clean(cell(r,c));return v?l+' '+v:''}).filter(Boolean).join('　'); if(!ex.days) ex.days=hr; const cl=clean(cell(r,col.closed)); ex.daysNote=[cl?'定休日：'+cl:'',ex.daysNote].filter(Boolean).join('　'); }
     const lat=parseFloat(String(cell(r,col.lat)).replace(',','.')); const lon=parseFloat(String(cell(r,col.lon)).replace(',','.')); out.push({pref,city,svc,name,addr,tel,...ex,parent,no,lat:Number.isFinite(lat)?lat:null,lon:Number.isFinite(lon)?lon:null,prods:[],tools:[],owner:''}); }
   return out;
@@ -853,6 +877,7 @@ $('exportBtn').onclick=exportCsv;
 function showMsg(t){const m=$('msg');m.classList.remove('info');m.textContent=t||'';m.style.display=t?'block':'none'}
 let infoT=0;
 function showInfo(t){const m=$('msg');m.classList.add('info');m.textContent=t;m.style.display='block';clearTimeout(infoT);infoT=setTimeout(()=>{if(m.classList.contains('info')){m.style.display='none';m.textContent=''}},12000)}
+const fileAB=f=>f.arrayBuffer?f.arrayBuffer():new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsArrayBuffer(f)});
 async function readCsvBuffer(ab){
   let utf8=true; try{ new TextDecoder('utf-8',{fatal:true}).decode(ab); }catch(e){ utf8=false; }
   const wb=utf8 ? XLSX.read(ab,{type:'array',codepage:65001,raw:true}) : XLSX.read(new TextDecoder('shift_jis').decode(ab),{type:'string',raw:true});
@@ -888,9 +913,9 @@ async function loadFiles(files,add){
       if(/\.zip$/i.test(file.name)){
         if(typeof JSZip==='undefined'){showMsg('ZIP解凍ライブラリを読み込めませんでした。インターネット接続を確認してください。');$('fname').textContent=prevName;return}
         $('fname').textContent='ZIPを展開中… '+file.name; setLoading('ZIPを展開中… '+file.name); await tick();
-        const zip=await JSZip.loadAsync(await file.arrayBuffer());
+        const zip=await JSZip.loadAsync(await fileAB(file));
         zip.forEach((p,entry)=>{ if(entry.dir||/(^|\/)(__MACOSX\/|\._)/.test(p)||!/\.(csv|txt)$/i.test(p))return; jobs.push({label:file.name+' / '+p.split('/').pop(),get:()=>entry.async('arraybuffer')}); });
-      }else jobs.push({label:file.name,get:()=>file.arrayBuffer()});
+      }else jobs.push({label:file.name,get:()=>fileAB(file)});
     }
     const items=[],skipped=[];
     for(let i=0;i<jobs.length;i++){
