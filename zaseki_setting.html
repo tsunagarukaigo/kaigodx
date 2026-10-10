@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>座席表作成ツール</title>
+<style>
+:root{
+  --ink:#1d232b; --line:#d9dee3; --bg:#f2f4f6; --panel:#ffffff; --muted:#6b7480;
+  --accent:#c0392b; --blue:#2f6db0; --grid:#d3d9df; --canvas:#e8ecef;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;
+  color:var(--ink);background:var(--bg);display:flex;flex-direction:column;overflow:hidden;
+  -webkit-user-select:none;user-select:none;
+}
+input{-webkit-user-select:text;user-select:text;font-family:inherit}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* ---------- header ---------- */
+header{height:52px;flex:none;background:var(--ink);color:#fff;display:flex;align-items:center;gap:16px;padding:0 16px}
+header h1{font-size:16px;font-weight:700;margin:0;white-space:nowrap;letter-spacing:.04em}
+#title{width:min(320px,40vw);height:32px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:6px;padding:0 10px;font-size:14px}
+#title::placeholder{color:rgba(255,255,255,.5)}
+.spacer{flex:1}
+#pdfBtn{height:34px;padding:0 18px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:14px;font-weight:700}
+#pdfBtn:hover{background:#a93226}
+#pdfBtn:disabled{opacity:.6;cursor:wait}
+.hbtn{height:34px;padding:0 14px;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:transparent;color:#fff;font-size:13px;font-weight:600}
+.hbtn:hover{background:rgba(255,255,255,.12)}
+.bulk{display:flex;flex-direction:column;gap:6px}
+.bulk label{display:flex;align-items:center;justify-content:space-between;font-size:13px}
+.bulk label span{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.bulk input{width:72px;height:28px;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:13px;text-align:right}
+#bulkBtn{margin-top:8px;width:100%;height:34px;border:1px solid var(--blue);background:#f1f6fb;color:var(--blue);border-radius:8px;font-size:13px;font-weight:700}
+#bulkBtn:hover{background:#e3eef9}
+.bulk-note{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+.tools .sep{width:1px;background:var(--line);margin:2px 2px}
+.tools button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+#viewport.marq{cursor:crosshair}
+.marquee{position:absolute;pointer-events:none;border:1px dashed var(--blue);background:rgba(47,109,176,.12);z-index:15}
+.auto-row{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+#autoSeatBtn{height:34px;border:1px solid var(--blue);background:#f1f6fb;color:var(--blue);border-radius:8px;font-size:13px;font-weight:700}
+#autoSeatBtn:hover{background:#e3eef9}
+.dlg-back{position:fixed;inset:0;background:rgba(20,24,30,.45);display:flex;align-items:center;justify-content:center;z-index:9999}
+.dlg{background:#fff;color:#1d232b;border-radius:12px;padding:20px 22px;width:min(420px,calc(100vw - 32px));box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.dlg p{margin:0 0 16px;font-size:14px;line-height:1.6;white-space:pre-wrap}
+.dlg input{width:100%;box-sizing:border-box;height:36px;margin:0 0 16px;padding:0 10px;border:1px solid #b9c2cc;border-radius:8px;font-size:14px}
+.dlg .btns{display:flex;justify-content:flex-end;gap:8px}
+.dlg button{height:34px;min-width:84px;padding:0 14px;border-radius:8px;border:1px solid #b9c2cc;background:#f4f6f8;font-size:13px;font-weight:700;cursor:pointer}
+.dlg button.ok{background:var(--blue);border-color:var(--blue);color:#fff}
+.auto-row label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:3000;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:12px;padding:22px 22px 18px;width:min(460px,100%);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.modal h3{margin:0 0 6px;font-size:17px;color:var(--accent)}
+.modal p{margin:0 0 10px;font-size:13px;color:var(--muted)}
+.modal ul{margin:0 0 14px;padding:8px 10px 8px 28px;max-height:220px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:#fafbfc;font-size:13px;line-height:1.8;-webkit-user-select:text;user-select:text}
+.modal .q{font-size:15px;font-weight:700;margin:0 0 14px;color:var(--ink)}
+.modal .btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.modal .btns button{height:38px;padding:0 16px;border-radius:8px;font-size:13px;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.modal .btns .yes{background:var(--ink);border-color:var(--ink);color:#fff}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:2000;display:none;max-width:80vw;text-align:center}
+
+/* ---------- layout ---------- */
+main{flex:1;min-height:0;display:flex}
+aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;overflow-y:auto}
+.sec{padding:12px 14px;border-bottom:1px solid var(--line)}
+.sec h2{font-size:12px;margin:0 0 8px;color:var(--muted);font-weight:600}
+.parts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.part{height:76px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);touch-action:none;cursor:grab}
+.part:hover{border-color:var(--blue);background:#f1f6fb}
+.part .ic-table{width:48px;height:18px;background:#c9a070;border:2px solid #8a6238;border-radius:4px}
+.part .ic-door{width:44px;height:22px;border:2px solid #1d232b;background:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
+.part .ic-arrow{font-size:28px;line-height:1;font-weight:700;height:30px;display:flex;align-items:center}
+.part .ic-round{width:30px;height:30px;background:#c9a070;border:2px solid #8a6238;border-radius:50%}
+.part .ic-chair{width:26px;height:26px;background:#fff;border:2px dashed #8f98a3;border-radius:6px}
+.members-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+#stat{font-size:11px;color:var(--muted)}
+#filter{width:100%;height:30px;margin-top:8px;border:1px solid var(--line);border-radius:6px;padding:0 9px;font-size:13px}
+#list{flex:1;min-height:140px;overflow-y:auto;padding:4px 14px 12px}
+.empty-list{margin-top:18px;font-size:12px;line-height:1.7;color:var(--muted)}
+.grp{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--muted);margin:12px 2px 5px}
+.grp i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+.mem{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;margin-bottom:5px;border:1px solid;border-radius:8px;font-size:13px;cursor:grab;touch-action:none}
+.mem .n{font-weight:700;overflow:hidden;white-space:nowrap}
+.mem .t{font-size:11px;opacity:.75;white-space:nowrap}
+.mem.seated{opacity:.45}
+.mem.seated .t::after{content:" 着席";font-weight:700}
+.foot{padding:12px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+#xlsxBtn{height:38px;border:none;border-radius:8px;background:var(--ink);color:#fff;font-size:14px;font-weight:700}
+#xlsxBtn:hover{background:#2c3642}
+.foot a{font-size:11px;color:var(--muted);text-align:center;cursor:pointer;text-decoration:underline}
+
+/* ---------- canvas ---------- */
+.canvas{flex:1;min-width:0;position:relative}
+#viewport{
+  position:absolute;inset:0;overflow:hidden;background-color:var(--canvas);touch-action:none;cursor:grab;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+}
+#viewport.panning{cursor:grabbing}
+#stage{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0}
+#emptyHint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#8b95a1;font-size:15px;text-align:center;line-height:1.8}
+.ui{position:absolute;z-index:20}
+.tools{top:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;padding:6px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);flex-wrap:wrap;justify-content:center;max-width:calc(100% - 24px)}
+.tools button,.zoom button{height:30px;padding:0 11px;border:1px solid var(--line);background:#fff;border-radius:6px;font-size:12px;font-weight:600;color:var(--ink)}
+.tools button:hover:not(:disabled),.zoom button:hover{background:#f1f6fb;border-color:var(--blue)}
+.tools button:disabled{opacity:.4;cursor:default}
+.tools .danger{color:var(--accent)}
+.zoom{right:12px;bottom:12px;display:flex;gap:6px;align-items:center;padding:6px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.zoom button.sq{width:32px;padding:0;font-size:18px;line-height:1}
+#zoomLabel{min-width:46px;text-align:center;font-size:12px;font-weight:600}
+.hint{left:12px;bottom:12px;font-size:11px;color:#7b8591;line-height:1.7;pointer-events:none}
+
+/* ---------- items ---------- */
+.item{position:absolute;touch-action:none;cursor:move}
+.item.sel{z-index:5;box-shadow:0 0 0 3px rgba(47,109,176,.6)}
+.table{background:#c9a070;border:2px solid #8a6238;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#5a3d1d;font-size:12px;font-weight:700}
+.table .tl{pointer-events:none;max-width:100%;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.door{padding:2px 4px;text-align:center;line-height:1.2;overflow:hidden;word-break:break-all;background:#fff;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--ink);letter-spacing:.1em}
+.arrow .ar{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:700;line-height:1;color:var(--ink);pointer-events:none}
+.table.round{border-radius:50%}
+.table.round .rz{display:none !important}
+.rz{position:absolute;right:-8px;top:50%;width:14px;height:30px;margin-top:-15px;border-radius:7px;background:#fff;border:2px solid var(--blue);cursor:ew-resize;display:none;z-index:6}
+.table.v .rz{right:auto;top:auto;bottom:-8px;left:50%;width:30px;height:14px;margin:0 0 0 -15px;cursor:ns-resize}
+.table:hover .rz,.table.sel .rz{display:block}
+.chair{background:#fff;border:2px dashed #9aa3ad;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3px 4px;overflow:visible}
+.chair.seated{border-style:solid}
+.chair .co{font-size:10px;line-height:12px;max-height:24px;overflow:hidden;word-break:break-all;width:100%;pointer-events:none}
+.chair .ti{font-size:9px;line-height:11px;max-height:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;pointer-events:none}
+.chair .nm{font-size:13px;line-height:16px;font-weight:700;max-height:32px;overflow:hidden;word-break:break-all;width:100%;pointer-events:none}
+.chair .nm.ph{font-size:12px;font-weight:500;color:#9aa3ad}
+.chair.drop{box-shadow:0 0 0 4px rgba(192,57,43,.45);border-color:var(--accent)}
+.grip{position:absolute;left:-7px;top:-7px;width:20px;height:20px;border-radius:50%;background:#fff;border:1px solid rgba(0,0,0,.3);font-size:11px;line-height:18px;text-align:center;cursor:grab;display:none;color:#333}
+.chair.seated:hover .grip,.chair.seated.sel .grip{display:block}
+
+.ghost{position:fixed;transform:translate(-50%,-50%);pointer-events:none;z-index:1000;opacity:.92;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+.ghost.g-table{background:#c9a070;border:2px solid #8a6238;border-radius:6px}
+.ghost.g-door{background:#fff;border:2px solid #1d232b;font-size:18px;font-weight:700;text-align:center;color:#1d232b}
+.ghost.g-arrow{font-size:52px;font-weight:700;text-align:center;color:#1d232b;box-shadow:none}
+.ghost.g-round{background:#c9a070;border:2px solid #8a6238;border-radius:50%}
+.ghost.g-chair{background:#fff;border:2px dashed #9aa3ad;border-radius:10px}
+.ghost.g-mem{padding:6px 12px;border:1px solid;border-radius:8px;font-size:13px;font-weight:700;white-space:nowrap}
+
+/* ---------- PDF export ---------- */
+.export{position:absolute;left:0;top:0;z-index:-1;background:#fff;padding:32px;display:inline-block;pointer-events:none}
+.export .ex-title{font-size:26px;font-weight:700;margin-bottom:18px;color:#1d232b}
+.export .ex-stage{position:relative}
+.export .ex-stage .item{cursor:default}
+.export .ex-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.export .chip{display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid;border-radius:999px;font-size:12px;font-weight:600}
+
+@media (max-width:760px){
+  aside{width:210px}
+  header h1{display:none}
+  .hint{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>座席表作成ツール</h1>
+  <input id="title" type="text" placeholder="座席表のタイトル（PDFに表示）" value="座席表" aria-label="座席表のタイトル">
+  <div class="spacer"></div>
+  <button id="backupBtn" class="hbtn" type="button" title="現在の座席表をdatファイルで保存">バックアップ</button>
+  <button id="restoreBtn" class="hbtn" type="button" title="datファイルから座席表を復元">復元</button>
+  <input id="restoreFile" type="file" accept=".dat" hidden>
+  <button id="pdfBtn" type="button">PDF出力</button>
+</header>
+
+<main>
+  <aside>
+    <div class="sec">
+      <h2>パーツ（右の描写エリアへドラッグ）</h2>
+      <div class="parts">
+        <button class="part" id="partTable" type="button"><span class="ic-table"></span>長机</button>
+        <button class="part" id="partChair" type="button"><span class="ic-chair"></span>椅子</button>
+        <button class="part" id="partRound" type="button"><span class="ic-round"></span>円卓</button>
+        <button class="part" id="partDoor" type="button"><span class="ic-door">入口</span>入口</button>
+        <button class="part" id="partArrow" type="button"><span class="ic-arrow">↑</span>矢印</button>
+      </div>
+    </div>
+    <div class="sec">
+      <h2>一括設定（まとめて自動配置）</h2>
+      <div class="bulk">
+        <label>机のサイズ<span><input id="bSize" type="number" min="1" max="16" value="2" inputmode="numeric"> 席分</span></label>
+        <label>机の個数<span><input id="bTables" type="number" min="0" max="100" value="4" inputmode="numeric"> 台</span></label>
+        <label>椅子の個数<span><input id="bChairs" type="number" min="0" max="1000" value="16" inputmode="numeric"> 脚</span></label>
+      </div>
+      <button id="bulkBtn" type="button">一括配置</button>
+      <div class="bulk-note">既存の配置の下に追加されます。椅子は机の両側に均等に割り振ります。</div>
+    </div>
+    <div class="sec" style="border-bottom:none;padding-bottom:4px">
+      <div class="members-head"><h2 style="margin:0">参加メンバー</h2><span id="stat"></span></div>
+      <input id="filter" type="search" placeholder="会社名・名前で絞り込み" aria-label="メンバーの絞り込み">
+      <div class="auto-row">
+        <button id="autoSeatBtn" type="button" title="一覧に表示されている未着席の人を、空いている椅子へランダムに座らせます">自動割り振り（ランダム）</button>
+        <label><input id="optRole" type="checkbox"> 近しい役職でまとめる</label>
+        <label><input id="optApart" type="checkbox"> 同じ会社は近くにしない</label>
+        <label><input id="optGender" type="checkbox"> 同じ性別をなるべく隣にしない</label>
+        <label><input id="reshuffle" type="checkbox"> 着席済みも含めてやり直す</label>
+      </div>
+    </div>
+    <div id="list"></div>
+    <div class="foot">
+      <button id="xlsxBtn" type="button">EXCEL読み取り</button>
+      <a id="sampleLink">サンプルダウンロード</a>
+      <input id="xlsx" type="file" accept=".xlsx,.xls" hidden>
+    </div>
+  </aside>
+
+  <section class="canvas">
+    <div id="viewport">
+      <div id="stage"></div>
+      <div id="emptyHint">左の「長机」「椅子」を<br>ここへドラッグして配置します</div>
+    </div>
+    <div class="ui tools" id="tools">
+      <button id="tUndo" type="button" title="1つ手順戻る (Ctrl+Z)" disabled>1つ手順戻る</button>
+      <button id="tRedo" type="button" title="1つ手順進む (Ctrl+Y / Ctrl+Shift+Z)" disabled>1つ手順進む</button>
+      <span class="sep"></span>
+      <button id="tMarq" type="button" title="オンにすると、空白をドラッグして範囲選択できます（Shift+ドラッグでも可）">範囲選択</button>
+      <button id="tArrange" type="button" title="椅子を近くの机に接着し、机の縦横の位置と間隔をそろえます（選択中があればその机だけが対象）">整列</button>
+      <span class="sep"></span>
+      <button id="tRotate" type="button" disabled>机を回転 (R)</button>
+      <button id="tAuto" type="button" disabled>椅子を自動配置</button>
+      <button id="tDup" type="button" disabled>複製</button>
+      <button id="tDel" type="button" class="danger" disabled>削除</button>
+      <button id="tClear" type="button" class="danger">配置を全消去</button>
+    </div>
+    <div class="ui zoom">
+      <button class="sq" id="zOut" type="button" aria-label="縮小">−</button>
+      <span id="zoomLabel">100%</span>
+      <button class="sq" id="zIn" type="button" aria-label="拡大">＋</button>
+      <button id="zFit" type="button">全体表示</button>
+    </div>
+    <div class="ui hint">ホイール：拡大縮小 ／ 空白をドラッグ：移動<br>Shift+ドラッグ：範囲選択 ／ Shift+クリック：選択を追加<br>席をダブルクリック：着席を解除 ／ Delete：削除<br>机・入口をダブルクリック：文字を編集</div>
+  </section>
+</main>
+
+<div id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(() => {
+'use strict';
+
+/* ================= 定数・状態 ================= */
+const CHAIR = 80;      // 椅子の一辺。長机1席分の長さ = 椅子1個分
+const TDEPTH = 48;     // 長机の奥行き
+const GRID = 16;       // 配置スナップ
+const GAP = 4;         // 机と椅子のすき間
+const MAXN = 16;       // 長机の最大席数
+const DW = 96, DH = 48;  // 入口の大きさ
+const AS = 64;           // 矢印の大きさ
+const RD = 128;        // 円卓の直径
+const RC = 120;        // 円卓の中心から椅子の中心までの距離（8席を等間隔に配置）
+const KEY = 'izakaya-seating-v1';
+
+const $ = s => document.querySelector(s);
+const viewport = $('#viewport'), stage = $('#stage'), listEl = $('#list');
+
+let items = [];            // {id,type:'table'|'chair',x,y,n?,v?,m?}
+let members = [];          // {id,company,title,name}
+let nextId = 1;
+let sel = new Set();      // 選択中アイテムのid
+let title = '座席表';
+const view = { s: 1, tx: 40, ty: 40 };
+const els = new Map();
+const memMap = new Map();
+const colorMap = new Map();
+
+const snap = v => Math.round(v / GRID) * GRID;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const item = id => items.find(i => i.id === id);
+
+/* ================= 保存 ================= */
+let saveT = null;
+function persist() {
+  clearTimeout(saveT);
+  saveT = setTimeout(() => {
+    try { localStorage.setItem(KEY, JSON.stringify({ items, members, nextId, title })); } catch (e) {}
+  }, 300);
+}
+function save() { pushHistory(); persist(); }   // 変更確定のたびに履歴へ記録＋自動保存
+
+/* ---------- 元に戻す / やり直す ---------- */
+let hist = [], hIdx = -1;
+const stateStr = () => JSON.stringify({ items, members });
+function updateHist() {
+  $('#tUndo').disabled = hIdx <= 0;
+  $('#tRedo').disabled = hIdx >= hist.length - 1;
+}
+function pushHistory() {
+  const s = stateStr();
+  if (hist[hIdx] === s) return;
+  hist = hist.slice(0, hIdx + 1);
+  hist.push(s);
+  if (hist.length > 100) hist.shift();
+  hIdx = hist.length - 1;
+  updateHist();
+}
+function setState(d) {
+  [...els.values()].forEach(e => e.remove());
+  els.clear();
+  items = d.items; members = d.members;
+  buildColors();
+  items.forEach(i => { if (i.type === 'chair' && i.m && !memMap.has(i.m)) i.m = null; });
+  sel = new Set([...sel].filter(id => item(id)));
+  paintAll(); updateTools(); renderList();
+}
+function undo() { if (hIdx <= 0) return; hIdx--; setState(JSON.parse(hist[hIdx])); persist(); updateHist(); }
+function redo() { if (hIdx >= hist.length - 1) return; hIdx++; setState(JSON.parse(hist[hIdx])); persist(); updateHist(); }
+$('#tUndo').onclick = undo;
+$('#tRedo').onclick = redo;
+
+let toastT = null;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(toastT);
+  toastT = setTimeout(() => { t.style.display = 'none'; }, 3500);
+}
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (!d) return;
+    items = d.items || []; members = d.members || []; nextId = d.nextId || 1; title = d.title || '座席表';
+  } catch (e) {}
+}
+
+/* ================= 色（会社ごとの薄い色） ================= */
+function buildColors() {
+  colorMap.clear(); memMap.clear();
+  let i = 0;
+  members.forEach(m => {
+    memMap.set(m.id, m);
+    if (!colorMap.has(m.company)) {
+      const h = Math.round((i * 137.508 + 12) % 360);
+      colorMap.set(m.company, {
+        bg: `hsl(${h}, 72%, 88%)`, bd: `hsl(${h}, 48%, 60%)`,
+        tx: `hsl(${h}, 55%, 16%)`, chip: `hsl(${h}, 55%, 62%)`
+      });
+      i++;
+    }
+  });
+}
+const colorOf = co => colorMap.get(co) || { bg: '#eceff2', bd: '#aab2bb', tx: '#222', chip: '#aab2bb' };
+
+/* ================= ビュー（拡大縮小・移動） ================= */
+function applyView() {
+  stage.style.transform = `translate(${view.tx}px,${view.ty}px) scale(${view.s})`;
+  const g = CHAIR * view.s;
+  viewport.style.backgroundSize = `${g}px ${g}px`;
+  viewport.style.backgroundPosition = `${view.tx}px ${view.ty}px`;
+  $('#zoomLabel').textContent = Math.round(view.s * 100) + '%';
+}
+function toStage(cx, cy) {
+  const r = viewport.getBoundingClientRect();
+  return { x: (cx - r.left - view.tx) / view.s, y: (cy - r.top - view.ty) / view.s };
+}
+function zoomAt(factor, cx, cy) {
+  const r = viewport.getBoundingClientRect();
+  if (cx === undefined) { cx = r.left + r.width / 2; cy = r.top + r.height / 2; }
+  const p = toStage(cx, cy);
+  const ns = clamp(view.s * factor, 0.2, 3);
+  view.s = ns;
+  view.tx = cx - r.left - p.x * ns;
+  view.ty = cy - r.top - p.y * ns;
+  applyView();
+}
+viewport.addEventListener('wheel', e => {
+  e.preventDefault();
+  const dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+  zoomAt(Math.exp(-dy * 0.0015), e.clientX, e.clientY);
+}, { passive: false });
+$('#zIn').onclick = () => zoomAt(1.2);
+$('#zOut').onclick = () => zoomAt(1 / 1.2);
+$('#zFit').onclick = fitView;
+
+function bounds() {
+  if (!items.length) return null;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  items.forEach(it => {
+    const { w, h } = itemSize(it);
+    x0 = Math.min(x0, it.x); y0 = Math.min(y0, it.y);
+    x1 = Math.max(x1, it.x + w); y1 = Math.max(y1, it.y + h);
+  });
+  return { x0, y0, x1, y1 };
+}
+function fitView() {
+  const b = bounds(), r = viewport.getBoundingClientRect();
+  if (!b) { view.s = 1; view.tx = 40; view.ty = 70; applyView(); return; }
+  const pad = 70;
+  const s = clamp(Math.min((r.width - pad * 2) / (b.x1 - b.x0), (r.height - pad * 2 - 40) / (b.y1 - b.y0)), 0.2, 1.5);
+  view.s = s;
+  view.tx = (r.width - (b.x1 - b.x0) * s) / 2 - b.x0 * s;
+  view.ty = (r.height - (b.y1 - b.y0) * s) / 2 - b.y0 * s + 24;
+  applyView();
+}
+
+/* ================= ポインタ補助 ================= */
+function track(e, onMove, onEnd) {
+  const sx = e.clientX, sy = e.clientY; let moved = false;
+  const mv = ev => {
+    const dx = ev.clientX - sx, dy = ev.clientY - sy;
+    if (!moved && Math.hypot(dx, dy) < 3) return;
+    moved = true; onMove(dx, dy, ev);
+  };
+  const up = ev => {
+    window.removeEventListener('pointermove', mv);
+    window.removeEventListener('pointerup', up);
+    window.removeEventListener('pointercancel', up);
+    onEnd && onEnd(moved, ev);
+  };
+  window.addEventListener('pointermove', mv);
+  window.addEventListener('pointerup', up);
+  window.addEventListener('pointercancel', up);
+}
+function dragGhost(e, ghost, onMove, onEnd) {
+  e.preventDefault();
+  document.body.appendChild(ghost);
+  ghost.style.display = 'none';
+  let moved = false; const sx = e.clientX, sy = e.clientY;
+  const place = ev => { ghost.style.left = ev.clientX + 'px'; ghost.style.top = ev.clientY + 'px'; };
+  place(e);
+  const mv = ev => {
+    if (!moved) {
+      if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < 5) return;
+      moved = true; ghost.style.display = 'block';
+    }
+    place(ev); onMove && onMove(ev);
+  };
+  const up = ev => {
+    window.removeEventListener('pointermove', mv);
+    window.removeEventListener('pointerup', up);
+    window.removeEventListener('pointercancel', up);
+    ghost.remove();
+    onEnd(ev, moved && ev.type === 'pointerup', moved);
+  };
+  window.addEventListener('pointermove', mv);
+  window.addEventListener('pointerup', up);
+  window.addEventListener('pointercancel', up);
+}
+const elAt = ev => document.elementFromPoint(ev.clientX, ev.clientY);
+const chairAt = ev => { const el = elAt(ev); return el && el.closest ? el.closest('.chair') : null; };
+const inRect = (ev, node) => { const r = node.getBoundingClientRect(); return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom; };
+
+/* ================= アイテム描画 ================= */
+function itemSize(it) {
+  if (it.type === 'chair') return { w: CHAIR, h: CHAIR };
+  if (it.type === 'door') return { w: DW, h: DH };
+  if (it.type === 'arrow') return { w: AS, h: AS };
+  if (it.round) return { w: RD, h: RD };
+  const L = it.n * CHAIR;
+  return it.v ? { w: TDEPTH, h: L } : { w: L, h: TDEPTH };
+}
+function ensureEl(it) {
+  let el = els.get(it.id);
+  if (!el) {
+    el = document.createElement('div');
+    el.className = 'item ' + it.type;
+    el.dataset.id = it.id;
+    if (it.type === 'table') {
+      el.innerHTML = '<span class="tl"></span><div class="rz" title="ドラッグで長さを変更"></div>';
+    } else if (it.type === 'door') {
+      el.textContent = '入口';
+    } else if (it.type === 'arrow') {
+      el.innerHTML = '<div class="ar">↑</div>';
+      el.title = 'クリックで右回転（ドラッグで移動）';
+    } else {
+      el.innerHTML = '<div class="co"></div><div class="ti"></div><div class="nm"></div><div class="grip" title="ドラッグでメンバーを移動">⇄</div>';
+    }
+    stage.appendChild(el);
+    els.set(it.id, el);
+  }
+  return el;
+}
+function paint(it) {
+  const el = ensureEl(it), { w, h } = itemSize(it);
+  el.style.left = it.x + 'px'; el.style.top = it.y + 'px';
+  el.style.width = w + 'px'; el.style.height = h + 'px';
+  el.classList.toggle('sel', sel.has(it.id));
+  if (it.type === 'door') { el.textContent = it.label != null ? it.label : '入口'; return; }
+  if (it.type === 'arrow') { el.querySelector('.ar').style.transform = `rotate(${(it.r || 0) * 90}deg)`; return; }
+  if (it.type === 'table') {
+    el.classList.toggle('round', !!it.round);
+    el.classList.toggle('v', !!it.v && !it.round);
+    el.querySelector('.tl').textContent = it.label ? it.label : (it.round ? '円卓' : it.n + '席分');
+  } else {
+    const m = it.m ? memMap.get(it.m) : null;
+    el.classList.toggle('seated', !!m);
+    const nm = el.querySelector('.nm');
+    if (m) {
+      const c = colorOf(m.company);
+      el.style.background = c.bg; el.style.borderColor = c.bd;
+      el.style.color = m.gender === '男' ? '#1d4fd8' : m.gender === '女' ? '#d11a2a' : '#000';
+      el.querySelector('.co').textContent = m.company;
+      el.querySelector('.ti').textContent = m.title || '';
+      nm.textContent = m.name; nm.classList.remove('ph');
+      el.title = [m.company, m.title, m.name].filter(Boolean).join('  ');
+    } else {
+      el.style.background = ''; el.style.borderColor = ''; el.style.color = '';
+      el.querySelector('.co').textContent = '';
+      el.querySelector('.ti').textContent = '';
+      nm.textContent = '空席'; nm.classList.add('ph');
+      el.title = '空席';
+    }
+  }
+}
+function paintAll() {
+  items.forEach(paint);
+  $('#emptyHint').style.display = items.length ? 'none' : 'flex';
+}
+function removeItem(it) {
+  const el = els.get(it.id);
+  if (el) el.remove();
+  els.delete(it.id);
+  items = items.filter(i => i !== it);
+}
+
+/* ================= 椅子のスロット・吸着 ================= */
+function roundSlots(t) {
+  const cx = t.x + RD / 2, cy = t.y + RD / 2;
+  return Array.from({ length: 8 }, (_, k) => {
+    const a = k * Math.PI / 4 - Math.PI / 2;      // 真上から時計回りに45度ずつ
+    return { x: Math.round(cx + RC * Math.cos(a) - CHAIR / 2), y: Math.round(cy + RC * Math.sin(a) - CHAIR / 2) };
+  });
+}
+function sideSlots(t) {
+  if (t.round) return roundSlots(t);
+  const out = [];
+  for (let k = 0; k < t.n; k++) {
+    if (!t.v) {
+      out.push({ x: t.x + k * CHAIR, y: t.y - CHAIR - GAP }, { x: t.x + k * CHAIR, y: t.y + TDEPTH + GAP });
+    } else {
+      out.push({ x: t.x - CHAIR - GAP, y: t.y + k * CHAIR }, { x: t.x + TDEPTH + GAP, y: t.y + k * CHAIR });
+    }
+  }
+  return out;
+}
+function endSlots(t) {
+  if (t.round) return [];
+  const L = t.n * CHAIR;
+  if (!t.v) {
+    const y = t.y + (TDEPTH - CHAIR) / 2;
+    return [{ x: t.x - CHAIR - GAP, y }, { x: t.x + L + GAP, y }];
+  }
+  const x = t.x + (TDEPTH - CHAIR) / 2;
+  return [{ x, y: t.y - CHAIR - GAP }, { x, y: t.y + L + GAP }];
+}
+function snapChair(c) {
+  let best = null, bd = Infinity;
+  const cx = c.x + CHAIR / 2, cy = c.y + CHAIR / 2;
+  items.filter(i => i.type === 'table').forEach(t => {
+    sideSlots(t).concat(endSlots(t)).forEach(p => {
+      const d = Math.hypot(p.x + CHAIR / 2 - cx, p.y + CHAIR / 2 - cy);
+      if (d < bd) { bd = d; best = p; }
+    });
+  });
+  if (best && bd < CHAIR * 0.9) { c.x = best.x; c.y = best.y; }
+  else { c.x = snap(c.x); c.y = snap(c.y); }
+}
+function attachedChairs(t) {
+  const slots = sideSlots(t).concat(endSlots(t));
+  return items.filter(c => c.type === 'chair' && slots.some(p => Math.abs(p.x - c.x) < 3 && Math.abs(p.y - c.y) < 3));
+}
+
+/* ================= 選択・ツールバー ================= */
+function select(id) { setSel(id == null ? [] : [id]); }
+function setSel(ids) {
+  sel = new Set(ids);
+  items.forEach(it => { const el = els.get(it.id); if (el) el.classList.toggle('sel', sel.has(it.id)); });
+  updateTools();
+}
+const selItems = () => items.filter(i => sel.has(i.id));
+function updateTools() {
+  const arr = selItems(), hasT = arr.some(i => i.type === 'table');
+  $('#tRotate').disabled = !arr.some(i => i.type === 'table' && !i.round);
+  $('#tAuto').disabled = !hasT;
+  $('#tDup').disabled = !arr.length;
+  $('#tDel').disabled = !arr.length;
+}
+function createItem(type, cx, cy) {
+  let it;
+  if (type === 'door' || type === 'arrow') {
+    const z = itemSize({ type });
+    it = { id: nextId++, type, x: snap(cx - z.w / 2), y: snap(cy - z.h / 2) };
+    if (type === 'arrow') it.r = 0;
+    items.push(it);
+    paintAll(); select(it.id); renderList(); save();
+    return it;
+  }
+  if (type === 'round') {
+    it = { id: nextId++, type: 'table', round: true, n: 8, v: false, x: snap(cx - RD / 2), y: snap(cy - RD / 2) };
+    items.push(it);
+    roundSlots(it).forEach(p => items.push({ id: nextId++, type: 'chair', x: p.x, y: p.y, m: null }));   // 8席を等間隔に配置
+    paintAll(); select(it.id); renderList(); save();
+    return it;
+  }
+  if (type === 'table') {
+    it = { id: nextId++, type, n: 2, v: false, x: 0, y: 0 };
+    it.x = snap(cx - it.n * CHAIR / 2); it.y = snap(cy - TDEPTH / 2);
+  } else {
+    it = { id: nextId++, type, x: cx - CHAIR / 2, y: cy - CHAIR / 2, m: null };
+  }
+  items.push(it);
+  if (type === 'chair') snapChair(it);
+  paintAll(); select(it.id); renderList(); save();
+  return it;
+}
+function addAtCenter(type) {
+  const r = viewport.getBoundingClientRect();
+  const p = toStage(r.left + r.width / 2, r.top + r.height / 2);
+  const off = (items.length % 6) * GRID;
+  createItem(type, p.x + off, p.y + off);
+}
+
+$('#tRotate').onclick = rotateSel;
+function rotateSel() {
+  const ts = selItems().filter(i => i.type === 'table' && !i.round);
+  if (!ts.length) return;
+  ts.forEach(t => {
+    const a = itemSize(t), cx = t.x + a.w / 2, cy = t.y + a.h / 2;
+    t.v = !t.v;
+    const b = itemSize(t);
+    t.x = snap(cx - b.w / 2); t.y = snap(cy - b.h / 2);
+    paint(t);
+  });
+  save();
+}
+$('#tAuto').onclick = () => {
+  const ts = selItems().filter(i => i.type === 'table');
+  if (!ts.length) return;
+  ts.forEach(t => sideSlots(t).forEach(p => {
+    const taken = items.some(c => c.type === 'chair' && Math.abs(c.x - p.x) < CHAIR * 0.6 && Math.abs(c.y - p.y) < CHAIR * 0.6);
+    if (!taken) items.push({ id: nextId++, type: 'chair', x: p.x, y: p.y, m: null });
+  }));
+  paintAll(); renderList(); save();
+};
+$('#tDup').onclick = () => {
+  const src = selItems();
+  if (!src.length) return;
+  const copies = src.map(it => {
+    const c = Object.assign({}, it, { id: nextId++, x: it.x + CHAIR, y: it.y + CHAIR });
+    if (c.type === 'chair') c.m = null;
+    return c;
+  });
+  items.push(...copies);
+  paintAll(); setSel(copies.map(c => c.id)); renderList(); save();
+};
+$('#tDel').onclick = deleteSel;
+function deleteSel() {
+  const arr = selItems();
+  if (!arr.length) return;
+  arr.forEach(removeItem);
+  setSel([]); paintAll(); renderList(); save();
+}
+/* 画面内ダイアログ（ブラウザ標準の confirm / prompt / alert が使えない環境でも動くように自前で用意） */
+function openDialog(msg, { input, okText = 'はい', cancelText = 'いいえ', single = false } = {}) {
+  return new Promise(resolve => {
+    const back = document.createElement('div');
+    back.className = 'dlg-back';
+    const box = document.createElement('div');
+    box.className = 'dlg';
+    box.setAttribute('role', 'dialog');
+    const p = document.createElement('p'); p.textContent = msg; box.appendChild(p);
+    let inp = null;
+    if (input !== undefined) { inp = document.createElement('input'); inp.type = 'text'; inp.value = input; box.appendChild(inp); }
+    const btns = document.createElement('div'); btns.className = 'btns';
+    const done = v => { back.remove(); document.removeEventListener('keydown', onKey, true); resolve(v); };
+    const ok = document.createElement('button'); ok.type = 'button'; ok.className = 'ok'; ok.textContent = okText;
+    ok.onclick = () => done(inp ? inp.value : true);
+    if (!single) {
+      const ng = document.createElement('button'); ng.type = 'button'; ng.textContent = cancelText;
+      ng.onclick = () => done(inp ? null : false);
+      btns.appendChild(ng);
+    }
+    btns.appendChild(ok); box.appendChild(btns); back.appendChild(box);
+    const onKey = e => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done(single ? true : (inp ? null : false)); }
+      else if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); ok.click(); }
+    };
+    document.addEventListener('keydown', onKey, true);
+    document.body.appendChild(back);
+    (inp || ok).focus(); if (inp) inp.select();
+  });
+}
+const askConfirm = msg => openDialog(msg);
+const askText = (msg, cur) => openDialog(msg, { input: cur, okText: 'OK', cancelText: 'キャンセル' });
+window.alert = msg => { openDialog(String(msg), { okText: 'OK', single: true }); };
+
+$('#tClear').onclick = async () => {
+  if (!items.length) { toast('リセットする配置がありません。'); return; }
+  if (!(await askConfirm('すべての配置をすべてリセットします。よろしいですか？'))) return;
+  [...items].forEach(removeItem);
+  nextId = Math.max(nextId, 1);
+  select(null); paintAll(); renderList(); save();
+  toast('すべての配置をリセットしました。');
+};
+
+window.addEventListener('keydown', e => {
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.isContentEditable)) return;
+  if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+    const k = e.key.toLowerCase();
+    if (k === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
+    else if (k === 'y') { e.preventDefault(); redo(); }
+    else if (k === 'a') { e.preventDefault(); setSel(items.map(i => i.id)); }
+    return;
+  }
+  if (e.key === 'Delete' || e.key === 'Backspace') { if (sel.size) { e.preventDefault(); deleteSel(); } }
+  else if (e.key === 'r' || e.key === 'R') rotateSel();
+  else if (e.key === 'Escape') select(null);
+});
+
+/* ================= 描写エリアの操作 ================= */
+viewport.addEventListener('pointerdown', e => {
+  if (e.target.closest('.ui')) return;
+  const onItem = e.target.closest('.item');
+  if (onItem && e.button === 0) return;           // アイテムは stage 側で処理
+  if (e.button !== 0 && e.button !== 1) return;
+  e.preventDefault();
+  if (e.button === 0 && (e.shiftKey || marqueeMode)) { startMarquee(e); return; }
+  const stx = view.tx, sty = view.ty;
+  viewport.classList.add('panning');
+  track(e, (dx, dy) => { view.tx = stx + dx; view.ty = sty + dy; applyView(); }, moved => {
+    viewport.classList.remove('panning');
+    if (!moved && e.button === 0) select(null);
+  });
+});
+
+let marqueeMode = false;
+$('#tMarq').onclick = () => {
+  marqueeMode = !marqueeMode;
+  $('#tMarq').classList.toggle('on', marqueeMode);
+  viewport.classList.toggle('marq', marqueeMode);
+};
+function startMarquee(e) {
+  const vr = viewport.getBoundingClientRect();
+  const box = document.createElement('div');
+  box.className = 'marquee';
+  viewport.appendChild(box);
+  const additive = e.ctrlKey || e.metaKey;
+  const base = additive ? new Set(sel) : new Set();
+  const x0 = e.clientX, y0 = e.clientY;
+  track(e, (dx, dy, ev) => {
+    const l = Math.min(x0, ev.clientX), t = Math.min(y0, ev.clientY);
+    const w = Math.abs(ev.clientX - x0), h = Math.abs(ev.clientY - y0);
+    box.style.left = (l - vr.left) + 'px'; box.style.top = (t - vr.top) + 'px';
+    box.style.width = w + 'px'; box.style.height = h + 'px';
+    const a = toStage(l, t), b = toStage(l + w, t + h);
+    const ids = new Set(base);
+    items.forEach(it => {
+      const z = itemSize(it);
+      if (it.x < b.x && it.x + z.w > a.x && it.y < b.y && it.y + z.h > a.y) ids.add(it.id);
+    });
+    setSel([...ids]);
+  }, moved => {
+    box.remove();
+    if (!moved && !additive) select(null);
+  });
+}
+
+stage.addEventListener('pointerdown', e => {
+  if (e.button !== 0) return;
+  const el = e.target.closest('.item');
+  if (!el) return;
+  const it = item(+el.dataset.id);
+  if (!it) return;
+  if (e.target.closest('.grip') && it.m) { startMemberDrag(e, it.m); return; }
+  if (e.target.closest('.rz')) { startResize(e, it); return; }
+  startMove(e, it);
+});
+stage.addEventListener('dblclick', e => {
+  const el = e.target.closest('.item');
+  if (!el || e.target.closest('.rz')) return;
+  const c = item(+el.dataset.id);
+  if (!c) return;
+  if (c.type === 'chair') { if (c.m) { c.m = null; paint(c); renderList(); save(); } }
+  else if (c.type === 'door' || c.type === 'table') editLabel(c);
+});
+// 机・入口の文字を編集（ダブルクリック）
+async function editLabel(it) {
+  const def = it.type === 'door' ? '入口' : (it.round ? '円卓' : it.n + '席分');
+  const cur = it.label != null && it.label !== '' ? it.label : def;
+  const v = await askText(it.type === 'door' ? '入口の文字を入力してください' : '机の文字を入力してください（空欄にすると初期表示「' + def + '」に戻ります）', cur);
+  if (v === null) return;
+  const t = v.trim().slice(0, 30);
+  if (it.type === 'door') it.label = t || '入口';
+  else if (t) it.label = t; else delete it.label;
+  paint(it); save();
+}
+
+function startMove(e, it) {
+  e.preventDefault();
+  const additive = e.shiftKey || e.ctrlKey || e.metaKey;
+  if (additive) {
+    const ids = new Set(sel);
+    if (ids.has(it.id)) { ids.delete(it.id); setSel([...ids]); return; }   // 選択解除
+    ids.add(it.id); setSel([...ids]);
+  } else if (!sel.has(it.id)) {
+    setSel([it.id]);
+  }
+  // 選択中のものをまとめて移動。選択した机に付いている椅子も一緒に動かす
+  const group = selItems();
+  group.filter(g => g.type === 'table').forEach(t => attachedChairs(t).forEach(c => { if (!group.includes(c)) group.push(c); }));
+  const orig = group.map(g => ({ g, x: g.x, y: g.y }));
+  const pr = orig.find(o => o.g === it);
+  track(e, (dx, dy) => {
+    const ddx = snap(pr.x + dx / view.s) - pr.x;
+    const ddy = snap(pr.y + dy / view.s) - pr.y;
+    orig.forEach(o => { o.g.x = o.x + ddx; o.g.y = o.y + ddy; paint(o.g); });
+  }, moved => {
+    if (!moved) {
+      if (!additive && sel.size > 1) setSel([it.id]);
+      if (!additive && it.type === 'arrow') { it.r = ((it.r || 0) + 1) % 4; paint(it); save(); }   // クリックで右に90度回転
+      return;
+    }
+    if (group.length === 1 && it.type === 'chair') { snapChair(it); paint(it); }
+    save();
+  });
+}
+function startResize(e, t) {
+  e.preventDefault(); e.stopPropagation();
+  select(t.id);
+  const start = t.n;
+  track(e, (dx, dy) => {
+    const d = (t.v ? dy : dx) / view.s;
+    t.n = clamp(Math.round(start + d / CHAIR), 1, MAXN);
+    paint(t);
+  }, moved => { if (moved) save(); });
+}
+
+/* ================= パーツのドラッグ ================= */
+function startPartDrag(e, type) {
+  if (e.button !== 0) return;
+  const g = document.createElement('div');
+  g.className = 'ghost g-' + type;
+  const s = view.s;
+  const dim = type === 'table' ? [2 * CHAIR, TDEPTH] : type === 'round' ? [RD, RD]
+    : type === 'door' ? [DW, DH] : type === 'arrow' ? [AS, AS] : [CHAIR, CHAIR];
+  g.style.width = dim[0] * s + 'px';
+  g.style.height = dim[1] * s + 'px';
+  if (type === 'door' || type === 'arrow') {
+    g.textContent = type === 'door' ? '入口' : '↑';
+    g.style.lineHeight = (dim[1] * s) + 'px';
+    g.style.fontSize = (type === 'door' ? 18 : 52) * s + 'px';
+  }
+  dragGhost(e, g, null, (ev, ok, moved) => {
+    if (!moved) { addAtCenter(type); return; }
+    if (!ok || !inRect(ev, viewport)) return;
+    const p = toStage(ev.clientX, ev.clientY);
+    createItem(type, p.x, p.y);
+  });
+}
+[['#partTable', 'table'], ['#partChair', 'chair'], ['#partRound', 'round'], ['#partDoor', 'door'], ['#partArrow', 'arrow']].forEach(([sel, type]) => {
+  const b = $(sel);
+  b.addEventListener('pointerdown', e => startPartDrag(e, type));
+  b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); addAtCenter(type); } });
+  b.addEventListener('click', e => e.preventDefault());
+});
+
+/* ================= メンバー一覧とドラッグ着席 ================= */
+function renderList() {
+  const q = $('#filter').value.trim().toLowerCase();
+  const chairs = items.filter(i => i.type === 'chair');
+  const seated = new Set(chairs.filter(c => c.m).map(c => c.m));
+  $('#stat').textContent = members.length
+    ? `参加 ${members.length}名 ／ 着席 ${seated.size}名 ／ 空席 ${chairs.filter(c => !c.m).length}` : '';
+  listEl.textContent = '';
+  if (!members.length) {
+    const d = document.createElement('div');
+    d.className = 'empty-list';
+    d.textContent = '左下の「EXCEL読み取り」で参加者を読み込むと、ここに一覧が表示されます。EXCELの列は「会社名・役職・名前」です。';
+    listEl.appendChild(d);
+    return;
+  }
+  const groups = new Map();
+  members.forEach(m => {
+    if (q && !(m.company + m.title + m.name).toLowerCase().includes(q)) return;
+    if (!groups.has(m.company)) groups.set(m.company, []);
+    groups.get(m.company).push(m);
+  });
+  groups.forEach((ms, co) => {
+    const c = colorOf(co);
+    const h = document.createElement('div');
+    h.className = 'grp';
+    const chip = document.createElement('i'); chip.style.background = c.chip;
+    const lab = document.createElement('span'); lab.textContent = `${co}（${ms.length}）`;
+    h.append(chip, lab);
+    listEl.appendChild(h);
+    ms.forEach(m => {
+      const d = document.createElement('div');
+      d.className = 'mem' + (seated.has(m.id) ? ' seated' : '');
+      d.style.background = c.bg; d.style.borderColor = c.bd; d.style.color = c.tx;
+      const n = document.createElement('span'); n.className = 'n'; n.textContent = m.name;
+      const t = document.createElement('span'); t.className = 't'; t.textContent = m.title;
+      d.append(n, t);
+      d.addEventListener('pointerdown', e => startMemberDrag(e, m.id));
+      listEl.appendChild(d);
+    });
+  });
+}
+$('#filter').addEventListener('input', renderList);
+
+function startMemberDrag(e, mid) {
+  if (e.button !== 0) return;
+  e.stopPropagation();
+  const m = memMap.get(mid);
+  if (!m) return;
+  const c = colorOf(m.company);
+  const g = document.createElement('div');
+  g.className = 'ghost g-mem';
+  g.style.background = c.bg; g.style.borderColor = c.bd; g.style.color = c.tx;
+  g.textContent = `${m.company}　${m.name}`;
+  let hover = null;
+  dragGhost(e, g, ev => {
+    const t = chairAt(ev);
+    if (t !== hover) { if (hover) hover.classList.remove('drop'); hover = t; if (t) t.classList.add('drop'); }
+  }, (ev, ok) => {
+    if (hover) hover.classList.remove('drop');
+    if (!ok) return;
+    const t = chairAt(ev);
+    if (t) { assign(+t.dataset.id, mid); return; }
+    if (inRect(ev, document.querySelector('aside'))) unseat(mid);
+  });
+}
+function assign(chairId, mid) {
+  const c = item(chairId);
+  if (!c) return;
+  const old = items.find(i => i.type === 'chair' && i.m === mid);
+  if (old === c) return;
+  const prev = c.m || null;
+  if (old) old.m = prev;          // 先に座っていた席は、相手と入れ替え（空席なら空に）
+  c.m = mid;
+  items.forEach(i => { if (i.type === 'chair') paint(i); });
+  renderList(); save();
+}
+function unseat(mid) {
+  const old = items.find(i => i.type === 'chair' && i.m === mid);
+  if (!old) return;
+  old.m = null; paint(old); renderList(); save();
+}
+
+/* ================= EXCEL 読み取り ================= */
+$('#xlsxBtn').onclick = () => $('#xlsx').click();
+$('#xlsx').addEventListener('change', async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    if (typeof XLSX === 'undefined') throw new Error('EXCEL読み取りのライブラリを読み込めませんでした。インターネット接続を確認してください。');
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false });
+    const list = parseRows(rows);
+    if (!list.length) { alert('参加者が見つかりませんでした。列の並びは「会社名・役職・名前」にしてください。'); return; }
+    setMembers(list);
+  } catch (err) {
+    alert('EXCELを読み取れませんでした：' + err.message);
+  }
+  e.target.value = '';
+});
+function normGender(s) {
+  s = String(s || '').trim();
+  if (/^(男|male|m$)/i.test(s)) return '男';
+  if (/^(女|female|f$)/i.test(s)) return '女';
+  return s;
+}
+function parseRows(rows) {
+  const re = { co: /会社|社名|所属|企業|団体|法人/, ti: /役職|肩書|職位|役割/, nm: /名前|氏名|参加者|メンバー|^名$/, ge: /性別|^性$/ };
+  let start = 0, col = { co: 0, ti: 1, nm: 2, ge: 3 };
+  for (let i = 0; i < Math.min(rows.length, 10); i++) {
+    const r = rows[i].map(x => String(x).trim());
+    const c = { co: r.findIndex(x => re.co.test(x)), ti: r.findIndex(x => re.ti.test(x)), nm: r.findIndex(x => re.nm.test(x)), ge: r.findIndex(x => re.ge.test(x)) };
+    if (c.nm >= 0 && (c.co >= 0 || c.ti >= 0)) { col = c; start = i + 1; break; }
+  }
+  const seen = new Map(), out = [];
+  for (let i = start; i < rows.length; i++) {
+    const r = rows[i];
+    const get = k => (col[k] >= 0 && r[col[k]] !== undefined) ? String(r[col[k]]).trim() : '';
+    const name = get('nm');
+    if (!name) continue;
+    const company = get('co') || '（会社名なし）', ttl = get('ti');
+    const key = company + '|' + name;
+    const k = (seen.get(key) || 0) + 1; seen.set(key, k);
+    out.push({ id: key + '#' + k, company, title: ttl, name, gender: normGender(get('ge')) });
+  }
+  return out;
+}
+function setMembers(list) {
+  members = list;
+  buildColors();
+  items.forEach(i => { if (i.type === 'chair' && i.m && !memMap.has(i.m)) i.m = null; });
+  paintAll(); renderList(); save();
+}
+$('#sampleLink').onclick = () => {
+  if (typeof XLSX === 'undefined') { alert('ライブラリを読み込めませんでした。'); return; }
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['会社名', '役職', '名前', '性別'],
+    ['株式会社サンプル商事', '部長', '山田 太郎', '男'],
+    ['株式会社サンプル商事', '課長', '鈴木 花子', '女'],
+    ['テスト建設株式会社', '代表取締役', '佐藤 一郎', '男']
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '参加者');
+  XLSX.writeFile(wb, '座席表_参加者サンプル.xlsx');
+};
+
+/* ================= 一括配置 ================= */
+$('#bulkBtn').onclick = () => {
+  const n = clamp(parseInt($('#bSize').value, 10) || 2, 1, MAXN);
+  const nt = clamp(parseInt($('#bTables').value, 10) || 0, 0, 100);
+  const nc = clamp(parseInt($('#bChairs').value, 10) || 0, 0, 1000);
+  if (!nt && !nc) { alert('机の個数か椅子の個数を入力してください。'); return; }
+  $('#bSize').value = n; $('#bTables').value = nt; $('#bChairs').value = nc;
+
+  const L = n * CHAIR;
+  const colW = L + 4 * GRID;                     // 机の長さ＋すき間
+  const rowH = 18 * GRID;                        // 椅子(上)＋机＋椅子(下)＋すき間
+  const b = bounds();
+  const ox = b ? snap(b.x0) : 0, oy = b ? snap(b.y1 + 4 * GRID) : 0;
+
+  let cols = nt ? clamp(Math.floor(1400 / colW), 1, nt) : 1;
+  const rows = nt ? Math.ceil(nt / cols) : 0;
+  if (nt) cols = Math.ceil(nt / rows);
+
+  const base = nt ? Math.floor(nc / nt) : 0, extra = nt ? nc % nt : 0;
+  let placed = 0;
+  for (let i = 0; i < nt; i++) {
+    const t = { id: nextId++, type: 'table', n, v: false,
+      x: ox + (i % cols) * colW, y: oy + Math.floor(i / cols) * rowH + 6 * GRID };
+    items.push(t);
+    const cnt = Math.min(2 * n, base + (i < extra ? 1 : 0));
+    sideSlots(t).slice(0, cnt).forEach(p => items.push({ id: nextId++, type: 'chair', x: p.x, y: p.y, m: null }));
+    placed += cnt;
+  }
+  const left = nc - placed;                      // 机に座りきれなかった椅子
+  if (left > 0) {
+    const perRow = Math.max(1, Math.floor((cols * colW) / (CHAIR + GRID)));
+    for (let k = 0; k < left; k++) {
+      items.push({ id: nextId++, type: 'chair', m: null,
+        x: ox + (k % perRow) * (CHAIR + GRID), y: oy + rows * rowH + Math.floor(k / perRow) * (CHAIR + GRID) });
+    }
+  }
+  select(null); paintAll(); renderList(); save(); fitView();
+  toast(left > 0
+    ? `机${nt}台を配置しました。椅子${left}脚は机に座りきれないため、下にまとめて置きました。`
+    : `机${nt}台・椅子${nc}脚を配置しました。`);
+};
+
+/* ================= バックアップ / 復元（.dat） ================= */
+$('#backupBtn').onclick = () => {
+  const data = { app: 'izakaya-seating', version: 1, savedAt: new Date().toISOString(), title, items, members, nextId };
+  const blob = new Blob([JSON.stringify(data)], { type: 'application/octet-stream' });
+  const d = new Date(), p2 = n => String(n).padStart(2, '0');
+  const stamp = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${(title || '座席表').replace(/[\\/:*?"<>|]/g, '_')}_バックアップ_${stamp}.dat`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('バックアップを保存しました。');
+};
+$('#restoreBtn').onclick = () => $('#restoreFile').click();
+$('#restoreFile').addEventListener('change', async e => {
+  const f = e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!d || d.app !== 'izakaya-seating' || !Array.isArray(d.items) || !Array.isArray(d.members)) throw new Error('座席表のバックアップファイルではありません。');
+    const num = v => Number.isFinite(+v) ? +v : 0;
+    const ids = new Set();
+    const newItems = [];
+    d.items.forEach(i => {
+      if (!i || !['table', 'chair', 'door', 'arrow'].includes(i.type)) return;
+      const id = Math.floor(num(i.id));
+      if (id <= 0 || ids.has(id)) return;
+      ids.add(id);
+      if (i.type === 'table') newItems.push({ id, type: 'table', x: num(i.x), y: num(i.y), n: i.round ? 8 : clamp(Math.round(num(i.n)) || 2, 1, MAXN), v: !!i.v, round: !!i.round, label: typeof i.label === 'string' && i.label ? i.label.slice(0, 30) : undefined });
+      else if (i.type === 'door') newItems.push({ id, type: 'door', x: num(i.x), y: num(i.y), label: typeof i.label === 'string' && i.label ? i.label.slice(0, 30) : '入口' });
+      else if (i.type === 'arrow') newItems.push({ id, type: 'arrow', x: num(i.x), y: num(i.y), r: ((Math.round(num(i.r)) % 4) + 4) % 4 });
+      else newItems.push({ id, type: 'chair', x: num(i.x), y: num(i.y), m: typeof i.m === 'string' ? i.m : null });
+    });
+    const newMembers = d.members.filter(m => m && typeof m.id === 'string' && typeof m.name === 'string')
+      .map(m => ({ id: m.id, company: String(m.company || '（会社名なし）'), title: String(m.title || ''), name: m.name, gender: normGender(m.gender) }));
+    if ((items.length || members.length) && !(await askConfirm('現在の内容を、バックアップの内容で置き換えます。よろしいですか？\n（復元後も「1つ手順戻る」で戻せます）'))) return;
+    title = typeof d.title === 'string' ? d.title : '座席表';
+    $('#title').value = title;
+    nextId = Math.max(nextId, num(d.nextId), ...newItems.map(i => i.id + 1), 1);
+    sel = new Set();
+    setState({ items: newItems, members: newMembers });
+    save(); fitView();
+    toast('バックアップから復元しました。');
+  } catch (err) {
+    alert('復元できませんでした：' + err.message);
+  }
+});
+
+/* ================= 整列 ================= */
+$('#tArrange').onclick = () => {
+  if (!items.length) { toast('整列する机や椅子がありません。'); return; }
+  const hasSel = sel.size > 0;
+  const scope = hasSel ? selItems() : items.slice();
+  const tables = scope.filter(i => i.type === 'table');
+  const allTables = items.filter(i => i.type === 'table');
+  const allChairs = items.filter(i => i.type === 'chair');
+  const near = (c, p) => Math.abs(p.x - c.x) < 3 && Math.abs(p.y - c.y) < 3;
+
+  /* A. 机から離れている椅子を、近くの空いている席位置に接着 */
+  const targets = tables.length ? tables : allTables;
+  const slots = [];
+  allTables.forEach(t => {
+    sideSlots(t).forEach(p => slots.push({ x: p.x, y: p.y, pen: 0, ok: targets.includes(t) }));
+    endSlots(t).forEach(p => slots.push({ x: p.x, y: p.y, pen: CHAIR * 0.3, ok: targets.includes(t) }));
+  });
+  const candidates = hasSel && scope.some(i => i.type === 'chair') ? scope.filter(i => i.type === 'chair') : allChairs;
+  const loose = candidates.filter(c => !slots.some(p => near(c, p)));
+  const freeSlots = slots.filter(p => p.ok && !allChairs.some(c => near(c, p)));
+  const pairs = [];
+  loose.forEach(c => freeSlots.forEach(p => {
+    const d = Math.hypot(p.x - c.x, p.y - c.y);
+    if (d < CHAIR * 1.8) pairs.push({ c, p, cost: d + p.pen });
+  }));
+  pairs.sort((a, b) => a.cost - b.cost);
+  const usedC = new Set(), usedP = new Set();
+  let attached = 0;
+  pairs.forEach(({ c, p }) => {
+    if (usedC.has(c) || usedP.has(p)) return;
+    usedC.add(c); usedP.add(p);
+    c.x = p.x; c.y = p.y; attached++;
+  });
+
+  /* B. 机（と付いている椅子）を「ブロック」として、行・列をそろえて等間隔にする */
+  let aligned = 0;
+  if (tables.length >= 2) {
+    const used = new Set();
+    const blocks = tables.map(t => {
+      const cs = attachedChairs(t).filter(c => !used.has(c));
+      cs.forEach(c => used.add(c));
+      const b = { t, cs };
+      measure(b);
+      return b;
+    });
+    function measure(b) {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      [b.t, ...b.cs].forEach(i => {
+        const z = itemSize(i);
+        x0 = Math.min(x0, i.x); y0 = Math.min(y0, i.y); x1 = Math.max(x1, i.x + z.w); y1 = Math.max(y1, i.y + z.h);
+      });
+      Object.assign(b, { x0, y0, x1, y1, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 });
+    }
+    const shift = (b, dx, dy) => { [b.t, ...b.cs].forEach(i => { i.x += dx; i.y += dy; }); measure(b); };
+    // 同じ行／列とみなす塊を作る
+    const cluster = (list, key, size) => {
+      const groups = [];
+      [...list].sort((a, b) => a[key] - b[key]).forEach(b => {
+        const g = groups[groups.length - 1], sz = size(b);
+        if (g && Math.abs(b[key] - g.c) < Math.min(sz, g.min) * 0.5) {
+          g.bs.push(b); g.min = Math.min(g.min, sz);
+          g.c = g.bs.reduce((a, x) => a + x[key], 0) / g.bs.length;
+        } else groups.push({ bs: [b], c: b[key], min: sz });
+      });
+      return groups;
+    };
+    const avgGap = gaps => Math.max(GRID, snap(gaps.length ? gaps.reduce((a, x) => a + Math.max(0, x), 0) / gaps.length : GRID));
+
+    // 行：中心の高さをそろえ、行どうしの間隔を等しくする
+    const rows = cluster(blocks, 'cy', b => b.y1 - b.y0);
+    rows.forEach(r => { const target = r.c; r.bs.forEach(b => shift(b, 0, Math.round(target - b.cy))); });
+    const rb = r => ({ y0: Math.min(...r.bs.map(b => b.y0)), y1: Math.max(...r.bs.map(b => b.y1)) });
+    if (rows.length > 1) {
+      let box = rows.map(rb);
+      const g = avgGap(box.slice(1).map((r, i) => r.y0 - box[i].y1));
+      let bottom = box[0].y1;
+      for (let i = 1; i < rows.length; i++) {
+        const cur = rb(rows[i]), dy = bottom + g - cur.y0;
+        rows[i].bs.forEach(b => shift(b, 0, dy));
+        bottom = cur.y1 + dy;
+      }
+    }
+    // 列：中心の横位置をそろえ、列どうしの間隔を等しくする
+    const cols = cluster(blocks, 'cx', b => b.x1 - b.x0);
+    cols.forEach(c => { const target = c.c; c.bs.forEach(b => shift(b, Math.round(target - b.cx), 0)); });
+    const cb = c => ({ x0: Math.min(...c.bs.map(b => b.x0)), x1: Math.max(...c.bs.map(b => b.x1)) });
+    if (cols.length > 1) {
+      const box = cols.map(cb);
+      const g = avgGap(box.slice(1).map((c, i) => c.x0 - box[i].x1));
+      let right = box[0].x1;
+      for (let i = 1; i < cols.length; i++) {
+        const cur = cb(cols[i]), dx = right + g - cur.x0;
+        cols[i].bs.forEach(b => shift(b, dx, 0));
+        right = cur.x1 + dx;
+      }
+    }
+    aligned = blocks.length;
+  }
+
+  if (!attached && !aligned) { toast(hasSel && tables.length < 2 ? '整列するには、机を2台以上選択してください（選択を解除すると全体を整列します）。' : 'すでに整列されています。'); return; }
+  paintAll(); save();
+  toast([attached ? `椅子${attached}脚を机に接着` : '', aligned ? `机${aligned}台を縦横そろえて整列` : ''].filter(Boolean).join('、') + 'しました。');
+};
+
+/* ================= 自動割り振り（ランダム着席） ================= */
+// 役職の序列（小さいほど上位）。判定できない役職は null
+const RANKS = [
+  [/副会長|副社長/, 2], [/会長|CEO|代表|社長|理事長|オーナー/, 1], [/専務/, 3], [/常務/, 4],
+  [/取締役|執行役員|役員|理事|監査役|顧問|相談役/, 5],
+  [/本部長|事業部長|支店長|支社長|所長|工場長|統括|センター長|室長|局長/, 6],
+  [/次長|副部長/, 8], [/部長/, 7], [/課長/, 9], [/係長|主任|リーダー|チーフ|班長/, 10],
+  [/一般|社員|スタッフ|担当|メンバー|新入/, 11]
+];
+function roleRank(t) {
+  t = (t || '').trim();
+  if (!t) return 11;
+  for (const [re, r] of RANKS) if (re.test(t)) return r;
+  return null;
+}
+// 条件（役職をまとめる／同じ会社を離す）に合うよう、焼きなまし法で席を入れ替えながら最適化
+function optimizeSeating(movable, placed, opt) {
+  const all = items.filter(i => i.type === 'chair');
+  const idx = new Map(all.map((c, i) => [c, i]));
+  const occ = all.map(c => (c.m ? memMap.get(c.m) || null : null));
+  const mv = movable.map(c => idx.get(c));
+  const arr = shuffle(placed.concat(Array(mv.length - placed.length).fill(null)));
+  mv.forEach((gi, k) => { occ[gi] = arr[k]; });
+  const ctr = all.map(c => [c.x + CHAIR / 2, c.y + CHAIR / 2]);
+  const nb = new Map();
+  mv.forEach(i => {
+    const l = [];
+    all.forEach((_, j) => {
+      if (j === i) return;
+      const w = 1 - Math.hypot(ctr[i][0] - ctr[j][0], ctr[i][1] - ctr[j][1]) / (CHAIR * 3);
+      if (w > 0) l.push([j, w]);
+    });
+    nb.set(i, l);
+  });
+  const rank = new Map(members.map(m => [m.id, roleRank(m.title)]));
+  const pc = (a, b) => {
+    let c = 0;
+    if (opt.role && a.title !== b.title) {
+      const ra = rank.get(a.id), rb = rank.get(b.id);
+      c += (ra != null && rb != null) ? Math.abs(ra - rb) : 4;
+    }
+    if (opt.apart && a.company === b.company) c += 10;
+    if (opt.gender && a.gender && b.gender && a.gender === b.gender) c += 6;
+    return c;
+  };
+  const local = i => {
+    const a = occ[i];
+    if (!a) return 0;
+    let s = 0;
+    for (const [j, w] of nb.get(i)) { const b = occ[j]; if (b) s += w * pc(a, b); }
+    return s;
+  };
+  const E = mv.length;
+  if (E >= 2) {
+    const iters = Math.min(80000, 4000 + E * 600);
+    for (let it = 0; it < iters; it++) {
+      const T = 3 * Math.pow(0.02 / 3, it / iters);
+      const p = mv[(Math.random() * E) | 0], q = mv[(Math.random() * E) | 0];
+      if (p === q || (!occ[p] && !occ[q])) continue;
+      const before = local(p) + local(q);
+      [occ[p], occ[q]] = [occ[q], occ[p]];
+      const delta = local(p) + local(q) - before;
+      if (delta > 0 && Math.random() >= Math.exp(-delta / T)) [occ[p], occ[q]] = [occ[q], occ[p]];
+    }
+  }
+  mv.forEach((gi, k) => { movable[k].m = occ[gi] ? occ[gi].id : null; });
+}
+function shuffle(a) {
+  a = a.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+$('#autoSeatBtn').onclick = () => {
+  if (!members.length) { alert('メンバーがいません。先に「EXCEL読み取り」で参加者を読み込んでください。'); return; }
+  const q = $('#filter').value.trim().toLowerCase();
+  const visible = members.filter(m => !q || (m.company + m.title + m.name).toLowerCase().includes(q));  // 一覧に表示中の人
+  if (!visible.length) { alert('一覧に表示されているメンバーがいません。'); return; }
+  let chairs = items.filter(i => i.type === 'chair');
+  if (!chairs.length) { alert('椅子が配置されていません。'); return; }
+  const picked = chairs.filter(c => sel.has(c.id));       // 椅子を選択中なら、その椅子だけが対象
+  const scoped = picked.length > 0;
+  if (scoped) chairs = picked;
+  const vis = new Set(visible.map(m => m.id));
+  if ($('#reshuffle').checked) chairs.forEach(c => { if (c.m && vis.has(c.m)) c.m = null; });
+  const seatedIds = new Set(items.filter(i => i.type === 'chair' && i.m).map(i => i.m));
+  const pool = shuffle(visible.filter(m => !seatedIds.has(m.id)));
+  const empty = shuffle(chairs.filter(c => !c.m));
+  if (!pool.length) {
+    paintAll(); renderList();
+    toast('未着席の人がいません。やり直すには「着席済みも含めてやり直す」にチェックしてください。');
+    return;
+  }
+  if (!empty.length) { paintAll(); renderList(); toast('空いている椅子がありません。'); return; }
+  const k = Math.min(pool.length, empty.length);
+  const opt = { role: $('#optRole').checked, apart: $('#optApart').checked, gender: $('#optGender').checked };
+  if (opt.role || opt.apart || opt.gender) optimizeSeating(empty, pool.slice(0, k), opt);
+  else for (let i = 0; i < k; i++) empty[i].m = pool[i].id;
+  items.forEach(i => { if (i.type === 'chair') paint(i); });
+  renderList(); save();
+  const rest = pool.length - k;
+  const notes = [opt.role ? '近しい役職をまとめ' : '', opt.apart ? '同じ会社を離し' : '', opt.gender ? '同じ性別が隣り合わないよう配慮し' : ''].filter(Boolean);
+  toast((notes.length ? `${notes.join('、')}て、${k}名を着席させました。` : `${k}名をランダムに着席させました。`) + (scoped ? `（選択中の椅子が対象）` : '') + (rest > 0 ? `椅子が足りず${rest}名は未着席です。` : ''));
+};
+
+/* ================= PDF 出力 ================= */
+function askUnassigned(list) {
+  // true = 配置画面に戻る / false = このままPDF作成
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.className = 'modal-ov';
+    const box = document.createElement('div');
+    box.className = 'modal'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true');
+    const h = document.createElement('h3'); h.textContent = '座席が決まっていません';
+    const p = document.createElement('p'); p.textContent = `未割り当ての方（${list.length}名）`;
+    const ul = document.createElement('ul');
+    list.forEach(m => { const li = document.createElement('li'); li.textContent = `${m.company}　${m.name}`; ul.appendChild(li); });
+    const q = document.createElement('div'); q.className = 'q'; q.textContent = '割り当てしますか？';
+    const btns = document.createElement('div'); btns.className = 'btns';
+    const no = document.createElement('button'); no.type = 'button'; no.textContent = 'いいえ（PDF作成）';
+    const yes = document.createElement('button'); yes.type = 'button'; yes.className = 'yes'; yes.textContent = 'はい（配置画面に戻る）';
+    btns.append(no, yes);
+    box.append(h, p, ul, q, btns);
+    ov.appendChild(box);
+    document.body.appendChild(ov);
+    const done = v => { document.removeEventListener('keydown', onKey, true); ov.remove(); resolve(v); };
+    const onKey = e => { if (e.key === 'Escape') { e.preventDefault(); done(true); } };
+    document.addEventListener('keydown', onKey, true);
+    yes.onclick = () => done(true);
+    no.onclick = () => done(false);
+    yes.focus();
+  });
+}
+
+$('#pdfBtn').onclick = async () => {
+  if (!items.length) { alert('机や椅子が配置されていません。'); return; }
+  const seatedIds = new Set(items.filter(i => i.type === 'chair' && i.m).map(i => i.m));
+  const unassigned = members.filter(m => !seatedIds.has(m.id));
+  if (unassigned.length && await askUnassigned(unassigned)) return;   // 「はい」→ 配置画面に戻る
+  if (typeof html2canvas === 'undefined' || !(window.jspdf && window.jspdf.jsPDF)) {
+    alert('PDF出力のライブラリを読み込めませんでした。インターネット接続を確認してください。'); return;
+  }
+  const btn = $('#pdfBtn');
+  btn.disabled = true; btn.textContent = '作成中…';
+  const b = bounds(), M = 24;
+  const bw = b.x1 - b.x0 + M * 2, bh = b.y1 - b.y0 + M * 2;
+  const ex = document.createElement('div');
+  ex.className = 'export';
+  try {
+    const ttl = document.createElement('div');
+    ttl.className = 'ex-title'; ttl.textContent = title || '座席表';
+    ex.appendChild(ttl);
+
+    const st = document.createElement('div');
+    st.className = 'ex-stage'; st.style.width = bw + 'px'; st.style.height = bh + 'px';
+    items.forEach(it => {
+      const clone = els.get(it.id).cloneNode(true);
+      clone.classList.remove('sel');
+      clone.querySelectorAll('.rz,.grip').forEach(n => n.remove());
+      clone.querySelectorAll('.ph').forEach(n => { n.textContent = ''; });
+      clone.style.left = (it.x - b.x0 + M) + 'px';
+      clone.style.top = (it.y - b.y0 + M) + 'px';
+      st.appendChild(clone);
+    });
+    ex.appendChild(st);
+
+    const counts = new Map();
+    items.forEach(i => { if (i.type === 'chair' && i.m && memMap.has(i.m)) { const co = memMap.get(i.m).company; counts.set(co, (counts.get(co) || 0) + 1); } });
+    if (counts.size) {
+      const lg = document.createElement('div');
+      lg.className = 'ex-legend'; lg.style.width = Math.max(bw, 360) + 'px';
+      counts.forEach((n, co) => {
+        const c = colorOf(co), chip = document.createElement('div');
+        chip.className = 'chip'; chip.style.background = c.bg; chip.style.borderColor = c.bd; chip.style.color = c.tx;
+        chip.textContent = `${co}（${n}名）`;
+        lg.appendChild(chip);
+      });
+      ex.appendChild(lg);
+    }
+    document.body.appendChild(ex);
+
+    const scale = clamp(3200 / Math.max(ex.offsetWidth, ex.offsetHeight), 1, 3);
+    const canvas = await html2canvas(ex, { scale, backgroundColor: '#ffffff', logging: false, scrollX: 0, scrollY: 0 });
+    const { jsPDF } = window.jspdf;
+    const landscape = canvas.width >= canvas.height;
+    const pdf = new jsPDF({ orientation: landscape ? 'landscape' : 'portrait', unit: 'mm', format: 'a4' });
+    const pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight(), pm = 8;
+    let iw = pw - pm * 2, ih = iw * canvas.height / canvas.width;
+    if (ih > ph - pm * 2) { ih = ph - pm * 2; iw = ih * canvas.width / canvas.height; }
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', (pw - iw) / 2, pm, iw, ih);
+    const fname = (title || '座席表').replace(/[\\/:*?"<>|]/g, '_');
+    pdf.save(fname + '.pdf');
+  } catch (err) {
+    alert('PDFを作成できませんでした：' + err.message);
+  } finally {
+    ex.remove();
+    btn.disabled = false; btn.textContent = 'PDF出力';
+  }
+};
+
+$('#title').addEventListener('input', e => { title = e.target.value; save(); });
+
+/* ================= 起動 ================= */
+load();
+$('#title').value = title;
+buildColors();
+paintAll();
+renderList();
+pushHistory();
+applyView();
+requestAnimationFrame(() => { if (items.length) fitView(); else { view.tx = 40; view.ty = 70; applyView(); } });
+})();
+</script>
+</body>
+</html>
