@@ -2,7 +2,10 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>座席表作成ツール</title>
 <style>
 :root{
@@ -10,18 +13,24 @@
   --accent:#c0392b; --blue:#2f6db0; --grid:#d3d9df; --canvas:#e8ecef;
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0}
+html,body{height:100%;margin:0;overscroll-behavior:none}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{
+  height:100vh;height:100dvh;
   font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;
   color:var(--ink);background:var(--bg);display:flex;flex-direction:column;overflow:hidden;
-  -webkit-user-select:none;user-select:none;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
+  padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);
 }
 input{-webkit-user-select:text;user-select:text;font-family:inherit}
-button{font-family:inherit;cursor:pointer}
+input[type=text],input[type=search],input[type=number]{-webkit-appearance:none;appearance:none;border-radius:6px}
+button{font-family:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;touch-action:manipulation}
+.mb{display:none}
 button:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 
 /* ---------- header ---------- */
-header{height:52px;flex:none;background:var(--ink);color:#fff;display:flex;align-items:center;gap:16px;padding:0 16px}
+header{height:calc(52px + env(safe-area-inset-top));flex:none;background:var(--ink);color:#fff;display:flex;align-items:center;gap:16px;padding:env(safe-area-inset-top) 16px 0}
+#panelBtn{display:none}
 header h1{font-size:16px;font-weight:700;margin:0;white-space:nowrap;letter-spacing:.04em}
 #title{width:min(320px,40vw);height:32px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:6px;padding:0 10px;font-size:14px}
 #title::placeholder{color:rgba(255,255,255,.5)}
@@ -70,7 +79,7 @@ aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(-
 .sec{padding:12px 14px;border-bottom:1px solid var(--line)}
 .sec h2{font-size:12px;margin:0 0 8px;color:var(--muted);font-weight:600}
 .parts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.part{height:76px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);touch-action:none;cursor:grab}
+.part{height:76px;border:1px solid var(--line);background:#fafbfc;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);touch-action:pan-y;cursor:grab}
 .part:hover{border-color:var(--blue);background:#f1f6fb}
 .part .ic-table{width:48px;height:18px;background:#c9a070;border:2px solid #8a6238;border-radius:4px}
 .part .ic-door{width:44px;height:22px;border:2px solid #1d232b;background:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1}
@@ -84,7 +93,7 @@ aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(-
 .empty-list{margin-top:18px;font-size:12px;line-height:1.7;color:var(--muted)}
 .grp{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--muted);margin:12px 2px 5px}
 .grp i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
-.mem{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;margin-bottom:5px;border:1px solid;border-radius:8px;font-size:13px;cursor:grab;touch-action:none}
+.mem{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;margin-bottom:5px;border:1px solid;border-radius:8px;font-size:13px;cursor:grab;touch-action:pan-y}
 .mem .n{font-weight:700;overflow:hidden;white-space:nowrap}
 .mem .t{font-size:11px;opacity:.75;white-space:nowrap}
 .mem.seated{opacity:.45}
@@ -152,10 +161,62 @@ aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(-
 .export .ex-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
 .export .chip{display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid;border-radius:999px;font-size:12px;font-weight:600}
 
+/* ---------- スマートフォン（縦）：描写エリアを上、操作パネルを下に配置 ---------- */
 @media (max-width:760px){
-  aside{width:210px}
-  header h1{display:none}
+  header{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;height:auto;padding:calc(8px + env(safe-area-inset-top)) 10px 8px}
+  header h1,.spacer{display:none}
+  #title{grid-column:1 / 3;width:auto;min-width:0;height:38px}
+  #panelBtn{display:block;grid-column:3;height:38px;padding:0 6px;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:transparent;color:#fff;font-size:13px;font-weight:600}
+  .hbtn,#pdfBtn{height:38px;padding:0 6px;font-size:13px}
+  main{flex-direction:column}
+  .canvas{order:1;flex:1;min-height:0}
+  aside{order:2;width:100%;height:46%;flex:none;border-right:none;border-top:2px solid var(--line);-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:env(safe-area-inset-bottom)}
+  body.panel-closed aside{display:none}
+  #list{flex:none;overflow:visible;min-height:120px}
+  .part{height:64px;gap:6px}
+  .mem{padding:10px 12px}
+}
+/* ---------- スマートフォン（横）：左にパネル、右に描写エリア ---------- */
+@media (orientation:landscape) and (max-height:520px) and (max-width:1000px){
+  header{display:flex;gap:8px;height:calc(44px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 10px 0}
+  header h1,.spacer{display:none}
+  #title{grid-column:auto;width:min(240px,32vw);height:32px}
+  #panelBtn{display:block;grid-column:auto;height:32px;padding:0 10px;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:transparent;color:#fff;font-size:12px;font-weight:600}
+  .hbtn,#pdfBtn{height:32px;padding:0 10px;font-size:12px}
+  .spacer{display:block;flex:1}
+  main{flex-direction:row}
+  .canvas{order:2;flex:1;min-width:0}
+  aside{order:1;width:260px;height:auto;border-right:1px solid var(--line);border-top:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  body.panel-closed aside{display:none}
+  #list{flex:none;overflow:visible;min-height:120px}
+  .part{height:60px;gap:4px}
+}
+/* スマートフォン共通 */
+@media (max-width:760px),(orientation:landscape) and (max-height:520px) and (max-width:1000px){
+  .pc{display:none}
+  .mb{display:inline}
+  div.mb{display:block}
+  .tools{top:8px;left:8px;right:8px;transform:none;max-width:none;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:5px}
+  .tools button{height:38px;flex:none;white-space:nowrap;padding:0 12px}
+  .tools .sep{flex:none}
+  .zoom{right:8px;bottom:8px}
+  .zoom button{height:38px}
+  .zoom button.sq{width:40px}
   .hint{display:none}
+  input[type=text],input[type=search],input[type=number]{font-size:16px}
+  .bulk input{height:34px}
+  #filter{height:38px}
+  .auto-row label{font-size:13px;padding:3px 0}
+  .auto-row input[type=checkbox]{width:20px;height:20px}
+  #bulkBtn,#autoSeatBtn,#xlsxBtn{height:42px}
+  #toast{bottom:16px}
+  #emptyHint{font-size:14px;padding:0 24px}
+  .touch-note{font-size:11px;color:var(--muted);line-height:1.7;padding:2px 2px 6px}
+}
+/* タッチ画面：つまみ（机の長さ変更）を大きく */
+@media (pointer:coarse){
+  .rz{width:24px;height:48px;margin-top:-24px;right:-14px;border-radius:12px}
+  .table.v .rz{width:48px;height:24px;margin:0 0 0 -24px;bottom:-14px;right:auto}
 }
 </style>
 </head>
@@ -164,6 +225,7 @@ aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(-
   <h1>座席表作成ツール</h1>
   <input id="title" type="text" placeholder="座席表のタイトル（PDFに表示）" value="座席表" aria-label="座席表のタイトル">
   <div class="spacer"></div>
+  <button id="panelBtn" type="button" aria-expanded="true">パネル ▼</button>
   <button id="backupBtn" class="hbtn" type="button" title="現在の座席表をdatファイルで保存">バックアップ</button>
   <button id="restoreBtn" class="hbtn" type="button" title="datファイルから座席表を復元">復元</button>
   <input id="restoreFile" type="file" accept=".dat" hidden>
@@ -173,7 +235,7 @@ aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(-
 <main>
   <aside>
     <div class="sec">
-      <h2>パーツ（右の描写エリアへドラッグ）</h2>
+      <h2><span class="pc">パーツ（右の描写エリアへドラッグ）</span><span class="mb">パーツ（タップで追加 ／ 長押しして配置したい場所へドラッグ）</span></h2>
       <div class="parts">
         <button class="part" id="partTable" type="button"><span class="ic-table"></span>長机</button>
         <button class="part" id="partChair" type="button"><span class="ic-chair"></span>椅子</button>
@@ -208,13 +270,14 @@ aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(-
       <button id="xlsxBtn" type="button">EXCEL読み取り</button>
       <a id="sampleLink">サンプルダウンロード</a>
       <input id="xlsx" type="file" accept=".xlsx,.xls" hidden>
+      <div class="touch-note mb">【スマホ操作】1本指：移動 ／ 2本指：拡大・縮小<br>メンバーを長押ししてドラッグ → 椅子へ着席（このパネルへ戻すと解除）<br>席・机・入口をダブルタップ：着席解除／文字編集 ／ 矢印：タップで回転</div>
     </div>
   </aside>
 
   <section class="canvas">
     <div id="viewport">
       <div id="stage"></div>
-      <div id="emptyHint">左の「長机」「椅子」を<br>ここへドラッグして配置します</div>
+      <div id="emptyHint"><span class="pc">左の「長机」「椅子」を<br>ここへドラッグして配置します</span><span class="mb">パネルの「長机」「椅子」を<br>タップして追加するか、<br>長押ししてここへドラッグします</span></div>
     </div>
     <div class="ui tools" id="tools">
       <button id="tUndo" type="button" title="1つ手順戻る (Ctrl+Z)" disabled>1つ手順戻る</button>
@@ -401,15 +464,75 @@ function fitView() {
   applyView();
 }
 
+/* ================= タッチ操作（スマートフォン） ================= */
+let dragLock = 0;          // ドラッグ中は画面スクロールを止める
+let pinched = false;       // 2本指操作が行われた間は、1本指のパン・移動を無効にする
+const touchPtrs = new Map();
+let pinch = null;
+window.addEventListener('touchmove', e => { if (dragLock) e.preventDefault(); }, { passive: false });
+['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault()));   // Safariのページ拡大を抑止
+document.addEventListener('contextmenu', e => { if (e.target.closest && e.target.closest('.mem,.part,.item,#viewport')) e.preventDefault(); });
+// 2本指：ピンチで拡大縮小＋移動（描写エリアで指を置いたとき。1本目が空白のドラッグ中のみ）
+viewport.addEventListener('pointerdown', e => {
+  if (e.pointerType !== 'touch') return;
+  touchPtrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (touchPtrs.size !== 2) return;
+  e.stopPropagation();                                   // 2本目の指で机の移動やパンを始めない
+  if (!viewport.classList.contains('panning')) return;   // 1本目がアイテム操作・範囲選択中ならピンチしない
+  const [a, b] = [...touchPtrs.values()];
+  pinched = true;
+  pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 };
+}, true);
+window.addEventListener('pointermove', e => {
+  const p = touchPtrs.get(e.pointerId);
+  if (!p) return;
+  p.x = e.clientX; p.y = e.clientY;
+  if (!pinch || touchPtrs.size < 2) return;
+  const [a, b] = [...touchPtrs.values()];
+  const d = Math.hypot(a.x - b.x, a.y - b.y) || 1, cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
+  view.tx += cx - pinch.cx; view.ty += cy - pinch.cy;
+  zoomAt(d / pinch.d, cx, cy);
+  pinch.d = d; pinch.cx = cx; pinch.cy = cy;
+});
+const releaseTouch = e => {
+  touchPtrs.delete(e.pointerId);
+  if (touchPtrs.size < 2) pinch = null;
+  if (!touchPtrs.size) pinched = false;
+};
+window.addEventListener('pointerup', releaseTouch);
+window.addEventListener('pointercancel', releaseTouch);
+window.addEventListener('touchend', e => { if (!e.touches.length) { touchPtrs.clear(); pinch = null; pinched = false; } });
+// 一覧・パーツ：タッチでは長押しでドラッグ開始（短いタップ／縦の動きはスクロールや追加として扱う）
+function onPress(e, begin, onTap) {
+  if (e.pointerType !== 'touch') { begin(e); return; }
+  const sx = e.clientX, sy = e.clientY, id = e.pointerId;
+  let timer = 0;
+  const stop = () => {
+    clearTimeout(timer);
+    window.removeEventListener('pointermove', mv);
+    window.removeEventListener('pointerup', up);
+    window.removeEventListener('pointercancel', cancel);
+  };
+  const mv = ev => { if (ev.pointerId === id && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 8) stop(); };
+  const up = ev => { if (ev.pointerId === id) { stop(); if (onTap) onTap(); } };
+  const cancel = ev => { if (ev.pointerId === id) stop(); };
+  timer = setTimeout(() => { stop(); try { navigator.vibrate && navigator.vibrate(12); } catch (_) {} begin(e); }, 230);
+  window.addEventListener('pointermove', mv);
+  window.addEventListener('pointerup', up);
+  window.addEventListener('pointercancel', cancel);
+}
+
 /* ================= ポインタ補助 ================= */
 function track(e, onMove, onEnd) {
   const sx = e.clientX, sy = e.clientY; let moved = false;
   const mv = ev => {
+    if (ev.pointerId !== e.pointerId || pinched) return;   // 2本指操作中・別の指は無視
     const dx = ev.clientX - sx, dy = ev.clientY - sy;
-    if (!moved && Math.hypot(dx, dy) < 3) return;
+    if (!moved && Math.hypot(dx, dy) < (ev.pointerType === 'touch' ? 6 : 3)) return;
     moved = true; onMove(dx, dy, ev);
   };
   const up = ev => {
+    if (ev.pointerId !== e.pointerId) return;
     window.removeEventListener('pointermove', mv);
     window.removeEventListener('pointerup', up);
     window.removeEventListener('pointercancel', up);
@@ -426,7 +549,9 @@ function dragGhost(e, ghost, onMove, onEnd) {
   let moved = false; const sx = e.clientX, sy = e.clientY;
   const place = ev => { ghost.style.left = ev.clientX + 'px'; ghost.style.top = ev.clientY + 'px'; };
   place(e);
+  dragLock++;
   const mv = ev => {
+    if (ev.pointerId !== e.pointerId) return;
     if (!moved) {
       if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < 5) return;
       moved = true; ghost.style.display = 'block';
@@ -434,6 +559,8 @@ function dragGhost(e, ghost, onMove, onEnd) {
     place(ev); onMove && onMove(ev);
   };
   const up = ev => {
+    if (ev.pointerId !== e.pointerId) return;
+    dragLock = Math.max(0, dragLock - 1);
     window.removeEventListener('pointermove', mv);
     window.removeEventListener('pointerup', up);
     window.removeEventListener('pointercancel', up);
@@ -773,13 +900,33 @@ stage.addEventListener('pointerdown', e => {
   if (e.target.closest('.rz')) { startResize(e, it); return; }
   startMove(e, it);
 });
+let lastDouble = 0;
+function onItemDouble(c) {
+  lastDouble = Date.now();
+  if (c.type === 'chair') { if (c.m) { c.m = null; paint(c); renderList(); save(); } }
+  else if (c.type === 'door' || c.type === 'table') editLabel(c);
+}
 stage.addEventListener('dblclick', e => {
+  if (Date.now() - lastDouble < 700) return;     // ダブルタップで処理済み
   const el = e.target.closest('.item');
   if (!el || e.target.closest('.rz')) return;
   const c = item(+el.dataset.id);
-  if (!c) return;
-  if (c.type === 'chair') { if (c.m) { c.m = null; paint(c); renderList(); save(); } }
-  else if (c.type === 'door' || c.type === 'table') editLabel(c);
+  if (c) onItemDouble(c);
+});
+// タッチのダブルタップ（iOS Safariなどでは dblclick が発生しにくいため自前で判定）
+let tapDown = null, lastTap = { t: 0, id: 0 };
+stage.addEventListener('pointerdown', e => { tapDown = e.pointerType === 'touch' ? { x: e.clientX, y: e.clientY } : null; });
+stage.addEventListener('pointerup', e => {
+  if (e.pointerType !== 'touch' || !tapDown || pinched) return;
+  const el = e.target.closest('.item');
+  if (!el || e.target.closest('.rz')) return;
+  if (Math.hypot(e.clientX - tapDown.x, e.clientY - tapDown.y) > 10) { tapDown = null; return; }
+  const id = +el.dataset.id, now = Date.now();
+  if (lastTap.id === id && now - lastTap.t < 380) {
+    lastTap = { t: 0, id: 0 };
+    const c = item(id);
+    if (c) onItemDouble(c);
+  } else lastTap = { t: now, id };
 });
 // 机・入口の文字を編集（ダブルクリック）
 async function editLabel(it) {
@@ -857,7 +1004,7 @@ function startPartDrag(e, type) {
 }
 [['#partTable', 'table'], ['#partChair', 'chair'], ['#partRound', 'round'], ['#partDoor', 'door'], ['#partArrow', 'arrow']].forEach(([sel, type]) => {
   const b = $(sel);
-  b.addEventListener('pointerdown', e => startPartDrag(e, type));
+  b.addEventListener('pointerdown', e => onPress(e, ev => startPartDrag(ev, type), () => addAtCenter(type)));
   b.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); addAtCenter(type); } });
   b.addEventListener('click', e => e.preventDefault());
 });
@@ -898,7 +1045,7 @@ function renderList() {
       const n = document.createElement('span'); n.className = 'n'; n.textContent = m.name;
       const t = document.createElement('span'); t.className = 't'; t.textContent = m.title;
       d.append(n, t);
-      d.addEventListener('pointerdown', e => startMemberDrag(e, m.id));
+      d.addEventListener('pointerdown', e => onPress(e, ev => startMemberDrag(ev, m.id)));
       listEl.appendChild(d);
     });
   });
@@ -1383,7 +1530,9 @@ $('#pdfBtn').onclick = async () => {
     }
     document.body.appendChild(ex);
 
-    const scale = clamp(3200 / Math.max(ex.offsetWidth, ex.offsetHeight), 1, 3);
+    let scale = clamp(3200 / Math.max(ex.offsetWidth, ex.offsetHeight), 1, 3);
+    scale = Math.min(scale, Math.sqrt(12e6 / (ex.offsetWidth * ex.offsetHeight)));   // スマホ(Safari)のキャンバス上限対策
+    scale = Math.max(scale, 0.5);
     const canvas = await html2canvas(ex, { scale, backgroundColor: '#ffffff', logging: false, scrollX: 0, scrollY: 0 });
     const { jsPDF } = window.jspdf;
     const landscape = canvas.width >= canvas.height;
@@ -1412,8 +1561,14 @@ paintAll();
 renderList();
 pushHistory();
 applyView();
+$('#panelBtn').onclick = () => {
+  const closed = document.body.classList.toggle('panel-closed');
+  $('#panelBtn').textContent = closed ? 'パネル ▲' : 'パネル ▼';
+  $('#panelBtn').setAttribute('aria-expanded', String(!closed));
+};
 requestAnimationFrame(() => { if (items.length) fitView(); else { view.tx = 40; view.ty = 70; applyView(); } });
 })();
 </script>
 </body>
 </html>
+
