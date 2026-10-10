@@ -71,7 +71,30 @@ header h1{font-size:16px;font-weight:700;margin:0;white-space:nowrap;letter-spac
 .modal .btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .modal .btns button{height:38px;padding:0 16px;border-radius:8px;font-size:13px;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink)}
 .modal .btns .yes{background:var(--ink);border-color:var(--ink);color:#fff}
-#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:2000;display:none;max-width:80vw;text-align:center}
+#regBtn{height:38px;border:none;border-radius:8px;background:var(--blue);color:#fff;font-size:14px;font-weight:700}
+#regBtn:hover{background:#285c96}
+.modal.reg{width:min(560px,100%);max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);display:flex;flex-direction:column}
+.reg-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.reg-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
+.reg-form input,.reg-form select{height:38px;width:100%;border:1px solid var(--line);border-radius:6px;padding:0 9px;font-size:16px;color:var(--ink);background:#fff;font-family:inherit}
+.reg-act{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:12px}
+#rMsg{flex:1;font-size:12px;color:var(--accent);min-width:0}
+#rMsg.ok{color:var(--blue)}
+.reg-act button{height:38px;padding:0 18px;border-radius:8px;font-size:13px;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.reg-act .yes{background:var(--blue);border-color:var(--blue);color:#fff}
+.reg-count{font-size:12px;color:var(--muted);margin-bottom:6px}
+.reg-list{flex:1;min-height:80px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:#fafbfc;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+.reg-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px}
+.reg-row:last-child{border-bottom:none}
+.reg-row.editing{background:#eef5fc}
+.reg-row .inf{flex:1;min-width:0}
+.reg-row .nm{font-weight:700}
+.reg-row .sub{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reg-row button{height:32px;padding:0 10px;border-radius:6px;border:1px solid var(--line);background:#fff;font-size:12px;font-weight:600;color:var(--ink)}
+.reg-row button.del{color:var(--accent)}
+.reg-empty{padding:18px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
+.modal .btns .dng{color:var(--accent);margin-right:auto}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:5000;display:none;max-width:80vw;text-align:center}
 
 /* ---------- layout ---------- */
 main{flex:1;min-height:0;display:flex}
@@ -267,6 +290,7 @@ aside{width:300px;flex:none;background:var(--panel);border-right:1px solid var(-
     </div>
     <div id="list"></div>
     <div class="foot">
+      <button id="regBtn" type="button">参加者登録</button>
       <button id="xlsxBtn" type="button">EXCEL読み取り</button>
       <a id="sampleLink">サンプルダウンロード</a>
       <input id="xlsx" type="file" accept=".xlsx,.xls" hidden>
@@ -829,7 +853,7 @@ $('#tClear').onclick = async () => {
 };
 
 window.addEventListener('keydown', e => {
-  if (e.target && (e.target.tagName === 'INPUT' || e.target.isContentEditable)) return;
+  if (e.target && (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName) || e.target.isContentEditable)) return;
   if ((e.ctrlKey || e.metaKey) && !e.altKey) {
     const k = e.key.toLowerCase();
     if (k === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
@@ -1020,7 +1044,7 @@ function renderList() {
   if (!members.length) {
     const d = document.createElement('div');
     d.className = 'empty-list';
-    d.textContent = '左下の「EXCEL読み取り」で参加者を読み込むと、ここに一覧が表示されます。EXCELの列は「会社名・役職・名前」です。';
+    d.textContent = '「参加者登録」で1人ずつ登録するか、「EXCEL読み取り」でまとめて読み込むと、ここに一覧が表示されます。EXCELの列は「会社名・役職・名前・性別」です。';
     listEl.appendChild(d);
     return;
   }
@@ -1089,6 +1113,129 @@ function unseat(mid) {
   const old = items.find(i => i.type === 'chair' && i.m === mid);
   if (!old) return;
   old.m = null; paint(old); renderList(); save();
+}
+
+/* ================= 参加者登録（1人ずつ登録・修正・削除） ================= */
+$('#regBtn').onclick = () => openRegister();
+function uniqueMemberId(company, name) {
+  const key = company + '|' + name;
+  let k = 1;
+  while (memMap.has(key + '#' + k)) k++;
+  return key + '#' + k;
+}
+function openRegister() {
+  if (document.querySelector('.reg-ov')) return;
+  const ov = document.createElement('div');
+  ov.className = 'modal-ov reg-ov';
+  ov.innerHTML = '<div class="modal reg" role="dialog" aria-label="参加者登録">' +
+    '<h3>参加者登録</h3>' +
+    '<p>1人ずつ登録できます。EXCELで読み込んだ参加者の追加・修正・削除もできます。</p>' +
+    '<div class="reg-form">' +
+    '<label>会社名<input id="rCo" type="text" list="rCoList" autocomplete="off" maxlength="60" placeholder="例：株式会社サンプル商事"></label>' +
+    '<label>役職<input id="rTi" type="text" autocomplete="off" maxlength="40" placeholder="例：部長"></label>' +
+    '<label>名前（必須）<input id="rNm" type="text" autocomplete="off" maxlength="40" placeholder="例：山田 太郎"></label>' +
+    '<label>性別<select id="rGe"><option value="">未設定</option><option value="男">男</option><option value="女">女</option></select></label>' +
+    '</div><datalist id="rCoList"></datalist>' +
+    '<div class="reg-act"><span id="rMsg"></span><button id="rCancel" type="button" hidden>編集をやめる</button><button id="rSave" class="yes" type="button">追加</button></div>' +
+    '<div class="reg-count" id="rCount"></div><div class="reg-list" id="rList"></div>' +
+    '<div class="btns"><button id="rClear" class="dng" type="button">全員削除</button><button id="rClose" class="yes" type="button">閉じる</button></div></div>';
+  document.body.appendChild(ov);
+  const q = id => ov.querySelector('#' + id);
+  const co = q('rCo'), ti = q('rTi'), nm = q('rNm'), ge = q('rGe'), msg = q('rMsg'), list = q('rList');
+  let editId = null;
+  const say = (t, ok) => { msg.textContent = t || ''; msg.className = ok ? 'ok' : ''; };
+  const resetForm = keepCompany => {
+    editId = null;
+    if (!keepCompany) co.value = '';
+    ti.value = ''; nm.value = ''; ge.value = '';
+    q('rSave').textContent = '追加'; q('rCancel').hidden = true;
+  };
+  const close = () => { document.removeEventListener('keydown', onKey); ov.remove(); };
+  const onKey = e => {
+    if (e.key === 'Escape' && !document.querySelector('.dlg-back')) { e.preventDefault(); close(); }
+  };
+  document.addEventListener('keydown', onKey);
+
+  function renderReg() {
+    const dl = q('rCoList'); dl.textContent = '';
+    [...new Set(members.map(m => m.company).filter(c => c !== '（会社名なし）'))].forEach(c => {
+      const o = document.createElement('option'); o.value = c; dl.appendChild(o);
+    });
+    q('rCount').textContent = members.length ? `登録済み：${members.length}名` : '';
+    list.textContent = '';
+    if (!members.length) {
+      const d = document.createElement('div'); d.className = 'reg-empty';
+      d.textContent = 'まだ参加者が登録されていません。上のフォームから登録してください。';
+      list.appendChild(d); return;
+    }
+    members.forEach(m => {
+      const row = document.createElement('div');
+      row.className = 'reg-row' + (m.id === editId ? ' editing' : '');
+      const inf = document.createElement('div'); inf.className = 'inf';
+      const n = document.createElement('div'); n.className = 'nm'; n.textContent = m.name;
+      if (m.gender) {
+        const g = document.createElement('span');
+        g.textContent = '　' + m.gender;
+        g.style.color = m.gender === '男' ? '#1d4fd8' : m.gender === '女' ? '#d11a2a' : '#000';
+        g.style.fontWeight = '600'; g.style.fontSize = '12px';
+        n.appendChild(g);
+      }
+      const sub = document.createElement('div'); sub.className = 'sub';
+      sub.textContent = [m.company, m.title].filter(Boolean).join('　／　');
+      inf.append(n, sub);
+      const ed = document.createElement('button'); ed.type = 'button'; ed.textContent = '編集';
+      ed.onclick = () => {
+        editId = m.id; co.value = m.company === '（会社名なし）' ? '' : m.company;
+        ti.value = m.title; nm.value = m.name; ge.value = ['男', '女'].includes(m.gender) ? m.gender : '';
+        q('rSave').textContent = '更新'; q('rCancel').hidden = false;
+        say('編集中：内容を直して「更新」を押してください', true);
+        renderReg(); nm.focus();
+      };
+      const del = document.createElement('button'); del.type = 'button'; del.className = 'del'; del.textContent = '削除';
+      del.onclick = () => {
+        members = members.filter(x => x !== m);
+        if (editId === m.id) { resetForm(true); say(''); }
+        setMembers(members); renderReg();
+        toast(`「${m.name}」を削除しました。（「1つ手順戻る」で戻せます）`);
+      };
+      row.append(inf, ed, del);
+      list.appendChild(row);
+    });
+  }
+
+  function submit() {
+    const name = nm.value.trim(), company = co.value.trim() || '（会社名なし）', title2 = ti.value.trim(), gender = ge.value;
+    if (!name) { say('名前を入力してください。'); nm.focus(); return; }
+    if (editId) {
+      const m = members.find(x => x.id === editId);
+      if (m) { m.company = company; m.title = title2; m.name = name; m.gender = gender; }
+      setMembers(members);
+      say(`更新しました：${name}`, true);
+      resetForm(true);
+    } else {
+      members.push({ id: uniqueMemberId(company, name), company, title: title2, name, gender });
+      setMembers(members);
+      say(`追加しました：${name}`, true);
+      resetForm(true);
+      requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; });
+    }
+    renderReg();
+    nm.focus();
+  }
+  q('rSave').onclick = submit;
+  q('rCancel').onclick = () => { resetForm(true); say(''); renderReg(); };
+  q('rClose').onclick = close;
+  q('rClear').onclick = async () => {
+    if (!members.length) return;
+    if (!(await askConfirm(`登録済みの参加者${members.length}名をすべて削除します。よろしいですか？\n（着席も解除されます）`))) return;
+    members = []; resetForm(true); say(''); setMembers(members); renderReg();
+  };
+  [co, ti, nm].forEach(i => i.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); submit(); }   // 日本語変換の確定Enterは除く
+  }));
+  ov.addEventListener('pointerdown', e => { if (e.target === ov) close(); });
+  renderReg();
+  nm.focus();
 }
 
 /* ================= EXCEL 読み取り ================= */
