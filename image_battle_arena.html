@@ -70,7 +70,22 @@ button,input,.panel,.fighter,.log,.winner-modal{font-family:'DotGothic16','Press
 .stat b{font-family:'Press Start 2P','DotGothic16',monospace;font-size:1.02rem;letter-spacing:0;text-shadow:2px 2px 0 #020813}
 .followers,.matchup-record{border-radius:0;border:2px solid #23466f;background:#071326;font-size:.68rem}
 .add-challenger{border-radius:0;border:3px dashed #397cb6;min-height:126px;font-family:'DotGothic16',monospace;box-shadow:3px 3px 0 #061020}
-@media(max-width:520px){.roster{grid-template-columns:minmax(0,440px)}.fighter{width:100%}.x-preview{height:auto;min-height:126px;flex-direction:row;text-align:left}.x-preview img{width:64px;height:64px}.x-preview .x-meta{text-align:left}.x-preview .x-meta .bio{font-size:.66rem}.stat{font-size:.62rem}.stat span{font-size:.66rem}}
+@media(max-width:520px){.roster{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:stretch}.fighter{width:100%;max-width:100%;padding:7px;min-width:0}.fighter .slot{font-size:.43rem;letter-spacing:0;overflow-wrap:anywhere}.fighter label{font-size:.66rem;line-height:1.35}.fighter input[type=text]{font-size:.58rem;padding:7px;min-width:0}.x-preview{height:auto;min-height:0;flex-direction:column;text-align:center;padding:7px;gap:5px}.x-preview img{width:48px;height:48px}.x-preview .x-meta{text-align:center;width:100%;min-width:0}.x-preview .x-meta strong{font-size:.72rem;line-height:1.3;overflow-wrap:anywhere}.x-preview .x-meta .handle{font-size:.61rem;overflow-wrap:anywhere}.x-preview .x-meta .bio{font-size:.59rem;line-height:1.3;max-height:2.6em}.fighter-vitals .hptext{font-size:.58rem}.stats{grid-template-columns:1fr;gap:5px}.stat{font-size:.58rem;min-height:36px;padding:5px}.stat span{font-size:.58rem}.stat b{font-size:.8rem}.followers,.matchup-record{font-size:.58rem;padding:6px}.add-challenger{min-height:100px;font-size:.68rem;padding:6px}}
+
+
+/* Compact favorite fighter shelf */
+.favorite-list{display:grid;grid-template-columns:1fr;gap:5px;max-height:340px;overflow:auto;padding:2px}
+.favorite-card{display:grid;grid-template-columns:32px minmax(0,1fr) minmax(0,1fr) 28px;align-items:center;gap:7px;min-width:0;padding:5px 6px;background:#071326;border:1px solid #24517d;border-radius:0;box-shadow:2px 2px 0 #030914;cursor:grab}
+.favorite-card:active{cursor:grabbing}
+.favorite-card img{width:30px;height:30px;object-fit:cover;border:1px solid var(--cyan);image-rendering:pixelated;background:#14223a}
+.favorite-card .fav-handle,.favorite-card .fav-display{font-size:.72rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.favorite-card .fav-handle{color:var(--cyan)}.favorite-card .fav-display{color:#edf4ff}
+.favorite-card .fav-remove{padding:3px 5px;min-width:0;background:#263954;color:#bcd0eb;border:1px solid #405575;border-radius:0;font-size:.72rem;line-height:1}
+.favorite-drop{border:2px dashed #397cb6;padding:8px;text-align:center;color:#8da9ca;font-size:.72rem;margin-bottom:8px}
+.favorite-drop.drag-over{border-color:var(--cyan);background:#12304a;color:var(--cyan)}
+.favorite-add-btn{grid-column:1/-1;width:100%;margin-top:5px;padding:7px 8px;background:#112842;color:#ffd96b;border:1px dashed #987d35;border-radius:0;font-size:.72rem;box-shadow:2px 2px 0 #030914}
+.favorite-add-btn.is-favorite{color:#75efb4;border-style:solid;border-color:#3b8068}
+@media(max-width:520px){.favorite-card{grid-template-columns:28px minmax(0,1fr) minmax(0,1fr) 24px;gap:5px;padding:4px}.favorite-card img{width:26px;height:26px}.favorite-card .fav-handle,.favorite-card .fav-display{font-size:.64rem}.favorite-add-btn{font-size:.62rem;padding:6px}}
 
 </style>
 </head>
@@ -93,7 +108,8 @@ button,input,.panel,.fighter,.log,.winner-modal{font-family:'DotGothic16','Press
  <div class="fighter" data-slot="1"><div class="slot">FIGHTER 02</div><label for="name1">Xアカウント名（@は省略可）</label><input id="name1" type="text" maxlength="32" placeholder="例：NASA" value="" autocomplete="off"><div class="preview x-preview" id="preview1">Xアカウント名を入力してください</div><div class="fighter-vitals"><div class="hpbar"><span id="fighterHpbar1" style="width:100%"></span></div><div class="hptext" id="fighterHptext1">精神力 — / —</div></div><div class="stats" id="stats1"><div class="empty">アカウント名を入力すると能力値を生成</div></div></div>
 </div>
 <aside class="rightcol">
-<section class="panel"><h2>🏆 殿堂入りチャンピオン</h2><p class="foot">これまでで最も勝利数が多いアカウントを表示します。カードを登録枠へドラッグするか、スマホでは「使う」で対戦相手に設定できます。</p><div id="hofList" class="hof-list"><div class="empty">まだ殿堂入りファイターはいません。</div></div></section>
+<section class="panel"><h2>⭐ お気に入りファイター <small id="favoriteCount" style="margin-left:auto;color:var(--muted);font-size:.72rem">0 / 20</small></h2><p class="foot">ファイター登録の「★ お気に入り追加」を押すか、登録カードをここへドラッグ。最大20名まで保存できます。</p><div class="favorite-drop" id="favoriteDrop">＋ ここへファイターをドラッグして追加</div><div id="favoriteList" class="favorite-list"><div class="empty">お気に入りファイターはまだいません。</div></div></section>
+<section class="panel"><h2>🏆 殿堂入りチャンピオン</h2><p class="foot">これまでで最も勝利数が多いアカウントを表示します。</p><div id="hofList" class="hof-list"><div class="empty">まだ殿堂入りファイターはいません。</div></div></section>
 <section class="panel"><h2>🏆 勝者ランキング TOP 10</h2><ol class="ranklist" id="ranking"><li class="empty">まだランキング登録がありません。</li></ol><p class="foot">勝利数の多い順に上位10アカウントを表示します。</p></section>
 </aside>
 <section class="panel arena">
@@ -115,7 +131,7 @@ const $ = id => document.getElementById(id);
 const rosterNode=$('roster'); if(rosterNode && $('rosterMount')) $('rosterMount').replaceWith(rosterNode);
 const state = {
  fighters:[null,null], mode:'single', active:false, attacker:0, turn:0, timer:null, fast:false, turnOrder:[], eliminated:[],
- totalBattles:0,totalWins:0, ranking:[],records:{},matchups:{}, hall:[]
+ totalBattles:0,totalWins:0, ranking:[],records:{},matchups:{}, hall:[], favorites:[]
 };
 const statNames=[['HP','精神力'],['AT','ツィート力'],['DF','自己肯定力'],['SP','ミュート力']];
 // X風の短文はすべてこのゲーム用に作成したオリジナル文。攻撃・防御・回避を合わせて300パターン生成。
@@ -155,14 +171,36 @@ function makeStats(handle){
 function readRank(){try{return JSON.parse(localStorage.getItem('imageArenaRanking')||'[]')}catch{return []}}
 function readTotals(){try{return JSON.parse(localStorage.getItem('imageArenaTotals')||'{}')}catch{return {}}}
 const saved=readTotals();state.totalBattles=saved.totalBattles||0;state.totalWins=saved.totalWins||0;state.ranking=readRank();state.records=saved.records||{};state.matchups=saved.matchups||{};try{state.hall=JSON.parse(localStorage.getItem('imageArenaHall')||'[]')}catch{state.hall=[]}
-function persist(){try{localStorage.setItem('imageArenaRanking',JSON.stringify(state.ranking));localStorage.setItem('imageArenaTotals',JSON.stringify({totalBattles:state.totalBattles,totalWins:state.totalWins,records:state.records,matchups:state.matchups}));localStorage.setItem('imageArenaHall',JSON.stringify(state.hall))}catch{}renderRanking()}
+try{state.favorites=JSON.parse(localStorage.getItem('imageArenaFavorites')||'[]').slice(0,20)}catch{state.favorites=[]}
+function persist(){try{localStorage.setItem('imageArenaRanking',JSON.stringify(state.ranking));localStorage.setItem('imageArenaTotals',JSON.stringify({totalBattles:state.totalBattles,totalWins:state.totalWins,records:state.records,matchups:state.matchups}));localStorage.setItem('imageArenaHall',JSON.stringify(state.hall));localStorage.setItem('imageArenaFavorites',JSON.stringify(state.favorites.slice(0,20)))}catch{}renderRanking()}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function renderStats(i){
  const f=state.fighters[i],el=$('stats'+i);
  if(!f){el.innerHTML='<div class="empty">アカウント名を入力すると能力値を生成</div>';return}
  el.innerHTML=statNames.map(([k,label])=>`<div class="stat-wrap stat-${k}"><div class="stat"><span>${label}</span><b>${f.stats[k]}</b></div><div class="bar"><span style="width:${f.stats[k]}%"></span></div></div>`).join('')+
- `<div class="followers">👥 <span>フォロワー</span> <b>${formatFollowers(f.followers)}</b></div><div class="matchup-record">⚔️ ${escapeHtml(matchupLabel(f,state.fighters.find((op,j)=>j!==i&&op)||null))}</div>`;
+ `<div class="followers">👥 <span>フォロワー</span> <b>${formatFollowers(f.followers)}</b></div><div class="matchup-record">⚔️ ${escapeHtml(matchupLabel(f,state.fighters.find((op,j)=>j!==i&&op)||null))}</div><button type="button" class="favorite-add-btn ${isFavorite(f.handle)?'is-favorite':''}" data-favorite-slot="${i}" ${isFavorite(f.handle)||state.favorites.length>=20?'disabled':''}>${isFavorite(f.handle)?'★ お気に入り登録済み':'★ お気に入り追加'}</button>`;
+ const favBtn=el.querySelector('[data-favorite-slot]');if(favBtn)favBtn.addEventListener('click',()=>addFavorite(i));
 }
+function isFavorite(handle){return state.favorites.some(x=>String(x.handle||'').toLowerCase()===String(handle||'').toLowerCase())}
+function addFavorite(slotOrFighter){
+ const f=typeof slotOrFighter==='number'?state.fighters[slotOrFighter]:slotOrFighter;
+ if(!f){alert('先にファイターを登録してください。');return false}
+ if(isFavorite(f.handle))return false;
+ if(state.favorites.length>=20){alert('お気に入りは最大20名まで登録できます。');return false}
+ state.favorites.push({id:f.id||('fav-'+Date.now()),name:f.name||'@'+f.handle,handle:f.handle,displayName:f.displayName||f.handle,description:f.description||'',image:f.image||avatarUrl(f.handle),followers:f.followers??null,stats:{...(f.stats||makeStats(f.handle))},wins:f.wins||0});
+ try{localStorage.setItem('imageArenaFavorites',JSON.stringify(state.favorites))}catch{}
+ renderFavorites();state.fighters.forEach((x,i)=>{if(x)renderStats(i)});return true;
+}
+function removeFavorite(handle){state.favorites=state.favorites.filter(x=>String(x.handle||'').toLowerCase()!==String(handle||'').toLowerCase());try{localStorage.setItem('imageArenaFavorites',JSON.stringify(state.favorites))}catch{}renderFavorites();state.fighters.forEach((x,i)=>{if(x)renderStats(i)})}
+function renderFavorites(){
+ const el=$('favoriteList'),count=$('favoriteCount');if(!el)return;
+ if(count)count.textContent=`${state.favorites.length} / 20`;
+ if(!state.favorites.length){el.innerHTML='<div class="empty">お気に入りファイターはまだいません。</div>';return}
+ el.innerHTML=state.favorites.slice(0,20).map((f,i)=>`<div class="favorite-card" draggable="true" data-favorite-index="${i}" title="ファイター登録枠へドラッグして使用"><img src="${escapeHtml(f.image||avatarUrl(f.handle))}" alt="" onerror="this.onerror=null;this.src='${fallbackAvatar()}'"><span class="fav-handle">${escapeHtml(f.name||'@'+f.handle)}</span><span class="fav-display" title="${escapeHtml(f.displayName||f.handle)}">${escapeHtml(f.displayName||f.handle)}</span><button type="button" class="fav-remove" data-remove-favorite="${escapeHtml(f.handle)}" aria-label="お気に入りから削除">×</button></div>`).join('');
+ el.querySelectorAll('[data-favorite-index]').forEach(card=>card.addEventListener('dragstart',e=>{const index=Number(card.dataset.favoriteIndex);e.dataTransfer.setData('text/plain',JSON.stringify({source:'favorites',index}));e.dataTransfer.effectAllowed='copy'}));
+ el.querySelectorAll('[data-remove-favorite]').forEach(btn=>btn.addEventListener('click',()=>removeFavorite(btn.dataset.removeFavorite)));
+}
+function setupFavoriteDrop(){const drop=$('favoriteDrop');if(!drop)return;drop.addEventListener('dragover',e=>{if(!state.active){e.preventDefault();drop.classList.add('drag-over')}});drop.addEventListener('dragleave',()=>drop.classList.remove('drag-over'));drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('drag-over');if(state.active)return;const raw=e.dataTransfer.getData('text/plain');let payload;try{payload=JSON.parse(raw)}catch{return}if(payload.source==='fighter'){if(addFavorite(Number(payload.index)))log('⭐ お気に入りファイターに追加しました。','special')}else if(payload.source==='ranking'){const item=state.ranking[Number(payload.index)];if(item)addFavorite(item)}else if(payload.source==='hall'){const item=state.hall[Number(payload.index)];if(item)addFavorite(item)} });}
 function avatarUrl(username){return 'https://unavatar.io/x/'+encodeURIComponent(username)}
 function formatFollowers(n){if(n===null||n===undefined||n==='')return '取得不可';const v=Number(n);return Number.isFinite(v)?v.toLocaleString('ja-JP')+'人':escapeHtml(String(n))}
 // フォロワー1,000人ごとに、1ターンあたり0.0001%（確率0.000001）を加算。
@@ -190,10 +228,10 @@ async function fetchProfile(handle, fighterId, slot){
 function renderRoster(){
  const roster=$('roster'); if(!roster)return;
  const count=state.fighters.length;
- roster.innerHTML=state.fighters.map((f,i)=>`<div class="fighter" data-slot="${i}"><div class="slot">FIGHTER ${String(i+1).padStart(2,'0')}</div><label for="name${i}">Xアカウント名（@は省略可）</label><input id="name${i}" type="text" maxlength="32" placeholder="例：${i===0?'OpenAI':i===1?'NASA':'挑戦者'+(i+1)}" value="${escapeHtml(f?.handle||'')}" autocomplete="off" ${state.active?'disabled':''}><div class="preview x-preview" id="preview${i}">${f?profileMarkup(f):'Xアカウント名を入力してください'}</div><div class="fighter-vitals"><div class="hpbar"><span id="fighterHpbar${i}" style="width:100%"></span></div><div class="hptext" id="fighterHptext${i}">精神力 — / —</div></div><div class="stats" id="stats${i}">${f?'':'<div class="empty">アカウント名を入力すると能力値を生成</div>'}</div></div>`).join('') + (state.mode==='melee'&&count<8?'<button type="button" class="add-challenger" id="addChallengerBtn">＋ 挑戦者追加</button>':'');
+ roster.innerHTML=state.fighters.map((f,i)=>`<div class="fighter" data-slot="${i}" draggable="${f ? 'true' : 'false'}"><div class="slot">FIGHTER ${String(i+1).padStart(2,'0')}</div><label for="name${i}">Xアカウント名（@は省略可）</label><input id="name${i}" type="text" maxlength="32" placeholder="例：${i===0?'OpenAI':i===1?'NASA':'挑戦者'+(i+1)}" value="${escapeHtml(f?.handle||'')}" autocomplete="off" ${state.active?'disabled':''}><div class="preview x-preview" id="preview${i}">${f?profileMarkup(f):'Xアカウント名を入力してください'}</div><div class="fighter-vitals"><div class="hpbar"><span id="fighterHpbar${i}" style="width:100%"></span></div><div class="hptext" id="fighterHptext${i}">精神力 — / —</div></div><div class="stats" id="stats${i}">${f?'':'<div class="empty">アカウント名を入力すると能力値を生成</div>'}</div></div>`).join('') + (state.mode==='melee'&&count<8?'<button type="button" class="add-challenger" id="addChallengerBtn">＋ 挑戦者追加</button>':'');
  state.fighters.forEach((f,i)=>{if(f)renderStats(i)});
  roster.querySelectorAll('.fighter input[type=text]').forEach(input=>{const i=Number(input.closest('.fighter').dataset.slot);input.addEventListener('change',()=>registerAccount(i));input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();registerAccount(i)}})});
- roster.querySelectorAll('.fighter').forEach(card=>{const i=Number(card.dataset.slot);card.addEventListener('dragover',e=>{if(!state.active){e.preventDefault();card.classList.add('drag-over')}});card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drag-over');if(state.active)return;const raw=e.dataTransfer.getData('text/plain');let payload;try{payload=JSON.parse(raw)}catch{payload={source:'hall',index:Number(raw)}}const idx=Number(payload.index);const item=payload.source==='ranking'?state.ranking[idx]:state.hall[idx];if(item)loadHallIntoSlot(item,i)})});
+ roster.querySelectorAll('.fighter').forEach(card=>{const i=Number(card.dataset.slot);card.addEventListener('dragover',e=>{if(!state.active){e.preventDefault();card.classList.add('drag-over')}});card.addEventListener('dragleave',()=>card.classList.remove('drag-over'));card.addEventListener('drop',e=>{e.preventDefault();card.classList.remove('drag-over');if(state.active)return;const raw=e.dataTransfer.getData('text/plain');let payload;try{payload=JSON.parse(raw)}catch{payload={source:'hall',index:Number(raw)}}const idx=Number(payload.index);const item=payload.source==='ranking'?state.ranking[idx]:payload.source==='favorites'?state.favorites[idx]:payload.source==='fighter'?state.fighters[idx]:state.hall[idx];if(item)loadHallIntoSlot(item,i)});card.addEventListener('dragstart',e=>{if(!state.fighters[i]){e.preventDefault();return}e.dataTransfer.setData('text/plain',JSON.stringify({source:'fighter',index:i}));e.dataTransfer.effectAllowed='copy'})})
  const add=$('addChallengerBtn');if(add)add.addEventListener('click',()=>{if(state.active||state.fighters.length>=8)return;state.fighters.push(null);renderRoster();updateReady();updateBattlePanels()});
 }
 function setMode(mode){
@@ -220,7 +258,7 @@ function registerAccount(i){
  const existing=state.fighters[i];if(existing&&existing.handle.toLowerCase()===raw.toLowerCase())return;
  const name='@'+raw;
  state.fighters[i]={id:'x'+i+'-'+Date.now()+'-'+Math.random().toString(36).slice(2),name,handle:raw,displayName:raw,description:'公開プロフィールを取得しています…',image:avatarUrl(raw),followers:null,stats:makeStats(raw),maxHP:0,hp:0,wins:0,losses:0};
- const f=state.fighters[i];f.maxHP=50+f.stats.HP*5;f.hp=f.maxHP;
+ const f=state.fighters[i];f.maxHP=50+f.stats.HP*5;f.hp=f.maxHP;const fighterCard=document.querySelector(`.fighter[data-slot="${i}"]`);if(fighterCard)fighterCard.draggable=true;
  $('preview'+i).innerHTML=profileMarkup(f);renderStats(i);updateReady();updateBattlePanels();fetchProfile(raw,f.id,i);
 }
 function updateReady(){
@@ -313,14 +351,22 @@ function takeTurn(){
  advanceAttacker();
 }
 
-function showWinner(winner,loserCount){
+function showWinner(winner,loserCount,losers=[]){
  const overlay=$('winnerOverlay');
  $('winnerName').textContent=`${winner.displayName||winner.name} (@${winner.handle})`;
  $('winnerStats').textContent=`精神力 ${Math.ceil(winner.hp)} / ${winner.maxHP}　｜　脱落者 ${loserCount} 名　｜　通算 ${winner.wins} 勝`;
- const tweetText=`🏆 X ARENAで勝利！ WINNER：${winner.displayName||winner.name} (@${winner.handle})
+ const opponentText=losers.length ? `対戦相手：${losers.map(f=>`${f.displayName||f.name} (@${f.handle})`).join('、')}` : '対戦相手：記録なし';
+ const tweetText=`🏆 X ACCOUNT BATTLE ARENAで勝利！
+WINNER：${winner.displayName||winner.name} (@${winner.handle})
+${opponentText}
 精神力 ${Math.ceil(winner.hp)}/${winner.maxHP}、通算 ${winner.wins} 勝！
 #XARENA #アカウントバトル`;
- $('tweetWinnerBtn').onclick=()=>{const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(tweetText);window.open(url,'_blank','noopener,noreferrer')};
+ $('tweetWinnerBtn').onclick=()=>{
+  const params=new URLSearchParams({text:tweetText});
+  // 公開サーバー上で開いた場合は、現在のアリーナURLを投稿に添付する。file://では共有可能なURLがないため付けない。
+  if(location.protocol==='https:'||location.protocol==='http:')params.set('url',location.href.split('#')[0]);
+  window.open('https://twitter.com/intent/tweet?'+params.toString(),'_blank','noopener,noreferrer');
+ };
  overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');$('closeWinnerBtn').focus();
 }
 function hideWinner(){const overlay=$('winnerOverlay');overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true')}
@@ -343,7 +389,7 @@ function finishBattle(winnerIndex,loserIndices){
  log(postLine(winner,'【勝利ポスト】最後まで自分の軸を守り切った。対戦ありがとうございました。',state.turn,randInt(20000,999999)),'win');
  log(`🏆 ${winner.name}が勝利！精神力 ${Math.ceil(winner.hp)} / ${winner.maxHP}。脱落者 ${losers.length} 名。ランキング入り！`,'win');
  $('battleStatus').innerHTML=`<strong>WINNER：${escapeHtml(winner.name)}</strong> — ランキングにエントリーしました！`;
- showWinner(winner,losers.length);
+ showWinner(winner,losers.length,losers);
  $('speedBtn').disabled=true;$('stopBtn').disabled=true;$('stopBtn').textContent='一時停止';$('singleModeBtn').disabled=false;$('meleeModeBtn').disabled=false;
  persist();state.fighters.forEach((f,i)=>{if(f)renderStats(i)});updateReady();updateBattlePanels();
 }
@@ -364,7 +410,7 @@ $('resetBtn').addEventListener('click',()=>{
  renderRoster();resetLog();log('対戦が始まると、X風の口撃・防御・回避ポストが流れます。','miss');
  $('battleStatus').textContent='シングル戦：ファイターを2名登録すると開始できます。';state.fast=false;$('speedBtn').textContent='倍速：OFF';$('speedBtn').disabled=$('stopBtn').disabled=true;$('stopBtn').textContent='一時停止';updateReady();updateBattlePanels();
 });
-renderRoster();renderRanking();renderHall();updateBattlePanels();updateReady();
+renderRoster();renderRanking();renderHall();renderFavorites();setupFavoriteDrop();updateBattlePanels();updateReady();
 
 })();
 </script>
