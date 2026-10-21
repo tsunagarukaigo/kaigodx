@@ -274,8 +274,8 @@ const D=`スーパーで食料品を万引きした|-1|-4|j||10
 子が援助してくれた|20|6
 友人がお金を貸してくれた|10|3
 衰弱して救急搬送|-20|-20||8|4
-生活保護を申請した|0|-2|w||5
-生活保護が決定した|0|8|w||4
+生活保護を申請した|0|-2|||5
+生活保護が決定した（毎月+77,220円）|0|8|w||4
 生活保護の申請を窓口で断られた|0|-8|||3
 扶養照会で子に連絡がいった|0|-6
 自己破産を申し立てた|0|-5|z||2
@@ -326,7 +326,7 @@ const D=`スーパーで食料品を万引きした|-1|-4|j||10
 const DW=D.reduce((a,e)=>a+e.w,0);
 function dEv(){let r=R()*DW,e;for(e of D){r-=e.w;if(r<=0)break}
  S.mo+=e.m;S.vit+=e.v;const f=e.f;
- if(f.includes('z'))S.mo=0;if(f.includes('w')&&!S.wel){S.wel=1;S.pen+=3}
+ if(f.includes('z'))S.mo=0;if(f.includes('w')&&!S.wel){S.wel=1;S.pen+=7.722}
  if(f.includes('c'))S.care=S.adl=true;if(f.includes('n'))S.dem=true;
  say(e.t+(e.m?'（'+(e.m>0?'+':'')+e.m+'万円）':''),e.v<0||e.m<0?'bad':'good');
  if(e.d&&R()*100<e.d){die(e.t);return 1}}
@@ -572,3 +572,4 @@ function go(){init();$('title').style.display='none';$('game').style.display='fl
 $('start').onclick=go;$('re').onclick=()=>{clearInterval(tm);$('over').style.display='none';$('game').style.display='none';$('title').style.display='flex'};
 $('tw').onclick=()=>window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(S.txt)+'&url='+encodeURIComponent(location.href),'_blank');
 </script></body></html>
+
