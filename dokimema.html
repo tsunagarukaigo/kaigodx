@@ -249,11 +249,24 @@ const CAT=[['f',/転倒|転んで|骨折|膝が痛|腰痛|サルコペニア|筋
 // 趣味・娯楽: JAGES研究で趣味グループ参加と低い要介護・死亡リスクの関連。因果と断定せずQOL/ストレスに小さく反映。
 const H=[{i:.88,f:.95,q:1},{f:.77,i:.95,m:.9,s:1.1,q:.92},{m:.8,i:.95,q:.97},{l:.75,s:1.25,z:.85,m:.9,q:.95},{l:.85,s:1.1,f:1.05,q:.97},{l:.85,s:1.15,m:.9,q:.90}];
 // 行動別のイベント回避補正。研究の効果量をゲーム内にそのまま転写せず、確率の微調整として縮小して適用。
-function avoidW(t){let w=1;
- if(sel===0&&/食中毒|腹痛|傷んでいた|賞味期限|栄養不足|低栄養|栄養が偏|食欲が落ち|誤嚥|血糖値|塩分|血圧/.test(t))w*=.78;
- if(sel===1&&/転倒|転ん|骨折|筋力低下|フレイル|サルコペニア|膝を痛|腰を痛|バランス/.test(t))w*=.77;
- if(sel===2&&/不眠|寝つけ|寝不足|睡眠リズム|夜中に何度|心配事|ストレス|気分が落ち/.test(t))w*=.80;
+function avoidW(t){let w=1;const a=S?S.am/12|0:65,ageBand=a<75?0:a<85?1:2;
+ // 年齢階級別のゲーム内イベント抽選補正。研究の相対リスクをそのまま個人の確率とはせず、控えめに縮小。
+ if(sel===0&&/食中毒|腹痛|傷んでいた|賞味期限|栄養不足|低栄養|栄養が偏|食欲が落ち|誤嚥|血糖値|塩分|血圧/.test(t))w*=[.82,.78,.75][ageBand];
+ if(sel===1&&/転倒|転ん|骨折|筋力低下|フレイル|サルコペニア|膝を痛|腰を痛|バランス/.test(t))w*=[.82,.77,.80][ageBand];
+ if(sel===2&&/不眠|寝つけ|寝不足|睡眠リズム|夜中に何度|心配事|ストレス|気分が落ち/.test(t))w*=[.84,.80,.82][ageBand];
  return w}
+function diseaseFactor(k,a){const b=a<75?0:a<85?1:2;
+ // 食事は代謝・栄養関連、運動は循環器・代謝関連、睡眠はストレス/代謝関連の発症抽選を微調整。
+ if(sel===0&&['h','d','l'].includes(k))return [0.97,0.94,0.92][b];
+ if(sel===1&&['h','d','l','s'].includes(k))return [0.94,0.91,0.93][b];
+ if(sel===2&&['h','d'].includes(k))return [0.98,0.96,0.97][b];
+ return 1}
+function activityMortalityFactor(a,age){const b=age<75?0:age<85?1:2;
+ // コホート/メタ解析の関連を縮小したゲーム内補正。個人の臨床的死亡確率を予測する値ではない。
+ if(sel===0)return [0.99,0.97,0.96][b];
+ if(sel===1)return [0.92,0.90,0.92][b];
+ if(sel===2)return [0.98,0.97,0.99][b];
+ return 1}
 function catW(t){const h=H[sel];let w=avoidW(t);for(const[k,r]of CAT)if(h[k]&&r.test(t))w*=h[k];return w}
 function pickW(L){let tot=0;const ws=L.map(e=>{const w=catW(e.t);tot+=w;return w});let r=R()*tot;
  for(let i=0;i<L.length;i++){r-=ws[i];if(r<=0)return L[i]}return L[L.length-1]}
@@ -328,13 +341,29 @@ const prev=(t,a)=>{let r=t[0][1];for(const[x,v]of t)if(a>=x)r=v;return r/100};
 const hz=(t,a)=>Math.max(.03,(prev(t,a+5)-prev(t,a))/5/(1-prev(t,a)))/12;
 const fmt=v=>Math.abs(v)>=10000?(v/10000).toFixed(2)+'億円':Math.round(v)+'万円';
 let S,tm,sel=0;
+// 物価・介護保険料モデル：2026年8月CPIの前年比+1.9%、65歳以上の介護保険料全国平均は第9期(2024-26年度)月額6,225円を基準にする。
+// 将来値は確定予測ではなく、ゲーム内で上下するよう小幅な変動を加える。
+function updateCosts(){
+ if(S.m%12===0){
+  S.cpiRate=Math.max(-.02,Math.min(.05,.019+(R()-.5)*.06));
+  S.priceIndex*=1+S.cpiRate;
+  lg('📈 物価変動：生活費の物価指数が'+(S.cpiRate>=0?'上昇':'低下')+'（年率'+(S.cpiRate*100).toFixed(1)+'%、指数×'+S.priceIndex.toFixed(3)+'）','');
+ }
+ if(S.m%36===0){
+  const old=S.carePremium;
+  const rate=Math.max(-.04,Math.min(.08,.035+(R()-.5)*.10));
+  S.carePremium=Math.max(.2,S.carePremium*(1+rate));
+  lg('🏥 介護保険料の3年ごとの改定：月'+old.toFixed(2)+'万円→'+S.carePremium.toFixed(2)+'万円（'+(rate>=0?'+':'')+(rate*100).toFixed(1)+'%）','');
+ }
+}
 function money(){const r=R()*100;
  if(r<30.4)return 0;if(r<39.5)return R()*100;if(r<43.8)return 100+R()*100;if(r<46.2)return 200+R()*100;
  if(r<50.7)return 300+R()*100;if(r<78.9)return 400+1600*R()**2;return 2000+8000*R()**3}
 function init(){
  const a=65+(R()*37|0);
  S={am:a*12+(R()*12|0),m:0,mo:money(),pen:penR(),vit:40+R()*50,
-  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵',hap:50,stress:25};
+  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵',hap:50,stress:25,
+  priceIndex:1,cpiRate:.019,carePremium:.6225};
  for(const k in DIS)S.dis[k]=R()<DIS[k][1]*(a>74?1.5:1);
  if(S.care)S.adl=true;
  nutI(a);
@@ -344,9 +373,9 @@ function init(){
 function draw(){const a=S.am/12|0;
  $('clock').innerHTML='経過 '+(S.m/12|0)+'年'+(S.m%12)+'カ月';
  if(S.vampire)$('man').textContent='🧛'+(S.sp?S.sp.face:'');
- $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>年金収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+exp().toFixed(1)+'万/月';
+ $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>年金収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+exp().toFixed(1)+'万/月（介護保険料 '+S.carePremium.toFixed(2)+'万含む）<br>物価指数 ×'+S.priceIndex.toFixed(2);
  [...$('acts').children].forEach((b,i)=>b.classList.toggle('on',i==sel))}
-function exp(){let e=(S.home?20:10)*Math.pow(1.02,S.m/12)+ACT[sel][2];
+function exp(){let e=(S.home?20:10)*S.priceIndex+ACT[sel][2]+S.carePremium;
  for(const k in S.dis)if(S.dis[k])e+=DIS[k][2];
  if(S.care&&!S.home)e+=3;if(S.dem&&!S.home)e+=2;if(S.sp)e+=5;if(S.hosp)e+=10;return e}
 function lg(t,c){if(!S||!S.log)return;const a=S.am/12|0;S.log.push({k:(S.m/12|0)+'年'+(S.m%12)+'カ月・'+a+'歳',t:t.replace(/<[^>]*>/g,''),c:c||''})}
@@ -753,7 +782,9 @@ function miracleEvent(){
  S.vampire=true;$('man').textContent='🧛'+(S.sp?S.sp.face:'');say('🧛 バンパイアになった！100歳になるまで死亡しない特別な体になった！','good');
 }
 function tick(){
- S.m++;S.am++;const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}
+ // イベントが発生しない月は、老人アイコン周囲の演出を残さない。
+ $('room').classList.remove('good','bad','sh');
+ S.m++;S.am++;updateCosts();const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}
  S.mo+=S.pen-exp();let poor=false;if(S.mo<0){poor=true;S.mo*=1.0125}
  if(poor){S.vit-=.6;if(!S.wel&&S.nu<8&&R()<.02)return die('餓死')}
  S.vit+=A[3]-.1-(a-65)*.012+(S.love?.3:0);
@@ -764,7 +795,7 @@ function tick(){
  if(!S.adl&&R()<hz(ADL,a)*adlF()*(S.vit<30?1.5:1))S.adl=true,say('身体が思うように動かなくなってきた…','bad');
  if(!S.care&&R()<hz(CARE,a)*(S.adl?2:.7))S.care=true,say('要介護認定を受けた','bad');
  if(!S.dem&&R()<hz(DEM,a)*A[6]*(longSleep()?1.25:1))S.dem=true,say('物忘れが目立ってきた…','bad');
- for(const k in DIS)if(!S.dis[k]&&R()<DIS[k][1]/10/12*(a>74?1.5:1)*A[5]){S.dis[k]=true;say(DIS[k][0]+'と診断された','bad')}
+ for(const k in DIS)if(!S.dis[k]&&R()<DIS[k][1]/10/12*(a<75?1:a<85?1.5:2.0)*A[5]*diseaseFactor(k,a)){S.dis[k]=true;say(DIS[k][0]+'と診断された（'+a+'歳・生活習慣補正）','bad')}
  const rare=R()<5e-8;const spd=spCheck()||hospCheck()||welfCheck();
  if(S.dead)return;
  if(rare){miracleEvent()}else if(spd){}else if(S.care&&!S.home&&R()<.25){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<remarriageMonthly(a)){marry(1)}else if(!S.sp&&!S.ex&&R()<Math.max(.00008,remarriageMonthly(a)*1.8)){love()}else if(S.sp&&R()<.1116){if(spEv())return}
@@ -774,7 +805,7 @@ function tick(){
  S.vit=Math.max(0,Math.min(100,S.vit));
  let q=.007*Math.exp(.1*(a-65));
  q*=Math.max(.5,Math.min(2.5,1+(60-S.vit)/75));
- if(S.adl)q*=sel==1?1.2:1.5;if(S.care)q*=1.6;if(S.dem)q*=1.4;if(poor)q*=S.face=='👴'?3:2;if(S.nu<15)q*=1.8;else if(S.nu<40)q*=1.25;q*=H[sel].q*(longSleep()?1.2:1);
+ if(S.adl)q*=sel==1?1.2:1.5;if(S.care)q*=1.6;if(S.dem)q*=1.4;if(poor)q*=S.face=='👴'?3:2;if(S.nu<15)q*=1.8;else if(S.nu<40)q*=1.25;q*=H[sel].q*activityMortalityFactor(sel,a)*(longSleep()?1.2:1);
  // Hidden happiness/stress model: association-based, deliberately conservative multiplier (not a clinical prediction). Evidence: BMJ pooled cohorts found higher psychological distress associated with higher mortality (HR 1.20-1.94).
  q*=Math.max(.82,Math.min(1.45,1+(S.stress-25)*.006-(S.hap-50)*.002));
  S.stress=Math.max(0,Math.min(100,S.stress-0.8+(S.hap>65?0.6:0))); S.hap=Math.max(0,Math.min(100,S.hap+0.15-(S.stress>70?0.35:0)));
