@@ -444,7 +444,7 @@ function init(){
 }
 function draw(){const a=S.am/12|0;
  $('clock').innerHTML='経過 '+(S.m/12|0)+'年'+(S.m%12)+'カ月';
- $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>年金収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+exp().toFixed(1)+'万/月<br>栄養 <span class="'+(S.nu<40?'bad':'good')+'">'+nutLv()+'</span>';
+ $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>年金収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+exp().toFixed(1)+'万/月';
  [...$('acts').children].forEach((b,i)=>b.classList.toggle('on',i==sel));
  [...$('acts').children].forEach((b,i)=>{const sm=b.querySelector&&b.querySelector('small');if(!sm)return;
   if(i==4)sm.textContent='+'+partInc().toFixed(1)+'万/月';else if(i==0||i==3||i==5)sm.textContent='−'+actCost(i).toFixed(1)+'万/月'})}
