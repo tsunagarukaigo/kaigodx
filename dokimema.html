@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>老後～ときどきメマイスル～</title>
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>老後～ときどきメマイスル～</title><!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>老後～ときどきメマイスル～</title>
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
 <style>
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -363,7 +363,7 @@ function init(){
  const a=65+(R()*37|0);
  S={am:a*12+(R()*12|0),m:0,mo:money(),pen:penR(),vit:40+R()*50,
   adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵',hap:50,stress:25,
-  priceIndex:1,cpiRate:.019,carePremium:.6225};
+  priceIndex:1,cpiRate:.019,carePremium:.6225,investments:[],marriageScam:false,scamChecked:false};
  for(const k in DIS)S.dis[k]=R()<DIS[k][1]*(a>74?1.5:1);
  if(S.care)S.adl=true;
  nutI(a);
@@ -373,7 +373,7 @@ function init(){
 function draw(){const a=S.am/12|0;
  $('clock').innerHTML='経過 '+(S.m/12|0)+'年'+(S.m%12)+'カ月';
  if(S.vampire)$('man').textContent='🧛'+(S.sp?S.sp.face:'');
- $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>年金収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+exp().toFixed(1)+'万/月（介護保険料 '+S.carePremium.toFixed(2)+'万含む）<br>物価指数 ×'+S.priceIndex.toFixed(2);
+ $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+(exp()+(S.marriageScam?20:0)).toFixed(1)+'万/月';
  [...$('acts').children].forEach((b,i)=>b.classList.toggle('on',i==sel))}
 function exp(){let e=(S.home?20:10)*S.priceIndex+ACT[sel][2]+S.carePremium;
  for(const k in S.dis)if(S.dis[k])e+=DIS[k][2];
@@ -781,11 +781,45 @@ function miracleEvent(){
  }
  S.vampire=true;$('man').textContent='🧛'+(S.sp?S.sp.face:'');say('🧛 バンパイアになった！100歳になるまで死亡しない特別な体になった！','good');
 }
+function showEvent(title,body,buttons,showAmount=false){
+ clearInterval(tm);$('eventTitle').textContent=title;$('eventText').textContent=body;
+ $('eventInputWrap').style.display=showAmount?'block':'none';$('investAmount').value='';
+ const wrap=$('eventButtons');wrap.innerHTML='';
+ buttons.forEach(b=>{const el=document.createElement('button');el.textContent=b.label;el.onclick=()=>{ $('eventModal').style.display='none';b.run();if(!S.dead)tm=setInterval(tick,1000)};wrap.appendChild(el)});
+ $('eventModal').style.display='flex';
+}
+function maybeFinancialEvent(){
+ if(S.mo>0 && R()<.04){
+  showEvent('📈 株投資イベント','株式投資を始めますか？投資額を入力してください。投資額は毎年ランダムに変動します。',[
+   {label:'投資する',run:()=>{let n=Number($('investAmount').value);if(!Number.isFinite(n)||n<=0){say('投資額が無効だったため、今回は見送った','bad');return}
+    n=Math.min(n,S.mo);if(n<=0)return;S.mo-=n;S.investments.push({value:n,initial:n,year:0});say('📈 株式に'+fmt(n)+'投資した','good')}},
+   {label:'投資しない',run:()=>say('株式投資は見送った','')}
+  ],true);return true;
+ }
+ if(S.mo>1000 && !S.scamChecked && R()<.05){
+  S.scamChecked=true;
+  showEvent('💔 結婚詐欺イベント','20歳代の相手から結婚を持ちかけられた。詐欺に遭い、毎月20万円の損失が発生します。話を信じてしまいますか？',[
+   {label:'信じてしまう',run:()=>{S.marriageScam=true;S.mo-=20;say('💔 結婚詐欺に遭った…以後、毎月20万円の損失','bad')}},
+   {label:'断る',run:()=>say('結婚詐欺を回避した','good')}
+  ]);return true;
+ }
+ return false;
+}
+function updateInvestments(){
+ if(S.m%12!==0||!S.investments.length)return;
+ for(const inv of S.investments){
+  const pct=-600+R()*1600; // ゲーム設定上の年間変動率
+  inv.value=Math.max(0,inv.value*(1+pct/100));inv.year++;
+  lg('📊 株価変動：'+inv.year+'年目 '+(pct>=0?'+':'')+pct.toFixed(0)+'%／評価額 '+fmt(inv.value),'');
+ }
+ const total=S.investments.reduce((a,x)=>a+x.value,0);
+ say('📊 年次株価更新。投資資産の評価額：'+fmt(total),total>0?'good':'bad');
+}
 function tick(){
  // イベントが発生しない月は、老人アイコン周囲の演出を残さない。
  $('room').classList.remove('good','bad','sh');
- S.m++;S.am++;updateCosts();const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}
- S.mo+=S.pen-exp();let poor=false;if(S.mo<0){poor=true;S.mo*=1.0125}
+ S.m++;S.am++;updateCosts();updateInvestments();const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}
+ S.mo+=S.pen-exp()-(S.marriageScam?20:0);let poor=false;if(S.mo<0){poor=true;S.mo*=1.0125}
  if(poor){S.vit-=.6;if(!S.wel&&S.nu<8&&R()<.02)return die('餓死')}
  S.vit+=A[3]-.1-(a-65)*.012+(S.love?.3:0);
  // 娯楽・趣味の継続によるQOL補正（社会参加研究は観察研究なので小さく反映）
