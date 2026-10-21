@@ -172,7 +172,7 @@ function exp(){let e=(S.home?20:10)*Math.pow(1.02,S.m/12)+ACT[sel][2];
 function say(t,c){$('msg').innerHTML='<span class="'+(c||'')+'">'+t+'</span>';if(c=='bad'){$('room').classList.remove('sh');void $('room').offsetWidth;$('room').classList.add('sh')}}
 function die(c){S.dead=1;clearInterval(tm);const a=S.am/12|0,m=S.am%12;
  $('age').innerHTML='享年 '+a+'歳'+m+'カ月<br><span style="font-size:.6em">生存 '+(S.m/12|0)+'年'+(S.m%12)+'カ月</span>';$('cause').textContent='死因：'+c;
- const o=$('over');o.style.display='flex';setTimeout(()=>o.style.opacity=1,30);S.txt='老後～ときどきメマイスル～で享年'+a+'歳'+m+'カ月、生存'+(S.m/12|0)+'年'+(S.m%12)+'カ月でした🪦 あなたは何歳まで生きられる？ #老後メマイスル #どきメマ'}
+ const o=$('over');o.style.display='flex';setTimeout(()=>o.style.opacity=1,30);S.txt='老後～ときどきメマイスル～で享年'+a+'歳'+m+'カ月（死因：'+c.replace(/（\d+歳での死因確率 \d+%）$/,'')+'）、生存'+(S.m/12|0)+'年'+(S.m%12)+'カ月でした🪦 あなたは何歳まで生きられる？ #老後メマイスル #どきメマ'}
 // 借金時イベント: 名前|万円|体力|フラグ(j=逮捕 z=自己破産 w=生活保護 c=要介護 n=認知症)|死亡%|重み(出現しやすさ)
 const D=`スーパーで食料品を万引きした|-1|-4|j||10
 コンビニでおにぎりを万引き|-1|-4|j||9
