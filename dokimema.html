@@ -139,6 +139,108 @@ SNS投資詐欺にひっかかった|-300|-8
 親戚から遺産が入った|80|3
 シルバー人材センターで働いた|8|3`.split('\n').map(s=>{const p=s.split('|');return{t:p[0],m:+p[1],v:+p[2],f:p[3]||''}});
 const LOVE=['気になる人とお茶をした💕','恋人ができた💖','手をつないで散歩した💗','プロポーズされた💍'];
+// ===== 追加: 時事ネタ・伴侶・夫婦イベント =====
+const Q=s=>s.split('\n').map(l=>{const p=l.split('|');return{t:p[0],m:+p[1],v:+p[2],f:p[3]||'',w:+p[4]||3}});
+// 直近1年の時事ネタ(悪10/良10)。フラグ p=年金収入がわずかに増える
+const NW=Q(`ニセ警察から「口座が犯罪に使われている」と電話が来た|-120|-8
+著名人を名乗るSNS投資グループに入金してしまった|-250|-10
+大手企業の個人情報漏えいで不審な電話・メールが増えた|-3|-6
+通販アプリの会員情報が流出しカードを不正利用された|-15|-5
+10月の値上げラッシュ(食品3千品目超)で食費がかさんだ|-4|-3
+電気・ガスの補助が終わり光熱費が跳ね上がった|-3|-2
+中東情勢の悪化でガソリン・灯油が高騰した|-4|-2
+円安で輸入品が値上がりし日用品が高くなった|-3|-2
+年金は2%増でも物価高に追いつかず実質目減り|-2|-3
+クマが住宅地に出没し外出を控え運動不足に|0|-8
+年金が4年連続で増額改定された(+2.0%)|3|2|p
+在職老齢年金の基準が65万円に緩和され年金が減らされなかった|6|4
+パート先で社会保険に加入でき将来の年金が増える(106万円の壁撤廃)|-1|3|p
+電気・ガス料金の補助で光熱費が軽くなった|1|2
+ガソリン税の暫定税率が廃止されガソリン代が下がった|1|1
+酒税改正でビールが減税になり晩酌が少し安くなった|0.5|4
+今年はクマの出没が減り安心して散歩できた|0|6
+年金生活者支援給付金が上乗せされた|3|3|p
+銀行窓口の声かけでニセ警察詐欺の被害を防げた|60|5
+AI投資ブームで保有する投資信託が値上がりした|30|3`);
+// 夫婦イベント50個 名前|万円|体力|フラグ(D=離婚 X=死別)|重み
+const CP=Q(`定年後ずっと家にいる伴侶にストレスがたまった|0|-6
+家事の分担で口論になった|0|-5
+洗濯物のたたみ方で喧嘩になった|0|-3
+味付けのことで喧嘩した|0|-3
+生活費の使い方で揉めた|-3|-5
+老後資金の運用方針で意見が割れた|-5|-4
+趣味に口を出されて口論になった|0|-4
+「同じ趣味を」と誘われ息苦しくなった|0|-3
+親の介護をめぐって夫婦で対立|-10|-8
+子への援助をめぐって意見が対立|-20|-5
+喧嘩して数日口をきかなかった|0|-7
+伴侶の何気ない一言にカチンときた|0|-4
+伴侶に内緒の借金が見つかった|-80|-10
+伴侶の浮気が発覚した|-20|-15
+浮気を疑われて大げんかになった|0|-8
+伴侶のスマホにスナックの連絡先を見つけた|-2|-8
+伴侶がこっそりスナック通いをしていた|-10|-6
+伴侶がロマンス詐欺にあい預金が減った|-150|-10
+伴侶がSNS投資詐欺にあい貯金が減った|-200|-10
+伴侶がニセ警察詐欺にだまされた|-120|-8
+伴侶の物忘れで口論が増えた|0|-6
+伴侶に認知症の疑い。老老介護が始まった|-10|-12
+老老介護で疲れ果てた|-5|-12
+伴侶が入院し付き添いで疲れた|-15|-10
+伴侶が転んで骨折し介護が必要に|-30|-10
+熟年離婚を切り出された|-10|-12||1.5
+離婚調停を申し立てられた|-30|-12||1.5
+離婚が成立した|0|-15|D|1
+伴侶ががんで亡くなった|-100|-25|X|1
+伴侶が急逝し葬儀を行った|-100|-25|X|1
+結婚記念日にディナーへ行った|-3|8
+夫婦で温泉旅行に出かけた|-10|12
+二人で散歩し昔話に花が咲いた|0|7
+伴侶が手料理を作ってくれた|0|6
+伴侶が看病してくれて心強かった|0|8
+夫婦そろって健康診断を受けた|-2|6
+夫婦でラジオ体操に参加した|0|7
+孫を連れて夫婦で旅行した|-5|10
+金婚式をお祝いした|-10|12
+夫婦で家計を見直し節約に成功|5|3
+家事を分担できて夫婦円満に|0|8
+伴侶に「ありがとう」と言われた|0|9
+二人でゲートボールを始めた|0|7
+夫婦で地域のボランティアに参加|0|6
+夫婦で終活の話し合いをした|-5|3
+夫婦の年金を合算し家計が安定した|3|3
+伴侶のパート収入が入った|8|3
+夫婦で家庭菜園を楽しんだ|2|7
+夫婦でドライブに出かけた|-2|6
+夫婦で晩酌。酒税改正でビールが少し安い|0|5`);
+const CPW=CP.reduce((a,e)=>a+e.w,0);
+const penR=()=>Math.max(0,Math.min(12,10+(R()+R()+R()-1.5)*3.5));
+function marry(re){
+ const sa=Math.max(720,S.am+((R()*11-5)|0)*12),pen=penR(),sv=money();
+ S.sp={face:S.face=='👴'?'👵':'👴',am:sa,pen:pen};
+ S.pen+=pen;S.mo+=sv;S.love=1;S.lv=0;S.ex=0;
+ $('man').textContent=S.face+S.sp.face;
+ say((re?'💒 再婚が決まった！':LOVE[3])+' 伴侶ができた！(貯金＋'+fmt(sv)+'／年金＋'+pen.toFixed(1)+'万/月)','good')}
+function love(){const l=LOVE[S.lv||0];S.lv=(S.lv||0)+1;S.love=1;S.mo-=5;S.vit+=15;
+ if(S.lv>=4)marry();else say(l+'（−5万円）','good')}
+function endSp(k){const sp=S.sp;S.sp=null;S.love=0;S.lv=0;S.ex=1;$('man').textContent=S.face;
+ if(k=='X'){S.pen=Math.max(0,S.pen-sp.pen*.5);return '（遺族年金に切替：年金−'+(sp.pen*.5).toFixed(1)+'万/月）'}
+ const h=S.mo>0?S.mo/2:0;S.mo-=h;S.pen=Math.max(0,S.pen-sp.pen*.7);
+ return '（財産分与−'+fmt(h)+'／年金−'+(sp.pen*.7).toFixed(1)+'万/月）'}
+function spCheck(){if(!S.sp)return 0;S.sp.am++;const sa=S.sp.am/12|0;
+ if(R()<1-Math.pow(1-Math.min(.007*Math.exp(.1*(sa-65)),.9),1/12)){
+  const x=endSp('X');S.vit-=25;S.mo-=100;say('伴侶が亡くなった（享年'+sa+'歳）葬儀−100万円'+x,'bad');return 1}return 0}
+function hospCheck(){
+ if(S.hosp){if(R()<.68){S.hosp=0;say('🏥 退院した（毎月10万円の入院費はなくなった）','good')}else say('🏥 入院中…（−10万円/月）','bad');return 1}
+ if(R()<.04){S.hosp=1;S.vit-=10;say('🏥 入院した…（以後、毎月−10万円）','bad');return 1}return 0}
+function doEv(e,pre){S.mo+=e.m;S.vit+=e.v;const f=e.f;
+ if(f.includes('a'))S.adl=true;if(f.includes('c'))S.care=S.adl=true;if(f.includes('n'))S.dem=true;
+ if(f.includes('k'))S.dis.k=true;if(f.includes('s'))S.dis.s=true;if(f.includes('p'))S.pen+=.3;
+ let x='';if(f.includes('D')&&S.sp)x=endSp('D');if(f.includes('X')&&S.sp)x=endSp('X');
+ say(pre+e.t+(e.m?'（'+(e.m>0?'+':'')+e.m+'万円）':'')+x,e.v+e.m/20<0?'bad':'good');
+ if(f.includes('r')&&R()<.1){die(e.t);return 1}}
+function spEv(){let r=R()*CPW,e;for(e of CP){r-=e.w;if(r<=0)break}return doEv(e,'👫 ')}
+
 // [名前,絵文字,月額費用(万),体力,ADL倍率,疾病倍率,認知症倍率]
 const ACT=[['食事','🍚',2,.5,1,.8,1],['運動','🚶',0,.6,.35,1,.9],['睡眠','😴',0,.5,1,.9,.9],['娯楽','🎮',2,.4,1,1,.9],['パート','💼',-.5,.3,1,1,.8],['趣味','🎨',1,.4,1,1,.7]];
 const ADL=[[65,4.9],[70,9.7],[75,16],[80,29.3],[85,62.3]];
@@ -155,7 +257,7 @@ function money(){const r=R()*100;
  if(r<50.7)return 300+R()*100;if(r<78.9)return 400+1600*R()**2;return 2000+8000*R()**3}
 function init(){
  const a=65+(R()*37|0);
- S={am:a*12+(R()*12|0),m:0,mo:money(),pen:Math.max(0,Math.min(12,10+(R()+R()+R()-1.5)*3.5)),vit:40+R()*50,
+ S={am:a*12+(R()*12|0),m:0,mo:money(),pen:penR(),vit:40+R()*50,
   adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵'};
  for(const k in DIS)S.dis[k]=R()<DIS[k][1]*(a>74?1.5:1);
  if(S.care)S.adl=true;
@@ -168,7 +270,7 @@ function draw(){const a=S.am/12|0;
  [...$('acts').children].forEach((b,i)=>b.classList.toggle('on',i==sel))}
 function exp(){let e=(S.home?20:10)*Math.pow(1.02,S.m/12)+ACT[sel][2];
  for(const k in S.dis)if(S.dis[k])e+=DIS[k][2];
- if(S.care&&!S.home)e+=3;if(S.dem&&!S.home)e+=2;return e}
+ if(S.care&&!S.home)e+=3;if(S.dem&&!S.home)e+=2;if(S.sp)e+=5;if(S.hosp)e+=10;return e}
 function say(t,c){$('msg').innerHTML='<span class="'+(c||'')+'">'+t+'</span>';if(c=='bad'){$('room').classList.remove('sh');void $('room').offsetWidth;$('room').classList.add('sh')}}
 function die(c){S.dead=1;clearInterval(tm);const a=S.am/12|0,m=S.am%12;
  $('age').innerHTML='享年 '+a+'歳'+m+'カ月<br><span style="font-size:.6em">生存 '+(S.m/12|0)+'年'+(S.m%12)+'カ月</span>';$('cause').textContent='死因：'+c;
@@ -553,12 +655,9 @@ function tick(){
  if(!S.care&&R()<hz(CARE,a)*(S.adl?2:.7))S.care=true,say('要介護認定を受けた','bad');
  if(!S.dem&&R()<hz(DEM,a)*A[6])S.dem=true,say('物忘れが目立ってきた…','bad');
  for(const k in DIS)if(!S.dis[k]&&R()<DIS[k][1]/10/12*(a>74?1.5:1)*A[5]){S.dis[k]=true;say(DIS[k][0]+'と診断された','bad')}
- if(S.care&&!S.home&&R()<.25){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(R()<.004){const l=LOVE[Math.min(S.love,3)];S.love=1;S.mo-=5;S.vit+=15;say(l+'（−5万円）','good')}
- else if(AE[sel]&&R()<.12){aEv()}else if(R()<.15){const e=E[R()*E.length|0];S.mo+=e.m;S.vit+=e.v;
-  const f=e.f;if(f.includes('a'))S.adl=true;if(f.includes('c'))S.care=S.adl=true;if(f.includes('n'))S.dem=true;
-  if(f.includes('k'))S.dis.k=true;if(f.includes('s'))S.dis.s=true;
-  say(e.t+(e.m?'（'+(e.m>0?'+':'')+e.m+'万円）':''),e.v+e.m/20<0?'bad':'good');
-  if(f.includes('r')&&R()<.1)return die(e.t)}
+ const spd=spCheck()||hospCheck();
+ if(spd){}else if(S.care&&!S.home&&R()<.25){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<.0144){marry(1)}else if(!S.sp&&!S.ex&&R()<.04){love()}else if(S.sp&&R()<.12){if(spEv())return}
+ else if(AE[sel]&&R()<.12){aEv()}else if(R()<.07){if(doEv(NW[R()*NW.length|0],'📰 '))return}else if(R()<.15){if(doEv(E[R()*E.length|0],''))return}
  S.vit=Math.max(0,Math.min(100,S.vit));
  let q=.007*Math.exp(.1*(a-65));
  q*=Math.max(.5,Math.min(2.5,1+(60-S.vit)/75));
