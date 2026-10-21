@@ -51,9 +51,9 @@ SNS投資詐欺にひっかかった|-300|-8
 架空請求ハガキに慌てた|-5|-2
 入浴中にヒートショック|-20|-20|r
 餅をのどに詰まらせた|-10|-15|r
-熱中症で救急搬送された|-15|-12
-風邪をこじらせ肺炎に|-25|-18
-インフルエンザにかかった|-5|-10
+熱中症で救急搬送された|-15|-12|r
+風邪をこじらせ肺炎に|-25|-18|r
+インフルエンザにかかった|-5|-10|r
 白内障の手術を受けた|-15|-3
 入れ歯が合わず食事が進まない|-8|-6
 歯が抜けて入れ歯を新調|-20|-3
@@ -251,7 +251,7 @@ function nutI(a){const p=lowNP(S.face=='👴',a)*(S.mo<0?3:S.mo<50?1.8:S.mo>2000
  S.nu=R()<Math.min(.9,p)?15+R()*24:45+R()*45}
 function nutT(a){const poor=S.mo<0&&!S.wel;let d=poor?-1.2:(S.mo<100&&!S.wel?-.3:.15);
  d+=a>=80?-.25:a>=75?-.1:0;
- if(sel==0)d+=1;if(S.dem)d-=.3;if(S.adl)d-=.15;if(S.hosp)d+=.3;if(S.sp)d+=.3;if(S.wel)d+=.4;
+ if(sel==0){d+=.25;if(R()<.25)S.nu=Math.min(100,S.nu+8+R()*12)}if(S.dem)d-=.3;if(S.adl)d-=.15;if(S.hosp)d+=.3;if(S.sp)d+=.3;if(S.wel)d+=.4;
  if(S.nu<65&&!poor)d+=.1;
  const b=nutLv();S.nu=Math.max(0,Math.min(100,S.nu+d));const n=nutLv();
  if(NL.indexOf(n)<NL.indexOf(b)&&NL.indexOf(n)<=2)say('🍚 栄養状態が「'+n+'」になった','bad')}
@@ -262,11 +262,20 @@ function welfCheck(){if(S.wcd>0)S.wcd--;if(S.wel||S.wcd>0||!(S.mo<30&&S.pen<13))
   if(R()<.85){startWelfare();say('🏛 生活保護の受給が決定した（年金と合わせ月13万円まで支給）','good');return 1}
   S.wcd=12;say('🏛 生活保護の申請が通らなかった…','bad');return 1}return 0}
 function marry(re){
- const sa=Math.max(720,S.am+((R()*11-5)|0)*12),pen=penR(),sv=money();
- S.sp={face:S.face=='👴'?'👵':'👴',am:sa,pen:pen,dv:R()<.21?3+(R()*33|0):0};
+ // 結婚時の演出確率：同性愛の伴侶2%、年の差の若い伴侶5%。ゲーム内イベント設定。
+ const sameSex=R()<.02, young=R()<.05;
+ const sa=young?(20+(R()*20|0))*12:Math.max(720,S.am+((R()*11-5)|0)*12),pen=penR(),sv=money();
+ const playerMale=S.face==='👴';
+ let spouseFace;
+ if(young) spouseFace=(sameSex?playerMale:!playerMale)?'👨‍🦱':'👩‍🦰';
+ else spouseFace=sameSex?S.face:(playerMale?'👵':'👴');
+ S.sp={face:spouseFace,am:sa,pen:pen,dv:R()<.21?3+(R()*33|0):0,sameSex,young};
  S.pen+=pen;S.mo+=sv;S.love=1;S.lv=0;S.ex=0;
  $('man').textContent=S.face+S.sp.face;
- say((re?'💒 再婚が決まった！':LOVE[3])+' 伴侶ができた！(貯金＋'+fmt(sv)+'／年金＋'+pen.toFixed(1)+'万/月)','good')}
+ const tags=[];
+ if(sameSex)tags.push(playerMale?'👨‍❤️‍👨 同性婚':'👩‍❤️‍👩 同性婚');
+ if(young)tags.push((sameSex?(playerMale?'👨‍❤️‍👨':'👩‍❤️‍👩'):'💑')+' 年の差婚・若い伴侶（'+(sa/12|0)+'歳）');
+ say(tags.join('／')+(tags.length?'！ ':' ')+(re?'💒 再婚が決まった！':LOVE[3])+' 伴侶ができた！(貯金＋'+fmt(sv)+'／年金＋'+pen.toFixed(1)+'万/月)','good')}
 function love(){const l=LOVE[S.lv||0];S.lv=(S.lv||0)+1;S.love=1;S.mo-=5;S.vit+=15;
  if(S.lv>=4)marry();else say(l+'（−5万円）','good')}
 function endSp(k){const sp=S.sp;S.sp=null;S.love=0;S.lv=0;S.ex=1;$('man').textContent=S.face;
@@ -278,14 +287,15 @@ function spCheck(){if(!S.sp)return 0;S.sp.am++;const sa=S.sp.am/12|0;
  if(R()<1-Math.pow(1-Math.min(.007*Math.exp(.1*(sa-65)),.9),1/12)){
   const x=endSp('X');S.vit-=25;S.mo-=100;say('伴侶が亡くなった（享年'+sa+'歳）葬儀−100万円'+x,'bad');return 1}return 0}
 function hospCheck(){
- if(S.hosp){if(R()<.68){S.hosp=0;say('🏥 退院した（毎月10万円の入院費はなくなった）','good')}else say('🏥 入院中…（−10万円/月）','bad');return 1}
+ if(S.hosp){const a=S.am/12|0;const deathP=a<70?.006:a<75?.012:a<80?.02:a<85?.035:a<90?.055:.085;if(R()<deathP){die('入院中の急変（年齢階級別のゲーム内推定）');return 1}if(R()<.68){S.hosp=0;say('🏥 退院した（毎月10万円の入院費はなくなった）','good')}else say('🏥 入院中…（−10万円/月）','bad');return 1}
  if(R()<.04){S.hosp=1;S.vit-=10;say('🏥 入院した…（以後、毎月−10万円）','bad');return 1}return 0}
-function doEv(e,pre){S.mo+=e.m;S.vit+=e.v;const f=e.f;
+function moodImpact(v){S.hap=Math.max(0,Math.min(100,S.hap+v*.65));S.stress=Math.max(0,Math.min(100,S.stress-v*.75));}
+function doEv(e,pre){S.mo+=e.m;S.vit+=e.v;moodImpact(e.v);const f=e.f;
  if(f.includes('a'))S.adl=true;if(f.includes('c'))S.care=S.adl=true;if(f.includes('n'))S.dem=true;
  if(f.includes('k'))S.dis.k=true;if(f.includes('s'))S.dis.s=true;if(f.includes('p'))S.pen+=.3;
  let x='';if(f.includes('D')&&S.sp)x=endSp('D');if(f.includes('X')&&S.sp)x=endSp('X');
  say(pre+e.t+(e.m?'（'+(e.m>0?'+':'')+e.m+'万円）':'')+x,e.v+e.m/20<0?'bad':'good');
- if(f.includes('r')&&R()<.1){die(e.t);return 1}}
+ if(f.includes('r')){const a=S.am/12|0;const p=a<70?.025:a<75?.04:a<80?.065:a<85?.10:a<90?.16:.23;if(R()<p){die(e.t+'（急性疾患の年齢補正リスク）');return 1}}}
 function spEv(){let r=R()*CPW,e;for(e of CP){r-=e.w;if(r<=0)break}return doEv(e,'👫 ')}
 
 // [名前,絵文字,月額費用(万),体力,ADL倍率,疾病倍率,認知症倍率]
@@ -305,7 +315,7 @@ function money(){const r=R()*100;
 function init(){
  const a=65+(R()*37|0);
  S={am:a*12+(R()*12|0),m:0,mo:money(),pen:penR(),vit:40+R()*50,
-  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵'};
+  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵',hap:50,stress:25};
  for(const k in DIS)S.dis[k]=R()<DIS[k][1]*(a>74?1.5:1);
  if(S.care)S.adl=true;
  nutI(a);
@@ -314,7 +324,7 @@ function init(){
 }
 function draw(){const a=S.am/12|0;
  $('clock').innerHTML='経過 '+(S.m/12|0)+'年'+(S.m%12)+'カ月';
- $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>年金収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+exp().toFixed(1)+'万/月<br>栄養 <span class="'+(S.nu<40?'bad':'good')+'">'+nutLv()+'</span>';
+ $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>年金収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+exp().toFixed(1)+'万/月';
  [...$('acts').children].forEach((b,i)=>b.classList.toggle('on',i==sel))}
 function exp(){let e=(S.home?20:10)*Math.pow(1.02,S.m/12)+ACT[sel][2];
  for(const k in S.dis)if(S.dis[k])e+=DIS[k][2];
@@ -562,6 +572,15 @@ const AE={
 肩を脱臼した|-8|-10|a
 低血糖でふらついた|-1|-8
 運動を三日坊主でやめた|0|-4`)],
+2:[P(`眠る前に深呼吸してぐっすり眠れた|0|7
+昼寝で疲れが取れた|0|5
+寝室を整えて朝まで熟睡|0|6
+寝る前の読書で気持ちが落ち着く|0|5
+生活リズムが整い目覚め爽快|0|7`),P(`夜中に何度も目が覚めた|0|-7
+心配事で寝つけない|0|-8
+いびきで家族に起こされた|0|-4
+寝る直前までスマホを見て夜更かし|0|-6
+暑さで寝苦しく寝不足|0|-5`)],
 3:[P(`映画館で名作を観た|-2|6
 カラオケで盛り上がった|-2|7
 温泉旅行に行った|-8|10
@@ -658,7 +677,12 @@ const AE={
 野鳥観察で珍しい鳥を見た|0|7
 カメラのレンズを新調|-5|8
 家庭菜園が大豊作|2|7
-盆栽が展覧会で評価された|0|8`),P(`道具に凝りすぎて散財|-15|-2
+盆栽が展覧会で評価された|0|8
+俳句仲間に作品を褒められた|0|7
+昔の楽器を弾けるようになった|-2|8
+孫と一緒に工作を完成|0|8
+野鳥観察で季節の移ろいを発見|0|6
+趣味の成果を地域展示会に出した|-1|9`),P(`道具に凝りすぎて散財|-15|-2
 釣りで船酔いした|-1|-6
 園芸で腰を痛めた|-2|-8
 作品が酷評された|0|-8
@@ -678,7 +702,7 @@ const AE={
 発表会で緊張し失敗した|0|-6
 道具を失くした|-3|-2
 カメラを落として壊した|-8|-5`)]};
-function aEv(){const L=AE[sel][R()<.5?0:1],e=L[R()*L.length|0];S.mo+=e.m;S.vit+=e.v;if(e.f&&(sel!=1||R()<.12))S.adl=true;
+function aEv(){const L=AE[sel][R()<.5?0:1],e=L[R()*L.length|0];S.mo+=e.m;S.vit+=e.v;moodImpact(e.v);if(e.f&&(sel!=1||R()<.12))S.adl=true;
  say(ACT[sel][1]+' '+e.t+(e.m?'（'+(e.m>0?'+':'')+e.m+'万円）':''),e.v<0?'bad':'good')}
 // 死因: 人口動態統計2024の構成比を基準に、状態と借金で重みを補正
 // 年齢階級別死因別死亡率(人口10万対、人口動態統計平成・近年の割合で補正)を重みにする
@@ -695,6 +719,8 @@ function cause0(poor,a){
  const W=[['悪性新生物（がん）',24*(S.dis.k?4:1)*(poor?1.2:1)],['心疾患',14*(poor?1.3:1)],['老衰',13*(a<75?.3:a>84?1.5:1)*(S.care?2:1)*(poor?.4:1)],['脳血管疾患',6.4*(S.dis.s?4:1)*(poor?1.3:1)],['肺炎',5*(poor?2:1)],['誤嚥性肺炎',3.6*(S.dem?2:1)*(poor?2:1)],['不慮の事故（'+['転倒・転落','入浴中の溺死','窒息','熱中症'][R()*4|0]+'）',2.8*(poor?3:1)*(S.adl?1.5:1)],['腎不全',2*(S.dis.d?2:1)],['認知症',3.2*(S.dem?4:1)],['その他',8]];
  if(poor)W.push(['低栄養・衰弱',7],['孤立死',5],['生活困窮',3]);
  let t=0;for(const x of W)t+=x[1];let r=R()*t;for(const x of W){r-=x[1];if(r<=0)return x[0]}return '老衰'}
+// IPSS 2022 remarriage rate at age 70+: men 0.21‰, women 0.08‰ per year; use as a base rate, with a modest game pacing factor.
+function remarriageMonthly(a){if(a<70)return .003;const annual=(S.face==='👴'?.00021:.00008);return 1-Math.pow(1-Math.min(.02,annual*8),1/12)}
 function tick(){
  S.m++;S.am++;const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}
  S.mo+=S.pen-exp();let poor=false;if(S.mo<0){poor=true;S.mo*=1.0125}
@@ -706,12 +732,17 @@ function tick(){
  if(!S.dem&&R()<hz(DEM,a)*A[6]*(longSleep()?1.25:1))S.dem=true,say('物忘れが目立ってきた…','bad');
  for(const k in DIS)if(!S.dis[k]&&R()<DIS[k][1]/10/12*(a>74?1.5:1)*A[5]){S.dis[k]=true;say(DIS[k][0]+'と診断された','bad')}
  const spd=spCheck()||hospCheck()||welfCheck();
- if(spd){}else if(S.care&&!S.home&&R()<.25){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<.0144){marry(1)}else if(!S.sp&&!S.ex&&R()<.04){love()}else if(S.sp&&R()<.12){if(spEv())return}
+ if(spd){}else if(S.care&&!S.home&&R()<.25){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<remarriageMonthly(a)){marry(1)}else if(!S.sp&&!S.ex&&R()<Math.max(.00008,remarriageMonthly(a)*1.8)){love()}else if(S.sp&&R()<.12){if(spEv())return}
  else if(AE[sel]&&R()<.12){aEv()}else if(R()<.07){if(doEv(pickW(NW),'📰 '))return}else if(R()<.15){if(doEv(pickW(E),''))return}
+ // After moving into a care facility, annual 30% chance of a harassment lawsuit; monthly equivalent probability.
+ if(S.home&&R()<1-Math.pow(.7,1/12)){const loss=40+(R()*61|0);S.mo-=loss;say('介護施設でパワハラ・セクハラを訴えられ、訴訟で'+loss+'万円の損失','bad')}
  S.vit=Math.max(0,Math.min(100,S.vit));
  let q=.007*Math.exp(.1*(a-65));
  q*=Math.max(.5,Math.min(2.5,1+(60-S.vit)/75));
  if(S.adl)q*=sel==1?1.2:1.5;if(S.care)q*=1.6;if(S.dem)q*=1.4;if(poor)q*=S.face=='👴'?3:2;if(S.nu<15)q*=1.8;else if(S.nu<40)q*=1.25;q*=H[sel].q*(longSleep()?1.2:1);
+ // Hidden happiness/stress model: association-based, deliberately conservative multiplier (not a clinical prediction). Evidence: BMJ pooled cohorts found higher psychological distress associated with higher mortality (HR 1.20-1.94).
+ q*=Math.max(.82,Math.min(1.45,1+(S.stress-25)*.006-(S.hap-50)*.002));
+ S.stress=Math.max(0,Math.min(100,S.stress-0.8+(S.hap>65?0.6:0))); S.hap=Math.max(0,Math.min(100,S.hap+0.15-(S.stress>70?0.35:0)));
  let w='老衰',mx=1;for(const k in S.dis)if(S.dis[k]){q*=DIS[k][3];if(DIS[k][3]>mx){mx=DIS[k][3];w=DIS[k][0]}}
  if(R()<1-Math.pow(1-Math.min(q,.9),1/12))return die(cause(poor,a));
  draw()}
