@@ -343,6 +343,7 @@ function init(){
 }
 function draw(){const a=S.am/12|0;
  $('clock').innerHTML='経過 '+(S.m/12|0)+'年'+(S.m%12)+'カ月';
+ if(S.vampire)$('man').textContent='🧛'+(S.sp?S.sp.face:'');
  $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>年金収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+exp().toFixed(1)+'万/月';
  [...$('acts').children].forEach((b,i)=>b.classList.toggle('on',i==sel))}
 function exp(){let e=(S.home?20:10)*Math.pow(1.02,S.m/12)+ACT[sel][2];
@@ -350,7 +351,7 @@ function exp(){let e=(S.home?20:10)*Math.pow(1.02,S.m/12)+ACT[sel][2];
  if(S.care&&!S.home)e+=3;if(S.dem&&!S.home)e+=2;if(S.sp)e+=5;if(S.hosp)e+=10;return e}
 function lg(t,c){if(!S||!S.log)return;const a=S.am/12|0;S.log.push({k:(S.m/12|0)+'年'+(S.m%12)+'カ月・'+a+'歳',t:t.replace(/<[^>]*>/g,''),c:c||''})}
 function say(t,c){lg(t,c);$('msg').innerHTML='<span class="'+(c||'')+'">'+t+'</span>';const room=$('room');room.classList.remove('good','bad','sh');if(c=='good'){void room.offsetWidth;room.classList.add('good')}else if(c=='bad'){void room.offsetWidth;room.classList.add('bad','sh')}}
-function die(c){lg('🪦 死亡：'+c.replace(/（\d+歳での死因確率 \d+%）$/,''),'bad');S.dead=1;clearInterval(tm);const a=S.am/12|0,m=S.am%12;
+function die(c){const age=S.am/12|0;if(S.vampire&&age<100){say('🧛 バンパイアの力で死を免れた（100歳までは死亡しない）','good');return 0}lg('🪦 死亡：'+c.replace(/（\d+歳での死因確率 \d+%）$/,''),'bad');S.dead=1;clearInterval(tm);const a=S.am/12|0,m=S.am%12;
  $('age').innerHTML='享年 '+a+'歳'+m+'カ月<br><span style="font-size:.6em">生存 '+(S.m/12|0)+'年'+(S.m%12)+'カ月</span>';$('cause').textContent='死因：'+c;
  const o=$('over');o.style.display='flex';setTimeout(()=>o.style.opacity=1,30);S.txt='老後～ときどきメマイスル～で享年'+a+'歳'+m+'カ月（死因：'+c.replace(/（\d+歳での死因確率 \d+%）$/,'')+'）、生存'+(S.m/12|0)+'年'+(S.m%12)+'カ月でした🪦 あなたは何歳まで生きられる？ #老後メマイスル #どきメマ'}
 // 借金時イベント: 名前|万円|体力|フラグ(j=逮捕 z=自己破産 w=生活保護 c=要介護 n=認知症)|死亡%|重み(出現しやすさ)
@@ -740,6 +741,17 @@ function cause0(poor,a){
  let t=0;for(const x of W)t+=x[1];let r=R()*t;for(const x of W){r-=x[1];if(r<=0)return x[0]}return '老衰'}
 // IPSS 2022 remarriage rate at age 70+: men 0.21‰, women 0.08‰ per year; use as a base rate, with a modest game pacing factor.
 function remarriageMonthly(a){if(a<70)return .003;const annual=(S.face==='👴'?.00021:.00008);return 1-Math.pow(1-Math.min(.02,annual*8),1/12)}
+// 超低確率の奇跡イベント：月ごとに合計0.000005%（5e-8）。3種類から1つを抽選。
+function miracleEvent(){
+ const r=R();
+ if(r<1/3){S.mo+=100000;say('🎰 10億円の宝くじに当選！人生が一変した！','good');return}
+ if(r<2/3){
+  // 芸能人との結婚。資産1億円を獲得し、伴侶として登録。
+  S.mo+=10000;S.sp={face:'🌟',am:Math.max(S.am,30*12),pen:0,dv:0,sameSex:false,young:false,celebrity:true};S.love=1;S.lv=0;S.ex=0;
+  $('man').textContent=S.face+'🌟';say('💍 芸能人と結婚！結婚により資産1億円を獲得した！','good');return
+ }
+ S.vampire=true;$('man').textContent='🧛'+(S.sp?S.sp.face:'');say('🧛 バンパイアになった！100歳になるまで死亡しない特別な体になった！','good');
+}
 function tick(){
  S.m++;S.am++;const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}
  S.mo+=S.pen-exp();let poor=false;if(S.mo<0){poor=true;S.mo*=1.0125}
@@ -753,8 +765,9 @@ function tick(){
  if(!S.care&&R()<hz(CARE,a)*(S.adl?2:.7))S.care=true,say('要介護認定を受けた','bad');
  if(!S.dem&&R()<hz(DEM,a)*A[6]*(longSleep()?1.25:1))S.dem=true,say('物忘れが目立ってきた…','bad');
  for(const k in DIS)if(!S.dis[k]&&R()<DIS[k][1]/10/12*(a>74?1.5:1)*A[5]){S.dis[k]=true;say(DIS[k][0]+'と診断された','bad')}
- const spd=spCheck()||hospCheck()||welfCheck();
- if(spd){}else if(S.care&&!S.home&&R()<.25){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<remarriageMonthly(a)){marry(1)}else if(!S.sp&&!S.ex&&R()<Math.max(.00008,remarriageMonthly(a)*1.8)){love()}else if(S.sp&&R()<.1116){if(spEv())return}
+ const rare=R()<5e-8;const spd=spCheck()||hospCheck()||welfCheck();
+ if(S.dead)return;
+ if(rare){miracleEvent()}else if(spd){}else if(S.care&&!S.home&&R()<.25){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<remarriageMonthly(a)){marry(1)}else if(!S.sp&&!S.ex&&R()<Math.max(.00008,remarriageMonthly(a)*1.8)){love()}else if(S.sp&&R()<.1116){if(spEv())return}
  else if(AE[sel]&&R()<.1116){aEv()}else if(R()<.0651){if(doEv(pickW(NW),'📰 '))return}else if(R()<.1395){if(doEv(pickW(E),''))return}
  // After moving into a care facility, annual 30% chance of a harassment lawsuit; monthly equivalent probability.
  if(S.home&&R()<1-Math.pow(.7,1/12)){const loss=40+(R()*61|0);S.mo-=loss;say('介護施設でパワハラ・セクハラを訴えられ、訴訟で'+loss+'万円の損失','bad')}
