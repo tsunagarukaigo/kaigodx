@@ -254,8 +254,8 @@ function hospCheck(){
  if(S.hosp){const a=S.am/12|0,i=a<75?0:a<80?1:a<85?2:a<90?3:4;
   const p=HM[i]*(a<70?.5:1)*S.hx[1]*cfMod();
   if(R()<p){die(S.hx[0]+'（入院中の死亡）');return 1}
-  if(R()<.68){S.hosp=0;say('🏥 退院した（毎月10万円の入院費はなくなった）','good')}else say('🏥 入院中（'+S.hx[0]+'）…（−10万円/月）','bad',1);return 1}
- if(R()<.04){S.hosp=1;S.hx=HDX[R()*HDX.length|0];S.vit-=10;say('🏥 入院した（'+S.hx[0]+'）…（以後、毎月−10万円）','bad');return 1}return 0}
+  if(R()<.68){S.hosp=0;say('🏥 退院した','good')}else say('🏥 入院中（'+S.hx[0]+'）','bad',1);return 1}
+ if(R()<.032*(S.adl?1.3:1)*(S.care?1.25:1)*(S.dem?1.1:1)*(S.nu<40?1.25:1)*(S.dis.k||S.dis.s?1.3:1)){S.hosp=1;S.hx=HDX[R()*HDX.length|0];S.vit-=10;say('🏥 入院した（'+S.hx[0]+'）','bad');return 1}return 0}
 
 // ===== 追加: パートの業績(裏ステータス) =====
 // 名前|基本額(万円)|体力|業績の変化。良い出来事の収入は 0.5万円+基本額×業績/100、失敗の損失は 基本額×(1.5−業績/100)
@@ -294,7 +294,7 @@ function priceFx(t){let x='';
   else if(/軽減|下がった|引き下げ/.test(t)){S.kp=Math.max(.7,S.kp*.95);x='（介護保険料↓ 食事・娯楽・趣味の費用↓）'}}
  else if(/補助で光熱費|暫定税率が廃止|減税|落ち着き|安くなった|下がった|安くなる|値下/.test(t)){S.px=Math.max(.7,S.px*.98);x='（物価↓ 食事・娯楽・趣味の費用↓）'}
  else if(/物価高|値上がり|高騰|値上げ|円安|跳ね上がった|上がった/.test(t)){S.px=Math.min(2.5,S.px*1.03);x='（物価↑ 食事・娯楽・趣味の費用↑）'}
- return x}
+ return ''}
 NW.push(...Q(`米の価格が落ち着き食費が下がった|1|2
 物価が落ち着き日用品が安くなった|1|2
 低所得者の介護保険料が軽減された|2|3`));
@@ -358,7 +358,8 @@ const qolQ=()=>S.qol>=70?.95:S.qol<=30?1.1:1;
 // 運動のf: 運動介入で転倒率23%減(Cochrane,RaR0.77)。q: 趣味/スポーツの会に週1回以上参加で11年死亡率が約3割低い(JAGES)を弱めて反映
 // 睡眠のm: 睡眠不足は認知症HR2.64・睡眠薬使用はHR1.66(久山町)など。他は方向性のみの仮定値
 const H=[{i:.92,f:.93,m:.97},{f:.77,i:.95,m:.9,s:1.1},{m:.8,i:.95,f:.95},{l:.75,s:1.25,z:.85,m:.88},{l:.85,s:1.1,f:1.05},{l:.8,s:1.2,m:.85}];
-function catW(t){const h=H[sel],at=S.am/12>=85?.8:1;let w=1;for(const[k,r]of CAT)if(h[k]&&r.test(t))w*=1-(1-h[k])*at;if(/うつ|不眠|睡眠薬|物忘れ|認知症の疑い/.test(t))w*=S.qol>=70?.85:S.qol<=30?1.3:1;return w}
+const ST=()=>({f:(S.adl?1.4:1)*(S.care?1.15:1)*(S.nu<40?1.15:1)*(S.vit<30?1.2:1),i:(S.adl?1.1:1)*(S.care?1.15:1)*(S.nu<40?1.25:1)*(S.vit<30?1.2:1),z:S.dem?1.6:1,m:(S.dem?1.2:1)*(S.adl?1.1:1)*(S.sp?.85:1),l:(S.adl?1.2:1)*(S.sp?.6:1)*(S.care?1.1:1),s:(S.adl?.8:1)*(S.sp?1.15:1)});
+function catW(t){const h=H[sel],at=S.am/12>=85?.8:1,st=ST();let w=1;for(const[k,r]of CAT){if(r.test(t))w*=st[k];if(h[k]&&r.test(t))w*=1-(1-h[k])*at}if(/うつ|不眠|睡眠薬|物忘れ|認知症の疑い/.test(t))w*=S.qol>=70?.85:S.qol<=30?1.3:1;return w}
 function pickW(L){let tot=0;const ws=L.map(e=>{const w=catW(e.t);tot+=w;return w});let r=R()*tot;
  for(let i=0;i<L.length;i++){r-=ws[i];if(r<=0)return L[i]}return L[L.length-1]}
 // フレイル新規発症: 通いの場に参加3年未満でIRR0.87、3年以上で0.47(JAGES)。運動=体操、娯楽/趣味=サロン・趣味の会として反映(後者は半分の効果)
@@ -390,24 +391,24 @@ function startWelfare(){if(S.wel)return;S.wel=1;S.pen=Math.max(S.pen,13)}
 function welfCheck(){if(S.wcd>0)S.wcd--;if(S.wel||S.wcd>0||!(S.mo<30&&S.pen<13))return 0;
  const a=S.am/12|0;
  if(R()<.001*(a>=75?1.5:1)*(S.mo<0?2:1)){
-  if(R()<.85){startWelfare();say('🏛 生活保護の受給が決定した（年金と合わせ月13万円まで支給）','good');return 1}
+  if(R()<.85){startWelfare();say('🏛 生活保護の受給が決定した','good');return 1}
   S.wcd=12;say('🏛 生活保護の申請が通らなかった…','bad');return 1}return 0}
 function marry(re,cel){
  const sa=Math.max(720,S.am+((R()*11-5)|0)*12),pen=penR(),sv=cel?10000:money();
  S.sp={face:cel?(S.face=='👴'?'👩‍🎤':'👨‍🎤'):(S.face=='👴'?'👵':'👴'),am:sa,pen:pen,dv:R()<.21?3+(R()*33|0):0,cel:cel?1:0};
  S.pen+=pen;S.mo+=sv;S.love=1;S.lv=0;S.ex=0;icon();
 
- say((cel?'🌟 芸能人と結婚した！':re?'💒 再婚が決まった！':LOVE[3])+' 伴侶ができた！(貯金＋'+fmt(sv)+'／年金＋'+pen.toFixed(1)+'万/月)','good')}
+ say((cel?'🌟 芸能人と結婚した！':re?'💒 再婚が決まった！':LOVE[3])+' 伴侶ができた！'+(sv>0?'（+'+fmt(sv)+'）':''),'good')}
 function love(){const l=LOVE[S.lv||0];S.lv=(S.lv||0)+1;S.love=1;S.mo-=5;S.out+=5;S.vit+=15;
  if(S.lv>=4)marry();else say(l+'（−5万円）','good')}
 function endSp(k){const sp=S.sp;S.sp=null;S.love=0;S.lv=0;S.ex=1;icon();
- if(k=='X'){S.pen=Math.max(0,S.pen-sp.pen*.5);return '（遺族年金に切替：年金−'+(sp.pen*.5).toFixed(1)+'万/月）'}
+ if(k=='X'){S.pen=Math.max(0,S.pen-sp.pen*.5);return ''}
  const h=S.mo>0?S.mo/2:0;S.mo-=h;S.pen=Math.max(0,S.pen-sp.pen*.7);
- return '（財産分与−'+fmt(h)+'／年金−'+(sp.pen*.7).toFixed(1)+'万/月）'}
+ return h>0?'（−'+fmt(h)+'）':''}
 function spCheck(){if(!S.sp)return 0;S.sp.am++;const sa=S.sp.am/12|0;
  if(S.sp.dv&&--S.sp.dv==0){const x=endSp('D');S.vit-=15;say('👫 離婚が成立した…'+x,'bad');return 1}
  if(R()<1-Math.pow(1-Math.min(.007*Math.exp(.1*(sa-65)),.9),1/12)){
-  const x=endSp('X');S.vit-=25;S.mo-=100;S.out+=100;say('伴侶が亡くなった（享年'+sa+'歳）葬儀−100万円'+x,'bad');return 1}return 0}
+  const x=endSp('X');S.vit-=25;S.mo-=100;S.out+=100;say('伴侶が亡くなった（享年'+sa+'歳）（−100万円）'+x,'bad');return 1}return 0}
 function doEv(e,pre){if(e.m<0)S.out-=e.m;S.mo+=e.m;S.vit+=e.v;const f=e.f;
  if(f.includes('a'))S.adl=true;if(f.includes('c'))S.care=S.adl=true;if(f.includes('n'))S.dem=true;
  if(f.includes('k'))S.dis.k=true;if(f.includes('s'))S.dis.s=true;if(f.includes('p'))S.pen+=.3;
@@ -434,7 +435,7 @@ function money(){const r=R()*100;
 function init(){
  const a=65+(R()*37|0);
  S={am:a*12+(R()*12|0),m:0,mo:money(),pen:penR(),vit:40+R()*50,
-  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],out:0,perf:50,qol:50,px:1,kp:1,vamp:0,love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵'};
+  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],hp:50,hist:[],out:0,perf:50,qol:50,px:1,kp:1,vamp:0,love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵'};
  for(const k in DIS)S.dis[k]=R()<DIS[k][1]*(a>74?1.5:1);
  if(S.care)S.adl=true;
  nutI(a);
@@ -453,12 +454,23 @@ function exp(){let e=(S.home?20:10)*Math.pow(1.02,S.m/12)+actCost(sel);
 function lg(t,c){if(!S||!S.log)return;const a=S.am/12|0;S.log.push({k:(S.m/12|0)+'年'+(S.m%12)+'カ月・'+a+'歳',t:t.replace(/<[^>]*>/g,''),c:c||''})}
 function fx(c){const r=$('room'),m=$('man');r.classList.remove('sh','fg');m.classList.remove('pop');void r.offsetWidth;
  if(c=='bad')r.classList.add('sh');else if(c=='good'){r.classList.add('fg');m.classList.add('pop')}}
-function say(t,c,nofx){lg(t,c);$('msg').innerHTML='<span class="'+(c||'')+'">'+t+'</span>';if(!nofx)fx(c)}
+function say(t,c,nofx){lg(t,c);if(!nofx&&S&&S.hist){if(c=='good')S.hp=Math.min(100,S.hp+6);else if(c=='bad')S.hp=Math.max(0,S.hp-6)}$('msg').innerHTML='<span class="'+(c||'')+'">'+t+'</span>';if(!nofx)fx(c)}
 function icon(){$('man').textContent=(S.vamp?'🧛':S.face)+(S.sp?S.sp.face:'')}
+
+function chart(){const by={};S.hist.forEach(([a,v])=>{const k=Math.floor(a);(by[k]=by[k]||[]).push(v)});
+ const ks=Object.keys(by).map(Number).sort((a,b)=>a-b);if(ks.length<2)return '';
+ const pts=ks.map(k=>[k,by[k].reduce((x,y)=>x+y,0)/by[k].length]);
+ const W=320,Hh=110,L=26,Rr=8,T=8,B=20,x0=ks[0],x1=ks[ks.length-1],X=a=>L+(a-x0)/(x1-x0||1)*(W-L-Rr),Y=v=>T+(100-v)/100*(Hh-T-B);
+ const d=pts.map(([a,v])=>X(a).toFixed(1)+','+Y(v).toFixed(1)).join(' ');
+ const ticks=[x0,Math.round((x0+x1)/2),x1].map(a=>'<text x="'+X(a).toFixed(1)+'" y="'+(Hh-5)+'" fill="#aaa" font-size="10" text-anchor="middle">'+a+'歳</text>').join('');
+ return '<div style="font-size:13px;color:#fff;margin-top:6px">幸せ度</div><svg viewBox="0 0 '+W+' '+Hh+'" style="width:min(90vw,420px);height:auto;border:1px solid #444">'
+  +'<line x1="'+L+'" x2="'+(W-Rr)+'" y1="'+Y(50)+'" y2="'+Y(50)+'" stroke="#444" stroke-dasharray="3 3"/>'
+  +'<text x="'+(L-3)+'" y="'+(Y(100)+3)+'" fill="#aaa" font-size="9" text-anchor="end">高</text><text x="'+(L-3)+'" y="'+(Y(0)+3)+'" fill="#aaa" font-size="9" text-anchor="end">低</text>'
+  +'<polyline points="'+d+'" fill="none" stroke="#6f6" stroke-width="2" stroke-linejoin="round"/>'+ticks+'</svg>'}
 function memory(){const L=S.log.filter(e=>!/死亡：|入院中|退院|栄養状態|が亡くなった|離婚/.test(e.t)&&e.c=='good');
  const B=L.length?L:S.log.filter(e=>!/死亡：/.test(e.t));if(!B.length)return null;return B[R()*B.length|0]}
-function die(c){if(S.vamp&&S.am<6000)return;lg('🪦 死亡：'+c.replace(/（\d+歳での死因確率 \d+%）$/,''),'bad');S.dead=1;clearInterval(tm);const a=S.am/12|0,m=S.am%12;
- $('age').innerHTML='享年 '+a+'歳'+m+'カ月<br><span style="font-size:.6em">生存 '+(S.m/12|0)+'年'+(S.m%12)+'カ月</span>';$('sub').innerHTML='生涯の支出 約'+fmt(Math.round(S.out));$('cause').textContent='死因：'+c;
+function die(c){if(S.vamp&&S.am<6000)return;S.hist.push([S.am/12,S.hp]);lg('🪦 死亡：'+c.replace(/（\d+歳での死因確率 \d+%）$/,''),'bad');S.dead=1;clearInterval(tm);const a=S.am/12|0,m=S.am%12;
+ $('age').innerHTML='享年 '+a+'歳'+m+'カ月<br><span style="font-size:.6em">生存 '+(S.m/12|0)+'年'+(S.m%12)+'カ月</span>';$('sub').innerHTML='';$('cause').textContent='死因：'+c.replace(/（\d+歳での死因確率 \d+%）$/,'');
  const o=$('over');o.style.display='flex';setTimeout(()=>o.style.opacity=1,30);S.txt='老後～ときどきメマイスル～で享年'+a+'歳'+m+'カ月（死因：'+c.replace(/（\d+歳での死因確率 \d+%）$/,'')+'）、生存'+(S.m/12|0)+'年'+(S.m%12)+'カ月でした🪦 あなたは何歳まで生きられる？ #老後メマイスル #どきメマ'}
 // 借金時イベント: 名前|万円|体力|フラグ(j=逮捕 z=自己破産 w=生活保護 c=要介護 n=認知症)|死亡%|重み(出現しやすさ)
 const D=`スーパーで食料品を万引きした|-1|-4|j||10
@@ -562,7 +574,7 @@ const D=`スーパーで食料品を万引きした|-1|-4|j||10
 友人がお金を貸してくれた|10|3
 衰弱して救急搬送|-20|-20||8|4
 生活保護を申請した|0|-2|||5
-生活保護が決定した（年金と合わせ月13万円まで支給）|0|8|w||4
+生活保護が決定した|0|8|w||4
 生活保護の申請を窓口で断られた|0|-8|||3
 扶養照会で子に連絡がいった|0|-6
 自己破産を申し立てた|0|-5|z||2
@@ -832,7 +844,7 @@ function cause0(poor,a){
  if(poor)W.push(['低栄養・衰弱',7],['孤立死',5],['生活困窮',3]);
  let t=0;for(const x of W)t+=x[1];let r=R()*t;for(const x of W){r-=x[1];if(r<=0)return x[0]}return '老衰'}
 function tick(){
- S.m++;S.am++;if(S.vamp&&S.am>=6000){S.vamp=0;return die('吸血鬼の寿命（500歳）')}const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}if(sel==4)S.perf=Math.min(100,S.perf+.1);S.qol=Math.max(0,Math.min(100,S.qol+(sel==5?.35:sel==3?.25:(50-S.qol)*.02)));
+ S.m++;S.am++;S.hp+=(50-S.hp)*.02;if(S.vamp&&S.am>=6000){S.vamp=0;return die('吸血鬼の寿命（500歳）')}const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}if(sel==4)S.perf=Math.min(100,S.perf+.1);S.qol=Math.max(0,Math.min(100,S.qol+(sel==5?.35:sel==3?.25:(50-S.qol)*.02)));
  const ex_=exp();S.out+=ex_;S.mo+=S.pen-ex_;let poor=false;if(S.mo<0){poor=true;S.mo*=1.0125}
  if(poor){S.vit-=.6;if(!S.wel&&S.nu<8&&R()<.02)return die('餓死')}
  S.vit+=A[3]-.1-(a-65)*.012+(S.love?.3:0)+(S.qol-50)/250;
@@ -840,11 +852,11 @@ function tick(){
  if(!S.adl&&R()<hz(ADL,a)*adlF()*(S.vit<30?1.5:1))S.adl=true,say('身体が思うように動かなくなってきた…','bad');
  if(!S.care&&R()<hz(CARE,a)*(S.adl?2:.7))S.care=true,say('要介護認定を受けた','bad');
  if(!S.dem&&R()<hz(DEM,a)*EF[sel].n[bnd(a)]*(S.qol<=30?1.15:S.qol>=70?.93:1)*(longSleep()?1.25:1))S.dem=true,say('物忘れが目立ってきた…','bad');
- for(const k in DIS)if(!S.dis[k]&&R()<DIS[k][1]/10/12*(a>74?1.5:1)*EF[sel].d[bnd(a)]){S.dis[k]=true;say(DIS[k][0]+'と診断された','bad')}
+ for(const k in DIS)if(!S.dis[k]&&R()<DIS[k][1]/10/12*(a>74?1.5:1)*EF[sel].d[bnd(a)]*(S.adl?1.15:1)*(S.nu<40?1.15:1)*(S.qol<=30?1.1:1)){S.dis[k]=true;say(DIS[k][0]+'と診断された','bad')}
  const spd=rareEv()||spCheck()||hospCheck()||welfCheck();if(S.dead)return;
  if(spd){}else if(S.care&&!S.home&&R()<.25){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<.0144){marry(1)}else if(!S.sp&&!S.ex&&R()<.04){love()}else if(S.sp&&R()<.12){if(spEv())return}
  else if(AE[sel]&&R()<.12){aEv()}else if(R()<.07){if(doEv(pickW(NW),'📰 '))return}else if(R()<.15){if(doEv(pickW(E),''))return}
- S.vit=Math.max(S.vamp?20:0,Math.min(100,S.vit));
+ S.vit=Math.max(S.vamp?20:0,Math.min(100,S.vit));S.hist.push([S.am/12,S.hp]);
  let q=.007*Math.exp(.1*(a-65));
  q*=Math.max(.5,Math.min(2.5,1+(60-S.vit)/75));
  if(S.adl)q*=sel==1?1.2:1.5;if(S.care)q*=1.6;if(S.dem)q*=1.4;if(poor)q*=S.face=='👴'?3:2;if(S.nu<15)q*=1.8;else if(S.nu<40)q*=1.25;q*=EF[sel].q[bnd(a)]*qolQ()*(longSleep()?1.2:1);if(S.fxm>0){q*=2;S.fxm--}
