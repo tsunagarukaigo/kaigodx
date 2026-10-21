@@ -23,6 +23,11 @@ button:active,button.on{background:#fff;color:#000}
 #acts button{padding:8px 4px;font-size:15px}
 #acts small{display:block;font-size:11px;opacity:.7}
 #over{position:absolute;inset:0;background:#000;display:none;opacity:0;transition:opacity 2s;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;z-index:5}
+#logv{position:absolute;inset:0;background:#000;display:none;flex-direction:column;z-index:6;padding:12px 16px}
+#logv .lh{display:flex;justify-content:space-between;align-items:center;font-size:18px;margin-bottom:8px}
+#logv .lh button{padding:6px 16px;font-size:16px}
+#ll{flex:1;overflow-y:auto;font-size:14px;line-height:1.7;text-align:left;-webkit-overflow-scrolling:touch}
+#ll div{border-bottom:1px solid #333;padding:3px 0}#ll i{font-style:normal;color:#aaa;margin-right:8px}
 #over .g{font-size:80px}
 #over h2{font-size:clamp(26px,7vw,44px);margin:0;font-weight:400}
 </style></head><body>
@@ -32,7 +37,8 @@ button:active,button.on{background:#fff;color:#000}
  <div id="room"><span id="man">👴</span></div>
  <div id="msg">1秒＝1か月。毎月の過ごし方を選ぼう</div>
  <div id="acts"></div>
- <div id="over"><div class="g">🪦</div><h2 id="age"></h2><div id="cause"></div><div><button id="tw">Xにつぶやく</button> <button id="re">もう一度</button></div></div>
+ <div id="over"><div class="g">🪦</div><h2 id="age"></h2><div id="cause"></div><div><button id="tw">Xにつぶやく</button> <button id="lg">自分史</button> <button id="re">もう一度</button></div></div>
+ <div id="logv"><div class="lh"><b>自分史</b><button id="lc">閉じる</button></div><div id="ll"></div></div>
 </div>
 <script>
 // 名前|増減(万円)|体力|フラグ(a=ADL低下 c=要介護 n=認知症 k=がん s=脳卒中 r=死亡リスク)
@@ -217,7 +223,7 @@ const CPW=CP.reduce((a,e)=>a+e.w,0);
 const penR=()=>Math.max(0,Math.min(12,10+(R()+R()+R()-1.5)*3.5));
 function marry(re){
  const sa=Math.max(720,S.am+((R()*11-5)|0)*12),pen=penR(),sv=money();
- S.sp={face:S.face=='👴'?'👵':'👴',am:sa,pen:pen};
+ S.sp={face:S.face=='👴'?'👵':'👴',am:sa,pen:pen,dv:R()<.21?3+(R()*33|0):0};
  S.pen+=pen;S.mo+=sv;S.love=1;S.lv=0;S.ex=0;
  $('man').textContent=S.face+S.sp.face;
  say((re?'💒 再婚が決まった！':LOVE[3])+' 伴侶ができた！(貯金＋'+fmt(sv)+'／年金＋'+pen.toFixed(1)+'万/月)','good')}
@@ -228,6 +234,7 @@ function endSp(k){const sp=S.sp;S.sp=null;S.love=0;S.lv=0;S.ex=1;$('man').textCo
  const h=S.mo>0?S.mo/2:0;S.mo-=h;S.pen=Math.max(0,S.pen-sp.pen*.7);
  return '（財産分与−'+fmt(h)+'／年金−'+(sp.pen*.7).toFixed(1)+'万/月）'}
 function spCheck(){if(!S.sp)return 0;S.sp.am++;const sa=S.sp.am/12|0;
+ if(S.sp.dv&&--S.sp.dv==0){const x=endSp('D');S.vit-=15;say('👫 離婚が成立した…'+x,'bad');return 1}
  if(R()<1-Math.pow(1-Math.min(.007*Math.exp(.1*(sa-65)),.9),1/12)){
   const x=endSp('X');S.vit-=25;S.mo-=100;say('伴侶が亡くなった（享年'+sa+'歳）葬儀−100万円'+x,'bad');return 1}return 0}
 function hospCheck(){
@@ -258,7 +265,7 @@ function money(){const r=R()*100;
 function init(){
  const a=65+(R()*37|0);
  S={am:a*12+(R()*12|0),m:0,mo:money(),pen:penR(),vit:40+R()*50,
-  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵'};
+  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵'};
  for(const k in DIS)S.dis[k]=R()<DIS[k][1]*(a>74?1.5:1);
  if(S.care)S.adl=true;
  $('man').textContent=S.face;sel=0;draw();$('msg').textContent='1秒＝1か月。毎月の過ごし方を選ぼう';
@@ -271,8 +278,9 @@ function draw(){const a=S.am/12|0;
 function exp(){let e=(S.home?20:10)*Math.pow(1.02,S.m/12)+ACT[sel][2];
  for(const k in S.dis)if(S.dis[k])e+=DIS[k][2];
  if(S.care&&!S.home)e+=3;if(S.dem&&!S.home)e+=2;if(S.sp)e+=5;if(S.hosp)e+=10;return e}
-function say(t,c){$('msg').innerHTML='<span class="'+(c||'')+'">'+t+'</span>';if(c=='bad'){$('room').classList.remove('sh');void $('room').offsetWidth;$('room').classList.add('sh')}}
-function die(c){S.dead=1;clearInterval(tm);const a=S.am/12|0,m=S.am%12;
+function lg(t,c){if(!S||!S.log)return;const a=S.am/12|0;S.log.push({k:(S.m/12|0)+'年'+(S.m%12)+'カ月・'+a+'歳',t:t.replace(/<[^>]*>/g,''),c:c||''})}
+function say(t,c){lg(t,c);$('msg').innerHTML='<span class="'+(c||'')+'">'+t+'</span>';if(c=='bad'){$('room').classList.remove('sh');void $('room').offsetWidth;$('room').classList.add('sh')}}
+function die(c){lg('🪦 死亡：'+c.replace(/（\d+歳での死因確率 \d+%）$/,''),'bad');S.dead=1;clearInterval(tm);const a=S.am/12|0,m=S.am%12;
  $('age').innerHTML='享年 '+a+'歳'+m+'カ月<br><span style="font-size:.6em">生存 '+(S.m/12|0)+'年'+(S.m%12)+'カ月</span>';$('cause').textContent='死因：'+c;
  const o=$('over');o.style.display='flex';setTimeout(()=>o.style.opacity=1,30);S.txt='老後～ときどきメマイスル～で享年'+a+'歳'+m+'カ月（死因：'+c.replace(/（\d+歳での死因確率 \d+%）$/,'')+'）、生存'+(S.m/12|0)+'年'+(S.m%12)+'カ月でした🪦 あなたは何歳まで生きられる？ #老後メマイスル #どきメマ'}
 // 借金時イベント: 名前|万円|体力|フラグ(j=逮捕 z=自己破産 w=生活保護 c=要介護 n=認知症)|死亡%|重み(出現しやすさ)
@@ -668,7 +676,12 @@ function tick(){
 $('acts').innerHTML=ACT.map((a,i)=>'<button data-i="'+i+'">'+a[1]+' '+a[0]+'<small>'+(a[2]<0?'+'+(-a[2])+'万/月':a[2]?'−'+a[2]+'万/月':'無料')+'</small></button>').join('');
 $('acts').onclick=e=>{const b=e.target.closest('button');if(b){sel=+b.dataset.i;if(S)draw()}};
 function go(){init();$('title').style.display='none';$('game').style.display='flex';clearInterval(tm);tm=setInterval(tick,1000)}
-$('start').onclick=go;$('re').onclick=()=>{clearInterval(tm);$('over').style.display='none';$('game').style.display='none';$('title').style.display='flex'};
+$('lg').onclick=()=>{const l=$('ll');l.innerHTML='';
+ S.log.forEach(e=>{const d=document.createElement('div'),i=document.createElement('i'),sp=document.createElement('span');
+  i.textContent=e.k;sp.textContent=e.t;sp.className=e.c;d.appendChild(i);d.appendChild(sp);l.appendChild(d)});
+ $('logv').style.display='flex';l.scrollTop=0};
+$('lc').onclick=()=>{$('logv').style.display='none'};
+$('start').onclick=go;$('re').onclick=()=>{$('logv').style.display='none';clearInterval(tm);$('over').style.display='none';$('game').style.display='none';$('title').style.display='flex'};
 $('tw').onclick=()=>window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(S.txt)+'&url='+encodeURIComponent(location.href),'_blank');
 </script></body></html>
 
