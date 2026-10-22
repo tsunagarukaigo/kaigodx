@@ -8,7 +8,11 @@ html,body{height:100%;margin:0;background:#000;color:#fff;font-family:'DotGothic
 #title{justify-content:space-between;text-align:center;padding-bottom:18vh}
 #title h1{margin:auto 0 0;font-size:clamp(34px,10vw,84px);line-height:1.25;font-weight:400;letter-spacing:.05em}
 #title h1 small{display:block;font-size:.45em;color:#aaa}
-#title .old{font-size:64px;margin:20px 0 auto}
+#title .old{font-size:64px;margin:20px 0 0}
+#title .old span{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;display:inline-block}
+#title .old span:active{transform:scale(.92)}
+#emuT{color:#f33;font-size:18px;margin:auto 0 10px;min-height:1.4em;visibility:hidden}
+#emuT.on{visibility:visible}
 button{font:inherit;color:#fff;background:#000;border:3px solid #fff;padding:12px 28px;font-size:20px;cursor:pointer}
 button:active,button.on{background:#fff;color:#000}
 #game{display:none}
@@ -18,7 +22,7 @@ button:active,button.on{background:#fff;color:#000}
 #room.sh{animation:sh .3s}
 #room.fg{animation:fg 1.2s ease-out}
 @keyframes fg{0%,100%{border-color:#fff;box-shadow:none}15%,55%{border-color:#3f3;box-shadow:0 0 22px #3f3,inset 0 0 18px #3f35}35%,75%{border-color:#fff;box-shadow:none}}
-#man.pop{display:inline-block;animation:pop .5s}
+#man{display:flex;align-items:center;justify-content:center;gap:.08em;white-space:nowrap}#man.pop{animation:pop .5s}
 @keyframes pop{30%{transform:scale(1.25)}60%{transform:scale(.95)}}
 @keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 #msg{min-height:3.2em;text-align:center;font-size:16px;width:100%;max-width:560px}
@@ -32,15 +36,22 @@ button:active,button.on{background:#fff;color:#000}
 #logv .lh button{padding:6px 16px;font-size:16px}
 #ll{flex:1;overflow-y:auto;font-size:14px;line-height:1.7;text-align:left;-webkit-overflow-scrolling:touch}
 #ll div{border-bottom:1px solid #333;padding:3px 0}#ll i{font-style:normal;color:#aaa;margin-right:8px}
+#emu{display:none;width:100%;max-width:560px;border:2px solid #fff;padding:4px 6px;margin-top:8px;font-size:12px;line-height:1.5;grid-template-columns:repeat(4,1fr);gap:2px 8px}
+#game.emu #emu{display:grid}#game.emu #room{width:min(86vw,30vh)}
+#emu div{display:flex;justify-content:space-between;white-space:nowrap}#emu i{font-style:normal;color:#aaa}
+#emu b{font-weight:400}#emu b.u{animation:eu 1.8s}#emu b.d{animation:ed 1.8s}
+@keyframes eu{0%,70%{color:#3f3;text-shadow:0 0 6px #3f3}100%{color:#fff;text-shadow:none}}
+@keyframes ed{0%,70%{color:#f44;text-shadow:0 0 6px #f44}100%{color:#fff;text-shadow:none}}
 #over .g{font-size:80px}
 #over h2{font-size:clamp(26px,7vw,44px);margin:0;font-weight:400}
 </style></head><body>
-<div id="title" class="sc"><h1>老後<small>～ときどきメマイスル～</small></h1><div class="old">👴👵</div><button id="start">スタート</button></div>
+<div id="title" class="sc"><h1>老後<small>～ときどきメマイスル～</small></h1><div class="old"><span id="oji">👴</span><span id="oba">👵</span></div><div id="emuT">[エミュレーションモード]</div><button id="start">スタート</button></div>
 <div id="game" class="sc">
  <div class="top"><div id="clock"></div><div class="r" id="stat"></div></div>
  <div id="room"><span id="man">👴</span></div>
  <div id="msg">1秒＝1か月。毎月の過ごし方を選ぼう</div>
  <div id="acts"></div>
+ <div id="emu"></div>
  <div id="over"><div class="g">🪦</div><h2 id="age"></h2><div id="cause"></div><div id="sub" style="font-size:12px;color:#aaa;line-height:1.7;max-width:90vw"></div><div><button id="tw">Xにつぶやく</button> <button id="lg">自分史</button> <button id="re">もう一度</button></div></div>
  <div id="logv"><div class="lh"><b>自分史</b><button id="lc">閉じる</button></div><div id="ll"></div></div>
 </div>
@@ -245,7 +256,7 @@ const DX=[[/風邪をこじらせ肺炎/,[.04,.07,.11,.18]],[/誤嚥性肺炎で
 [/転んで大腿骨を骨折/,[.03,.05,.07,.11]],[/熱中症で救急搬送/,[.01,.02,.04,.07]],
 [/脱水症状になった/,[.01,.015,.025,.04]],[/入浴中にヒートショック/,[.08,.10,.13,.17]],
 [/餅をのどに詰まらせた/,[.08,.10,.12,.15]]];
-const cfMod=()=>(S.adl?1.15:1)*(S.dem?1.2:1)*(S.nu<40?1.3:1)*(S.care?1.1:1);
+const cfMod=()=>ADM(0)*(S.dem?1.2:1)*(S.nu<40?1.3:1)*(S.care?1.1:1);
 function cfOf(t){const a=S.am/12|0;for(const[r,arr]of DX)if(r.test(t))return Math.min(.6,bf(arr,a)*cfMod());return null}
 // 入院中の月あたり死亡率: 70-74/75-79/80-84/85-89/90歳以上。傷病名で補正
 const HDX=[['肺炎',1.3],['誤嚥性肺炎',1.6],['心不全',1.2],['脳梗塞',1.2],['大腿骨骨折',1],['尿路感染症',.8],['脱水症',.7],['COPD増悪',1.1]];
@@ -255,7 +266,7 @@ function hospCheck(){
   const p=HM[i]*(a<70?.5:1)*S.hx[1]*cfMod();
   if(R()<p){die(S.hx[0]+'（入院中の死亡）');return 1}
   if(R()<.68){S.hosp=0;say('🏥 退院した','good')}else say('🏥 入院中（'+S.hx[0]+'）','bad',1);return 1}
- if(R()<.032*(S.adl?1.3:1)*(S.care?1.25:1)*(S.dem?1.1:1)*(S.nu<40?1.25:1)*(S.dis.k||S.dis.s?1.3:1)){S.hosp=1;S.hx=HDX[R()*HDX.length|0];S.vit-=10;say('🏥 入院した（'+S.hx[0]+'）','bad');return 1}return 0}
+ if(R()<.032*ADM(1)*(S.care?1.25:1)*(S.dem?1.1:1)*(S.nu<40?1.25:1)*(S.dis.k||S.dis.s?1.3:1)){S.hosp=1;S.hx=HDX[R()*HDX.length|0];S.vit-=10;say('🏥 入院した（'+S.hx[0]+'）','bad');return 1}return 0}
 
 // ===== 追加: パートの業績(裏ステータス) =====
 // 名前|基本額(万円)|体力|業績の変化。良い出来事の収入は 0.5万円+基本額×業績/100、失敗の損失は 基本額×(1.5−業績/100)
@@ -358,7 +369,7 @@ const qolQ=()=>S.qol>=70?.95:S.qol<=30?1.1:1;
 // 運動のf: 運動介入で転倒率23%減(Cochrane,RaR0.77)。q: 趣味/スポーツの会に週1回以上参加で11年死亡率が約3割低い(JAGES)を弱めて反映
 // 睡眠のm: 睡眠不足は認知症HR2.64・睡眠薬使用はHR1.66(久山町)など。他は方向性のみの仮定値
 const H=[{i:.92,f:.93,m:.97},{f:.77,i:.95,m:.9,s:1.1},{m:.8,i:.95,f:.95},{l:.75,s:1.25,z:.85,m:.88},{l:.85,s:1.1,f:1.05},{l:.8,s:1.2,m:.85}];
-const ST=()=>({f:(S.adl?1.4:1)*(S.care?1.15:1)*(S.nu<40?1.15:1)*(S.vit<30?1.2:1),i:(S.adl?1.1:1)*(S.care?1.15:1)*(S.nu<40?1.25:1)*(S.vit<30?1.2:1),z:S.dem?1.6:1,m:(S.dem?1.2:1)*(S.adl?1.1:1)*(S.sp?.85:1),l:(S.adl?1.2:1)*(S.sp?.6:1)*(S.care?1.1:1),s:(S.adl?.8:1)*(S.sp?1.15:1)});
+const ST=()=>({f:ADM(2)*FLV[S.cl||0]*(S.nu<40?1.15:1)*(S.vit<30?1.2:1),i:ADM(4)*(S.care?1.15:1)*(S.nu<40?1.25:1)*(S.vit<30?1.2:1),z:S.dem?1.6:1,m:(S.dem?1.2:1)*ADM(5)*(S.sp?.85:1),l:ADM(6)*(S.sp?.6:1)*(S.care?1.1:1),s:ADM(7)*(S.sp?1.15:1)});
 function catW(t){const h=H[sel],at=S.am/12>=85?.8:1,st=ST();let w=1;for(const[k,r]of CAT){if(r.test(t))w*=st[k];if(h[k]&&r.test(t))w*=1-(1-h[k])*at}if(/うつ|不眠|睡眠薬|物忘れ|認知症の疑い/.test(t))w*=S.qol>=70?.85:S.qol<=30?1.3:1;return w}
 function pickW(L){let tot=0;const ws=L.map(e=>{const w=catW(e.t);tot+=w;return w});let r=R()*tot;
  for(let i=0;i<L.length;i++){r-=ws[i];if(r<=0)return L[i]}return L[L.length-1]}
@@ -383,7 +394,7 @@ function nutI(a){const p=lowNP(S.face=='👴',a)*(S.mo<0?3:S.mo<50?1.8:S.mo>2000
  S.nu=R()<Math.min(.9,p)?15+R()*24:45+R()*45}
 function nutT(a){const poor=S.mo<0&&!S.wel;let d=poor?-1.2:(S.mo<100&&!S.wel?-.3:.15);
  d+=a>=80?-.25:a>=75?-.1:0;
- if(sel==0)d+=1;if(S.dem)d-=.3;if(S.adl)d-=.15;if(S.hosp)d+=.3;if(S.sp)d+=.3;if(S.wel)d+=.4;
+ if(sel==0)d+=1;d+=HS[sel][1];if(S.dem)d-=.3;d-=[0,.1,.2,.3,.4][adIdx()];if(S.hosp)d+=.3;if(S.sp)d+=.3;if(S.wel)d+=.4;
  if(S.nu<65&&!poor)d+=.1;
  const b=nutLv();S.nu=Math.max(0,Math.min(100,S.nu+d));const n=nutLv();
  if(NL.indexOf(n)<NL.indexOf(b)&&NL.indexOf(n)<=2)say('🍚 栄養状態が「'+n+'」になった','bad')}
@@ -410,15 +421,17 @@ function spCheck(){if(!S.sp)return 0;S.sp.am++;const sa=S.sp.am/12|0;
  if(R()<1-Math.pow(1-Math.min(.007*Math.exp(.1*(sa-65)),.9),1/12)){
   const x=endSp('X');S.vit-=25;S.mo-=100;S.out+=100;say('伴侶が亡くなった（享年'+sa+'歳）（−100万円）'+x,'bad');return 1}return 0}
 function doEv(e,pre){if(e.m<0)S.out-=e.m;S.mo+=e.m;S.vit+=e.v;const f=e.f;
- if(f.includes('a'))S.adl=true;if(f.includes('c'))S.care=S.adl=true;if(f.includes('n'))S.dem=true;
+ if(f.includes('a')){adlAdd(-(6+R()*Math.min(20,Math.abs(e.v))));if(S.care&&S.cl<5&&R()<.3){const o=S.cl;S.cl++;S.lvm='（要介護度が悪化 '+lvTxt(o)+'→'+lvTxt(S.cl)+'）'}}if(f.includes('c'))setCare();if(f.includes('n'))S.dem=true;
  if(f.includes('k'))S.dis.k=true;if(f.includes('s'))S.dis.s=true;if(f.includes('p'))S.pen+=.3;
  let x=priceFx(e.t);if(f.includes('D')&&S.sp)x+=endSp('D');if(f.includes('X')&&S.sp)x+=endSp('X');S.qol=Math.max(0,Math.min(100,S.qol+e.v/10));
- say(pre+e.t+(e.m?'（'+(e.m>0?'+':'')+e.m+'万円）':'')+x,e.v+e.m/20<0?'bad':'good');
+ say(pre+e.t+(e.m?'（'+(e.m>0?'+':'')+e.m+'万円）':'')+x+(S.lvm||''),e.v+e.m/20<0?'bad':'good');S.lvm='';
  if(/大腿骨/.test(e.t))S.fxm=12;
  const cf=cfOf(e.t);if(cf!==null){if(R()<cf){die(e.t);return 1}}else if(f.includes('r')&&R()<.1){die(e.t);return 1}}
 function spEv(){let r=R()*CPW,e;for(e of CP){r-=e.w;if(r<=0)break}return doEv(e,'👫 ')}
 
 // [名前,絵文字,月額費用(万),体力,ADL倍率,疾病倍率,認知症倍率]
+// 過ごし方ごとの裏ステータスの毎月の増減: [体力(追加分),栄養,QOL,幸せ度]。体力は既存の効果(+0.3〜0.6)に上乗せして月±1前後、趣味は幸せ度+1.5
+const HS=[[0,.5,.3,.3],[.4,-.3,.4,.4],[.6,0,.5,.3],[.3,0,.6,.8],[-.5,0,-.2,.2],[.4,0,1,1.5]];
 const ACT=[['食事','🍚',2,.5,1,.8,1],['運動','🚶',0,.6,.35,1,.9],['睡眠','😴',0,.5,1,.9,.9],['娯楽','🎮',2,.4,1,1,.9],['パート','💼',-.5,.3,1,1,.8],['趣味','🎨',1,.4,1,1,.7]];
 const ADL=[[65,4.9],[70,9.7],[75,16],[80,29.3],[85,62.3]];
 const CARE=[[65,2.9],[70,5.8],[75,12.4],[80,26.4],[85,48.5],[90,69.5],[95,84.1]];
@@ -432,30 +445,120 @@ let S,tm,sel=0;
 function money(){const r=R()*100;
  if(r<30.4)return 0;if(r<39.5)return R()*100;if(r<43.8)return 100+R()*100;if(r<46.2)return 200+R()*100;
  if(r<50.7)return 300+R()*100;if(r<78.9)return 400+1600*R()**2;return 2000+8000*R()**3}
+// ===== 追加: 要介護度(1〜5)・転倒・認知症・介護保険の自己負担(1〜3割) =====
+// 要介護度の構成: 在宅の認定者で 要介護1:23.7% 2:21.7% 3:22.9% 4:14.8% 5:9.1%(練馬区2026年調査)を要介護1〜5内で正規化。年齢が高いほど重度寄り(仮定)
+const CLW=[25.7,23.5,24.8,16.1,9.9];
+function rollCL(a){const adj=a>=85?[.8,.9,1.05,1.25,1.4]:a<75?[1.3,1.1,.95,.8,.7]:[1,1,1,1,1];const w=CLW.map((x,i)=>x*adj[i]);let r=R()*w.reduce((t,x)=>t+x,0);for(let i=0;i<5;i++){r-=w[i];if(r<=0)return i+1}return 1}
+function setCare(l){if(!S.care){S.care=true;S.cl=l||rollCL(S.am/12|0)}else if(l&&l>S.cl)S.cl=l;const b=LVB[S.cl];if(S.as>b[1])adlAdd(b[0]+R()*(b[1]-b[0])-S.as)}
+// 要介護度(0=認定なし,1〜5)ごとの倍率
+// DLV 認知症の発症: 認知症自立度Ⅱ以上の割合は要介護1で約4割→要介護5で約8割以上(厚労省・自治体調査)→段階的に上げる(仮定)
+// FLV 転倒: 地域の65歳以上は年に2〜3割以上が転倒(Cochrane他)。要介護1〜3は動けるぶん多く、要介護5は寝たきりに近く減る(仮定)
+// CLQ 死亡 / HOMEP 老人ホーム入居(月あたり)
+const DLV=[1,1.3,1.8,2.3,2.7,3];
+const FLV=[1,1.3,1.6,1.7,1.4,.8];
+const CLQ=[1,1.25,1.45,1.7,2,2.4];
+const HOMEP=[0,.12,.18,.25,.32,.4];
+const lvTxt=l=>l?'要介護'+l:'自立';
+// 転倒(年): 基準は年齢別(65-74歳22%・75-84歳30%・85歳以上36%)×要介護度×ADL・認知症・低栄養
+// 運動: 運動介入で転倒率23%減(Cochrane RaR0.77。バランス+筋トレで34%減)→12か月以上継続でさらに14%減(仮定)
+function fallAnn(a){let r=(a<75?.22:a<85?.30:.36)*FLV[S.cl||0]*ADM(2)*(S.dem?1.3:1)*(S.nu<40?1.25:1)*(S.vit<30?1.2:1)*(H[sel].f||1);
+ if(sel==1&&(S.run||0)>=12)r*=.86;return Math.min(.9,r)}
+// 転倒の結末(転倒1回あたり): 大腿骨骨折1.5%・その他の骨折4.5%・打撲24%・無傷70%(仮定)
+function fallCheck(){const a=S.am/12|0;if(R()>=1-Math.pow(1-fallAnn(a),1/12))return 0;const r=R();
+ if(r<.015){doEv({t:'転んで大腿骨を骨折',m:-40,v:-15,f:'a'},'⚠ ');return 1}
+ if(r<.06){doEv({t:'転倒して手首を骨折した',m:-12,v:-8,f:''},'⚠ ');return 1}
+ if(r<.30){doEv({t:'転倒して打撲した',m:-2,v:-4,f:''},'⚠ ');return 1}
+ return 0}
+// 要介護度の変化(年): 悪化24%・改善9%を基準(仮定)。運動(通いの場・運動器機能向上)と栄養(低栄養はフレイル・要介護化の主因)で変わる
+function lvUp(why){if(!S.care||S.cl>=5)return;const o=S.cl;S.cl++;adlAdd(-(5+R()*8));say('📉 要介護度が悪化した（'+lvTxt(o)+'→'+lvTxt(S.cl)+(why?'・'+why:'')+'）','bad')}
+function levelCheck(){if(!S.care)return;let w=.24,i=.09;const lg_=(S.run||0)>=12;
+ if(sel==1){w*=lg_?.65:.75;i*=lg_?2:1.5}
+ if(sel==0){w*=.92;i*=1.15}
+ if(S.nu>=65){w*=.85;i*=1.3}else if(S.nu<40){w*=1.35;i*=.6}
+ if(S.dem)w*=1.3;w*=ADM(9);if(S.hosp)w*=2;if(S.qol>=70)w*=.92;
+ const pw=1-Math.pow(1-Math.min(.9,w),1/12),pi=1-Math.pow(1-Math.min(.9,i),1/12),r=R();
+ if(r<pw)lvUp();
+ else if(r<pw+pi){
+  if(S.cl==1){if(S.home||R()<.5)return;S.care=false;S.cl=0;adlAdd(5);say('💪 要介護認定が外れた（自立に改善）','good')}
+  else{const o=S.cl;S.cl--;adlAdd(4+R()*6);say('💪 要介護度が改善した（'+lvTxt(o)+'→'+lvTxt(S.cl)+'）','good')}}}
+// 疾病の発症: 栄養良好で0.92倍、食事・運動を12か月以上続けると0.9/0.92倍(野菜・果物でHR0.91〜0.93(JPHC)・生活習慣介入で糖尿病58%減(DPP)等を弱めた仮定)
+const DISX=()=>(S.nu>=65?.92:1)*((S.run||0)>=12?(sel==0?.9:sel==1?.92:1):1);
+// 介護保険の自己負担: 割合は判定基準(合計所得160/220万円・年金収入+その他所得 単身280/340万円・2人以上346/463万円)で1〜3割
+// 合計所得≒年金収入−公的年金等控除110万−10万。その他所得は貯金の2%(運用益)と仮定。生活保護は介護扶助で0円
+const CAPU=[0,16.765,19.705,27.048,30.938,36.217],USE=[0,.55,.62,.72,.77,.80];
+function cpRate(){if(S.wel)return 1;const pp=S.pen+(sel==4?partInc():0),own=(pp-(S.sp?S.sp.pen:0))*12,ot=Math.max(0,S.mo)*.02,
+ tot=Math.max(0,own-120)+ot,sum=(S.sp?pp*12:own)+ot,two=!!S.sp;
+ if(tot<160)return 1;if(tot>=220&&sum>=(two?463:340))return 3;return sum>=(two?346:280)?2:1}
+// 月の自己負担 = 区分支給限度額×利用率(平均的な利用額)×負担割合。高額介護サービス費の上限(月)で頭打ち
+function careFee(r){if(!S.care||S.wel)return 0;const c=CAPU[S.cl||1]*USE[S.cl||1]*Math.pow(1.02,S.m/12),rate=r||cpRate(),
+ hh=(S.pen+(sel==4?partInc():0))*12+Math.max(0,S.mo)*.02,
+ cap=rate==3?(hh>=700?14.01:hh>=400?9.3:4.44):hh<=80?1.5:hh<=155?2.46:4.44;return Math.min(c*rate/10,cap)}
+// ===== 追加: ADL(Barthel Index 0〜100点) =====
+// 状態: 85点以上=ほぼ自立(軽度依存) / 60〜84=部分自立(中等度依存・カットオフ) / 40〜59=大部分介助(重度依存) / 20〜39=非常に重度な介助が必要 / 0〜19=全介助
+// 要介護度ごとの点数の目安(要介護1:65〜84 … 要介護5:0〜20)。認定を受けると点数がこの範囲まで下がる(仮定)
+const LVB=[[85,100],[65,84],[50,70],[35,55],[15,40],[0,20]];
+// 状態(0=ほぼ自立〜4=全介助)ごとの倍率。行: 0入院・急変時の致死率 1入院しやすさ 2転倒・骨折しやすさ 3死亡率 4感染症・疾病 5メンタル系の出来事 6孤立 7交流・参加 8要介護認定 9要介護度の悪化
+// 転倒は部分〜大部分介助で最多、全介助は動けないため減る。交流・参加は点数が下がるほど減る(仮定)
+const ADX=[[1,1.1,1.2,1.35,1.5],[1,1.2,1.5,1.9,2.3],[1,1.5,1.8,1.3,.5],[1,1.2,1.5,2,2.8],[1,1.1,1.25,1.4,1.6],[1,1.05,1.1,1.15,1.2],[1,1.2,1.4,1.7,2],[1,.85,.6,.4,.2],[.5,1.2,2.2,3.2,4],[1,1,1.2,1.4,1.6]];
+const ADL_YR=.2; // 運動しない1年での最大低下率(0〜20%)。小さくするとゲームが易しくなる
+const adIdx=()=>S.as>=85?0:S.as>=60?1:S.as>=40?2:S.as>=20?3:4;
+const ADM=k=>ADX[k][adIdx()];
+const adName=()=>['ほぼ自立（軽度依存）','部分自立（中等度依存）','大部分介助（重度依存）','非常に重度な介助が必要','全介助'][adIdx()];
+function adlAdd(d){S.as=Math.max(0,Math.min(100,S.as+d));S.adl=S.as<85}
+// 老化による筋力低下: 年あたりの低下(点)の基準は 65〜74歳0.6・75〜84歳1.5・85歳以上3.0(年末の低下と合わせてADL低下の割合の上昇に近づける仮定)
+// 運動を選ぶと6割の月は低下せず維持、残りも0.4倍。リハビリ効果で少し回復もする。運動しない年は、年末に現在の点数の0〜20%(運動した月数が多いほど小さい)を失う。体を動かす度合いは 運動1・パート0.5・趣味0.3・娯楽0.2 の月として数える(仮定)
+function adlTick(a){const i0=adIdx();S.exm=(S.exm||0)+[0,1,0,.2,.5,.3][sel];
+ let d=(a<75?.6:a<85?1.5:3)/12*(.4+R()*1.2);
+ d*=(S.vit<30?1.5:S.vit>70?.8:1)*(S.nu<40?1.3:S.nu>=65?.9:1)*(S.dem?1.2:1)*(S.hosp?3:1)*(S.dis.s?1.3:1);
+ if(sel==1){if(R()<.6)d=0;else d*=.4;if(S.as<95&&R()<.25)d-=.3+R()*.5}
+ else if(sel==3||sel==5)d*=adlF();
+ adlAdd(-d);
+ if(S.m%12==0){const e=S.exm||0,dr=S.as*R()*ADL_YR*(1-Math.min(1,e/12));S.exm=0;
+  if(dr>=.5)adlAdd(-dr)}
+}
 function init(){
  const a=65+(R()*37|0);
  S={am:a*12+(R()*12|0),m:0,mo:money(),pen:penR(),vit:40+R()*50,
   adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],hp:50,hist:[],out:0,perf:50,qol:50,px:1,kp:1,vamp:0,love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵'};
  for(const k in DIS)S.dis[k]=R()<DIS[k][1]*(a>74?1.5:1);
- if(S.care)S.adl=true;
+ if(S.care){S.cl=rollCL(a);const b=LVB[S.cl];S.as=b[0]+R()*(b[1]-b[0])}else{S.cl=0;S.as=S.adl?60+R()*24:85+R()*15}S.adl=S.as<85;S.exm=0;
  nutI(a);
  icon();sel=0;draw();$('msg').textContent='1秒＝1か月。毎月の過ごし方を選ぼう';
  $('over').style.display='none';$('over').style.opacity=0;
 }
+
+// ===== エミュレーションモード(裏ステータス表示) =====
+let EMU=false;
+const EK=[['vit','体力',0],['nu','栄養',0],['qol','QOL',0],['hp','幸せ度',0],
+['perf','業績',0],['px','物価',1],['kp','介護料',1],['dn','疾患',2],
+['as','ADL点',0],['cl','要介護度',4],['dem','認知症',3],['hosp','入院',3],['cp','負担割合',5],['fl','転倒/年',6],['dr','認知×',1],['rf','介護費',7]];
+const evals=()=>({vit:S.vit,nu:S.nu,qol:S.qol,hp:S.hp,perf:S.perf,px:S.px,kp:S.kp,dn:Object.values(S.dis).filter(x=>x).length,as:S.as,cl:S.cl||0,cp:S.care?cpRate():0,fl:fallAnn(S.am/12|0),dr:DLV[S.cl||0],rf:S.care?careFee():0,dem:S.dem?1:0,hosp:S.hosp?1:0});
+function emuBuild(){$('emu').innerHTML=EK.map(([k,l])=>'<div><i>'+l+'</i><b id="e_'+k+'"></b></div>').join('')}
+function emuDraw(){const v=evals(),sn=S.sn||v,ev=S.evt;
+ for(const[k,l,t]of EK){const el=$('e_'+k);if(!el)continue;const x=v[k],o=sn[k];
+  let txt=t==0?String(Math.round(x)):t==1?'×'+x.toFixed(2):t==2?String(x):t==4?(x?'要介護'+x:'なし'):t==5?(x?x+'割':'—'):t==6?Math.round(x*100)+'%':t==7?x.toFixed(1)+'万':(x?(k=='hosp'?'中':'あり'):'なし');
+  const ch=Math.abs(x-o)>(t==1?.0005:t==0?1:.01);
+  if(ev&&ch){const up=x>o;txt+=up?'▲':'▼';
+   // 体力・栄養・QOL・幸せ度・業績は上昇=緑。物価・介護料・疾患・ADL等は上昇=赤(悪化)
+   const good=(t==0)?up:!up;el.className='';void el.offsetWidth;el.className=good?'u':'d'}
+  else if(!ev)el.className='';
+  el.textContent=txt}
+ S.sn=v;S.evt=0}
 function draw(){const a=S.am/12|0;
  $('clock').innerHTML='経過 '+(S.m/12|0)+'年'+(S.m%12)+'カ月';
  $('stat').innerHTML='年齢 '+a+'歳<br>'+(S.mo<0?'<span class="bad">借金 '+fmt(-S.mo)+'</span>':'貯金 '+fmt(S.mo))+'<br>年金収入 '+S.pen.toFixed(1)+'万/月'+(S.wel?'(生活保護)':'')+'<br>支出 '+exp().toFixed(1)+'万/月';
  [...$('acts').children].forEach((b,i)=>b.classList.toggle('on',i==sel));
  [...$('acts').children].forEach((b,i)=>{const sm=b.querySelector&&b.querySelector('small');if(!sm)return;
-  if(i==4)sm.textContent='+'+partInc().toFixed(1)+'万/月';else if(i==0||i==3||i==5)sm.textContent='−'+actCost(i).toFixed(1)+'万/月'})}
+  if(i==4)sm.textContent='+'+partInc().toFixed(1)+'万/月';else if(i==0||i==3||i==5)sm.textContent='−'+actCost(i).toFixed(1)+'万/月'});
+ if(EMU)emuDraw()}
 function exp(){let e=(S.home?20:10)*Math.pow(1.02,S.m/12)+actCost(sel);
  for(const k in S.dis)if(S.dis[k])e+=DIS[k][2];
- if(S.care&&!S.home)e+=3;if(S.dem&&!S.home)e+=2;if(S.sp)e+=5;if(S.hosp)e+=10;return e}
+ if(S.care){const f=careFee();e+=S.home?Math.max(0,f-careFee(1)):f}if(S.dem&&!S.home)e+=2;if(S.sp)e+=5;if(S.hosp)e+=10;return e}
 function lg(t,c){if(!S||!S.log)return;const a=S.am/12|0;S.log.push({k:(S.m/12|0)+'年'+(S.m%12)+'カ月・'+a+'歳',t:t.replace(/<[^>]*>/g,''),c:c||''})}
 function fx(c){const r=$('room'),m=$('man');r.classList.remove('sh','fg');m.classList.remove('pop');void r.offsetWidth;
  if(c=='bad')r.classList.add('sh');else if(c=='good'){r.classList.add('fg');m.classList.add('pop')}}
-function say(t,c,nofx){lg(t,c);if(!nofx&&S&&S.hist){if(c=='good')S.hp=Math.min(100,S.hp+6);else if(c=='bad')S.hp=Math.max(0,S.hp-6)}$('msg').innerHTML='<span class="'+(c||'')+'">'+t+'</span>';if(!nofx)fx(c)}
-function icon(){$('man').textContent=(S.vamp?'🧛':S.face)+(S.sp?S.sp.face:'')}
+function say(t,c,nofx){lg(t,c);if(!nofx&&S)S.evt=1;if(!nofx&&S&&S.hist){if(c=='good')S.hp=Math.min(100,S.hp+6);else if(c=='bad')S.hp=Math.max(0,S.hp-6)}$('msg').innerHTML='<span class="'+(c||'')+'">'+t+'</span>';if(!nofx)fx(c)}
+function icon(){$('man').innerHTML='<span>'+(S.vamp?'🧛':S.face)+'</span>'+(S.sp?'<span>'+S.sp.face+'</span>':'');$('room').style.fontSize=S.sp?'min(14vw,7.5vh)':''}
 
 function chart(){const by={};S.hist.forEach(([a,v])=>{const k=Math.floor(a);(by[k]=by[k]||[]).push(v)});
  const ks=Object.keys(by).map(Number).sort((a,b)=>a-b);if(ks.length<2)return '';
@@ -626,7 +729,7 @@ const DW=D.reduce((a,e)=>a+e.w,0);
 function dEv(){let r=R()*DW,e;for(e of D){r-=e.w;if(r<=0)break}
  if(e.m<0)S.out-=e.m;S.mo+=e.m;S.vit+=e.v;const f=e.f;
  if(f.includes('z'))S.mo=0;if(f.includes('w'))startWelfare();if(/1日1食|食事を抜く|水だけ|栄養失調|低栄養|賞味期限|食べられない/.test(e.t))S.nu=Math.max(0,S.nu-6);if(/フードバンク|子ども食堂|炊き出し|食料支援|野菜をもらった/.test(e.t))S.nu=Math.min(100,S.nu+6);
- if(f.includes('c'))S.care=S.adl=true;if(f.includes('n'))S.dem=true;
+ if(f.includes('c'))setCare();if(f.includes('n'))S.dem=true;
  say(e.t+(e.m?'（'+(e.m>0?'+':'')+e.m+'万円）':''),e.v<0||e.m<0?'bad':'good');
  if(e.d&&R()*100<e.d){die(e.t);return 1}}
 // 選択中の過ごし方ごとのイベント(良/悪): 名前|万円|体力|a=ADL低下
@@ -826,7 +929,7 @@ const AE={
 発表会で緊張し失敗した|0|-6
 道具を失くした|-3|-2
 カメラを落として壊した|-8|-5`)]};
-function aEv(){const L=AE[sel][R()<.5?0:1],e=L[R()*L.length|0];S.qol=Math.max(0,Math.min(100,S.qol+e.v/10));if(sel==4&&R()<.7)return perfEv();if((sel==3||sel==5)&&R()<.45)return qolEv();if(e.m<0)S.out-=e.m;S.mo+=e.m;S.vit+=e.v;if(e.f&&(sel!=1||R()<.12))S.adl=true;
+function aEv(){const L=AE[sel][R()<.5?0:1],e=L[R()*L.length|0];S.qol=Math.max(0,Math.min(100,S.qol+e.v/10));if(sel==4&&R()<.7)return perfEv();if((sel==3||sel==5)&&R()<.45)return qolEv();if(e.m<0)S.out-=e.m;S.mo+=e.m;S.vit+=e.v;if(e.f&&(sel!=1||R()<.12))adlAdd(-(5+R()*12));
  say(ACT[sel][1]+' '+e.t+(e.m?'（'+(e.m>0?'+':'')+e.m+'万円）':''),e.v<0?'bad':'good')}
 // 死因: 人口動態統計2024の構成比を基準に、状態と借金で重みを補正
 // 年齢階級別死因別死亡率(人口10万対、人口動態統計平成・近年の割合で補正)を重みにする
@@ -844,33 +947,38 @@ function cause0(poor,a){
  if(poor)W.push(['低栄養・衰弱',7],['孤立死',5],['生活困窮',3]);
  let t=0;for(const x of W)t+=x[1];let r=R()*t;for(const x of W){r-=x[1];if(r<=0)return x[0]}return '老衰'}
 function tick(){
- S.m++;S.am++;S.hp+=(50-S.hp)*.02;if(S.vamp&&S.am>=6000){S.vamp=0;return die('吸血鬼の寿命（500歳）')}const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}if(sel==4)S.perf=Math.min(100,S.perf+.1);S.qol=Math.max(0,Math.min(100,S.qol+(sel==5?.35:sel==3?.25:(50-S.qol)*.02)));
+ if(EMU&&S.evt==0)S.sn=evals();S.m++;S.am++;S.hp=Math.max(0,Math.min(100,S.hp+(50-S.hp)*.02+HS[sel][3]));if(S.vamp&&S.am>=6000){S.vamp=0;return die('吸血鬼の寿命（500歳）')}const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}if(sel==4)S.perf=Math.min(100,S.perf+.1);S.qol=Math.max(0,Math.min(100,S.qol+(sel==5?.35:sel==3?.25:(50-S.qol)*.02)+HS[sel][2]));
  const ex_=exp();S.out+=ex_;S.mo+=S.pen-ex_;let poor=false;if(S.mo<0){poor=true;S.mo*=1.0125}
  if(poor){S.vit-=.6;if(!S.wel&&S.nu<8&&R()<.02)return die('餓死')}
- S.vit+=A[3]-.1-(a-65)*.012+(S.love?.3:0)+(S.qol-50)/250;
+ S.vit+=A[3]+HS[sel][0]-.1-(a-65)*.012+(S.love?.3:0)+(S.qol-50)/250;
  nutT(a);if(S.nu<40)S.vit-=S.nu<15?.7:.25;
- if(!S.adl&&R()<hz(ADL,a)*adlF()*(S.vit<30?1.5:1))S.adl=true,say('身体が思うように動かなくなってきた…','bad');
- if(!S.care&&R()<hz(CARE,a)*(S.adl?2:.7))S.care=true,say('要介護認定を受けた','bad');
- if(!S.dem&&R()<hz(DEM,a)*EF[sel].n[bnd(a)]*(S.qol<=30?1.15:S.qol>=70?.93:1)*(longSleep()?1.25:1))S.dem=true,say('物忘れが目立ってきた…','bad');
- for(const k in DIS)if(!S.dis[k]&&R()<DIS[k][1]/10/12*(a>74?1.5:1)*EF[sel].d[bnd(a)]*(S.adl?1.15:1)*(S.nu<40?1.15:1)*(S.qol<=30?1.1:1)){S.dis[k]=true;say(DIS[k][0]+'と診断された','bad')}
- const spd=rareEv()||spCheck()||hospCheck()||welfCheck();if(S.dead)return;
- if(spd){}else if(S.care&&!S.home&&R()<.25){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<.0144){marry(1)}else if(!S.sp&&!S.ex&&R()<.04){love()}else if(S.sp&&R()<.12){if(spEv())return}
+ adlTick(a);
+ if(!S.care&&R()<hz(CARE,a)*ADM(8)){setCare();say('要介護認定を受けた（要介護'+S.cl+'）','bad')}else levelCheck();
+ if(!S.dem&&R()<hz(DEM,a)*DLV[S.cl||0]*EF[sel].n[bnd(a)]*(S.qol<=30?1.15:S.qol>=70?.93:1)*(longSleep()?1.25:1))S.dem=true,say('物忘れが目立ってきた…','bad');
+ for(const k in DIS)if(!S.dis[k]&&R()<DIS[k][1]/10/12*(a>74?1.5:1)*EF[sel].d[bnd(a)]*ADM(4)*(S.nu<40?1.15:1)*(S.qol<=30?1.1:1)*DISX()){S.dis[k]=true;say(DIS[k][0]+'と診断された','bad')}
+ const spd=rareEv()||spCheck()||hospCheck()||welfCheck()||fallCheck();if(S.dead)return;
+ if(spd){}else if(S.care&&!S.home&&R()<HOMEP[S.cl||1]){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<.0144){marry(1)}else if(!S.sp&&!S.ex&&R()<.04){love()}else if(S.sp&&R()<.12){if(spEv())return}
  else if(AE[sel]&&R()<.12){aEv()}else if(R()<.07){if(doEv(pickW(NW),'📰 '))return}else if(R()<.15){if(doEv(pickW(E),''))return}
  S.vit=Math.max(S.vamp?20:0,Math.min(100,S.vit));S.hist.push([S.am/12,S.hp]);
  let q=.007*Math.exp(.1*(a-65));
  q*=Math.max(.5,Math.min(2.5,1+(60-S.vit)/75));
- if(S.adl)q*=sel==1?1.2:1.5;if(S.care)q*=1.6;if(S.dem)q*=1.4;if(poor)q*=S.face=='👴'?3:2;if(S.nu<15)q*=1.8;else if(S.nu<40)q*=1.25;q*=EF[sel].q[bnd(a)]*qolQ()*(longSleep()?1.2:1);if(S.fxm>0){q*=2;S.fxm--}
+ q*=ADM(3)*(sel==1&&S.as<85?.85:1);if(S.care)q*=CLQ[S.cl||1];if(S.dem)q*=1.4;if(poor)q*=S.face=='👴'?3:2;if(S.nu<15)q*=1.8;else if(S.nu<40)q*=1.25;q*=EF[sel].q[bnd(a)]*qolQ()*(longSleep()?1.2:1);if(S.fxm>0){q*=2;S.fxm--}
  let w='老衰',mx=1;for(const k in S.dis)if(S.dis[k]){q*=DIS[k][3];if(DIS[k][3]>mx){mx=DIS[k][3];w=DIS[k][0]}}
  if(R()<1-Math.pow(1-Math.min(q,.9),1/12))return die(cause(poor,a));
  draw()}
 $('acts').innerHTML=ACT.map((a,i)=>'<button data-i="'+i+'">'+a[1]+' '+a[0]+'<small>'+(a[2]<0?'+'+(-a[2])+'万/月':a[2]?'−'+a[2]+'万/月':'無料')+'</small></button>').join('');
 $('acts').onclick=e=>{const b=e.target.closest('button');if(b){sel=+b.dataset.i;if(S)draw()}};
-function go(){init();$('title').style.display='none';$('game').style.display='flex';clearInterval(tm);tm=setInterval(tick,1000)}
+function go(){init();$('game').classList.toggle('emu',EMU);if(EMU){emuBuild();S.sn=evals();emuDraw()}$('title').style.display='none';$('game').style.display='flex';clearInterval(tm);tm=setInterval(tick,1000)}
 $('lg').onclick=()=>{const l=$('ll');l.innerHTML='';
  S.log.forEach(e=>{const d=document.createElement('div'),i=document.createElement('i'),sp=document.createElement('span');
   i.textContent=e.k;sp.textContent=e.t;sp.className=e.c;d.appendChild(i);d.appendChild(sp);l.appendChild(d)});
  $('logv').style.display='flex';l.scrollTop=0};
 $('lc').onclick=()=>{$('logv').style.display='none'};
+let cj=0,cb=0;
+function emuTog(){cj=cb=0;EMU=!EMU;$('emuT').classList.toggle('on',EMU)}
+$('oji').onclick=()=>{cj=1;if(cj&&cb)emuTog()};
+$('oba').onclick=()=>{cb=1;if(cj&&cb)emuTog()};
 $('start').onclick=go;$('re').onclick=()=>{$('logv').style.display='none';clearInterval(tm);$('over').style.display='none';$('game').style.display='none';$('title').style.display='flex'};
 $('tw').onclick=()=>window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(S.txt)+'&url='+encodeURIComponent(location.href),'_blank');
 </script></body></html>
+
