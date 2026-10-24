@@ -30,9 +30,10 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 .flash.go{animation:fl 1.7s ease-out}
 @keyframes fl{0%{opacity:0}10%{opacity:.6}24%{opacity:.08}36%{opacity:.42}70%,100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.fac{animation:fi 3s 1s forwards}.fac .w,.fac .sg{animation:none}.flash{display:none}.op .note{display:none}}
-.rvh{display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card);padding:2px 0 6px;z-index:1}.rvh h2{margin:0}.rvh .accuse{padding:6px 10px;font-size:.85rem}
-.btns{display:flex;gap:6px}.sub{background:var(--card);color:var(--ink);border:1px solid var(--line)}.tm{font-size:.85rem;color:var(--sub);font-weight:400;white-space:nowrap}
+.rvh{display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card);padding:2px 0 6px;z-index:1}.rvh h2{margin:0}.rvh .accuse{padding:6px 8px;font-size:.75rem}.rvh{flex-wrap:wrap;gap:6px}.rvh h2{font-size:1.1rem}.rvh .on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btns{display:flex;gap:6px}.sub{background:var(--card);color:var(--ink);border:1px solid var(--line)}.tm{display:none}
 .rl{font-size:.75rem;color:var(--sub);margin:4px 0 10px;line-height:1.5}.case b{color:var(--ink)}
+.tl{flex:none;position:relative;height:30px;margin:0 6px 2px}.trk{position:relative;height:12px;border-radius:6px;background:var(--line);overflow:hidden}.trk .fl{height:100%;width:0;background:var(--acc);transition:width .4s}.trk .tk{position:absolute;top:0;bottom:0;width:1px;background:var(--bg);opacity:.7}.trk .tk.h{width:2px;opacity:1}.tl .lb{position:absolute;top:14px;font-size:.62rem;color:var(--sub);white-space:nowrap}
 .sus{display:flex;justify-content:center;gap:6px;margin:4px 0 8px}
 .s{background:var(--card);flex:1;max-width:96px;min-width:0;border:2px solid var(--line);border-radius:8px;padding:4px 2px;text-align:center;cursor:pointer;font:inherit;color:inherit}
 .s.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
@@ -55,6 +56,7 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 .box h2{margin:0 0 8px;color:var(--acc)}
 </style></head><body><main>
 <header><div class="turn"><span id="turn"></span> <span id="tm" class="tm">⏱ 00:00</span></div><div class="btns"><button class="accuse sub" id="relb">推理メモ</button><button class="accuse" id="acc">犯人はお前だ！</button></div></header>
+<div class="tl" id="tl"></div>
 <div class="sus" id="sus"></div>
 <div class="scr" id="scr"><div class="case" id="case"></div>
 <div class="log" id="log"></div>
@@ -62,7 +64,7 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 </main>
 <div class="op" id="op"><div class="flash" id="fl"></div><svg class="fac" viewBox="0 0 300 140" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><rect x="-120" y="98" width="112" height="42"/><polygon points="-126,98 -64,80 -2,98"/><rect class="w" x="-106" y="110" width="8" height="11" style="--d:8.5s;--r:-2.8s"/><rect class="w" x="-84" y="110" width="8" height="11" style="--d:4.1s;--r:-3.1s"/><rect x="312" y="94" width="112" height="46"/><polygon points="306,94 368,74 430,94"/><rect class="w" x="326" y="108" width="8" height="11" style="--d:3.5s;--r:-4.9s"/><rect class="w" x="370" y="108" width="8" height="11" style="--d:8.8s;--r:-3.9s"/><rect x="10" y="70" width="80" height="70"/><rect x="90" y="40" width="120" height="100"/><rect x="112" y="22" width="76" height="18"/><rect x="210" y="70" width="80" height="70"/><rect x="134" y="108" width="32" height="4"/><rect x="135" y="112" width="3" height="28"/><rect x="162" y="112" width="3" height="28"/><polygon points="165,128 194,140 165,140"/><text class="sg" x="150" y="35.5" text-anchor="middle" font-size="10" font-family="Hiragino Mincho ProN,Yu Mincho,serif">つながる介護</text><rect class="w c" x="18" y="80" width="10" height="12" style="--d:6.2s;--r:-0.4s"/><rect class="w" x="36" y="80" width="10" height="12" style="--d:3.2s;--r:-2.8s"/><rect class="w" x="54" y="80" width="10" height="12" style="--d:6.1s;--r:-3.8s"/><rect class="w" x="72" y="80" width="10" height="12" style="--d:5.7s;--r:-1.7s"/><rect class="w" x="98" y="50" width="10" height="12" style="--d:4.7s;--r:-0.4s"/><rect class="w" x="134" y="50" width="10" height="12" style="--d:5.3s;--r:-5.7s"/><rect class="w" x="170" y="50" width="10" height="12" style="--d:8.5s;--r:-2.8s"/><rect class="w c" x="98" y="72" width="10" height="12" style="--d:6.8s;--r:-4.7s"/><rect class="w c" x="116" y="72" width="10" height="12" style="--d:5.0s;--r:-5.8s"/><rect class="w" x="152" y="72" width="10" height="12" style="--d:3.6s;--r:-0.4s"/><rect class="w" x="188" y="72" width="10" height="12" style="--d:5.7s;--r:-1.1s"/><rect class="w" x="116" y="94" width="10" height="12" style="--d:3.7s;--r:-2.5s"/><rect class="w" x="134" y="94" width="10" height="12" style="--d:8.8s;--r:-4.8s"/><rect class="w" x="152" y="94" width="10" height="12" style="--d:4.3s;--r:-2.4s"/><rect class="w" x="218" y="80" width="10" height="12" style="--d:4.3s;--r:-1.5s"/><rect class="w" x="254" y="80" width="10" height="12" style="--d:3.4s;--r:-0.5s"/><rect class="w" x="218" y="104" width="10" height="12" style="--d:5.2s;--r:-2.7s"/><rect class="w" x="254" y="104" width="10" height="12" style="--d:8.2s;--r:-1.1s"/><rect class="w" x="272" y="104" width="10" height="12" style="--d:7.9s;--r:-1.5s"/><rect class="w" x="142" y="114" width="16" height="26" style="--d:8s;--r:-1s"/></svg><div class="t l1">明けない夜は、ミッドナイト</div><h1 class="t">つながる介護の夜</h1><div class="t l2">犯人は、この中にいる。</div><button class="t accuse st" id="st">捜査を始める</button><div class="t note">※ 光の点滅演出があります</div></div>
 <div class="ov" id="ov"><div class="box"><h2 id="oh"></h2><div id="ot"></div><p style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="accuse sub" id="tw">Xにつぶやく</button><button class="accuse" id="rt">タイトルに戻る</button></p></div></div>
-<div class="ov" id="rv"><div class="box" style="max-width:420px;width:100%;max-height:88vh;overflow:auto"><div class="rvh"><h2>推理メモ</h2><button class="accuse sub" id="rvc">✕ 閉じる</button></div><div id="rvb"></div></div></div>
+<div class="ov" id="rv"><div class="box" style="max-width:420px;width:100%;max-height:88vh;overflow:auto"><div class="rvh"><h2>推理メモ</h2><div class="btns"><button class="accuse sub on" id="tt">タイムグラフ</button><button class="accuse sub" id="tr">相関図</button><button class="accuse sub" id="rvc">✕ 閉じる</button></div></div><div id="rvb"></div></div></div>
 <script>
 const MAX=16,SH=5,PT=3;
 const S=[["白鳥","👴","理事長・72歳"],["サチ","👩‍🦳","ヘルパー・62歳"],["レン","🧑‍🦱","介護士・22歳"],["ひなた","🧹","清掃員・19歳"],["神崎","🧘","セラピスト・45歳"],["麗華","💉","ナース・38歳"],["ソラ","👦","家族（孫）・10歳"],["氷室","📋","ケアマネージャー・30歳"],["源さん","💂","守衛さん・58歳"],["鷹村","🤵","事務長・50歳"]];
@@ -166,8 +168,10 @@ function init(){
  $("case").innerHTML=cs[0]+"施設にいたのは4人の容疑者。犯人は、この中にいる。事件が起きたのは22:00ごろ。証言の矛盾を見抜け。<br><b>最初の証言</b>"+sus.map(i=>"<div>"+S[i][1]+" <b>"+S[i][0]+"</b>："+stm(i)+"</div>").join("");
  $("log").innerHTML="";rel=[];told={};NV={};hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
 }
+const hm=m=>Math.floor(m/60)+":"+String(m%60).padStart(2,"0");
+function tlBar(){const e=$("tl");if(!e.firstChild){let h='<div class="trk"><div class="fl" id="tlf"></div>';for(let k=1;k<MAX;k++)h+='<i class="tk'+(k%4?'':' h')+'" style="left:'+k/MAX*100+'%"></i>';h+='</div>';for(let k=0;k<=4;k++)h+='<span class="lb" style="left:'+k*25+'%;transform:translateX(-'+k*25+'%)">'+k+':00</span>';e.innerHTML=h}$("tlf").style.width=turn/MAX*100+"%"}
 function draw(){
- $("turn").textContent="ターン "+Math.min(turn+1,MAX)+" / "+MAX;
+ $("turn").textContent="🌙 "+hm(turn*15);tlBar();
  $("sus").innerHTML=sus.map(i=>`<button class="s${sel===i?" on":""}" data-i="${i}"><span class="ic${ag[i]>=PT?" shake":""}" id="ic${i}">${S[i][1]}</span><span class="nm">${S[i][0]}</span><br><span class="ds">${S[i][2]}</span></button>`).join("");
  document.querySelectorAll(".s").forEach(b=>b.onclick=()=>{if(!over){sel=+b.dataset.i;draw()}});
  const qa=$("qa");
@@ -203,7 +207,9 @@ $("acc").onclick=()=>{
  $("ot").innerHTML+=`<p>ターン <b>${turn}</b>　推理時間 <b>${fm(sc)}</b><br>ランク <b style="font-size:2rem;color:var(--acc)">${rk}</b>${ok?"":"（失敗）"}</p><hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0">スコア：<b style="font-size:1.5rem">${f(pt)}</b></p><p style="line-height:1.8;margin:0;font-size:.9rem;color:var(--sub)">時間ボーナス：${f(b.sb)}<br>ターンボーナス：${f(b.tb)}<br>推理力：${f(b.hp+b.cl+b.sk)}</p>`;
  $("ov").classList.add("show");
 };
-$("relb").onclick=()=>{$("rvb").innerHTML='<div class="rl"><b>アリバイ・タイムグラフ</b>（青＝最初の証言／赤の破線＝質問で聞き直した答え）</div>'+tlDraw()+'<div class="rl"><b>関係図</b></div>'+relDraw();$("rv").classList.add("show")};
+const memo=k=>{$("rvb").innerHTML=k?'<div class="rl"><b>関係図</b></div>'+relDraw():'<div class="rl"><b>アリバイ・タイムグラフ</b>（青＝最初の証言／赤の破線＝質問で聞き直した答え）</div>'+tlDraw();$("tt").classList.toggle("on",!k);$("tr").classList.toggle("on",!!k)};
+$("tt").onclick=()=>memo(0);$("tr").onclick=()=>memo(1);
+$("relb").onclick=()=>{memo(0);$("rv").classList.add("show")};
 $("rvc").onclick=()=>$("rv").classList.remove("show");
 init();
 const op=$("op"),fl=$("fl");let stk;
