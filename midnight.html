@@ -104,6 +104,7 @@ const G=[
 const NV0=0;
 const pk=(i,q)=>{const c=i===cul,p=G[q-1][c?1:0],n=Math.floor(Math.random()*(p.length+1)),nv=Math.random()<(c?.6:.15),pre=nv?NERV[Math.floor(Math.random()*4)]:"";if(nv)NV[i]=(NV[i]||0)+1;const b=n<p.length?PRE[i]+p[n]+E[i]:A[i][q];return pre+b.replace("{t}",cs[1])};
 const RFS=[["……その時間のことは、答えたくない","それは、言いたくない","黙秘する。話すつもりはない"],["利用者さんの個人情報に関わるので、その時間の話は言えない","守秘義務があるので、詳しくは言えない","時間のことは、記録を見てほしい。口頭では答えられない"]];
+const FG=["そのことは、よく覚えていない","記憶があいまいで、はっきり思い出せない","夜勤続きで、頭がぼんやりして覚えていない","忙しくて、いつのことだったか思い出せない","言われてみると、その辺りの記憶が飛んでいる","ちょうどその頃のことは、すっかり忘れてしまった","細かいことは、ちっとも覚えていない","年のせいか、すぐ忘れてしまう"];
 const LV={H:["高","var(--acc)",4],M:["中","#d98a1f",3],L:["低","var(--sub)",1.5]};
 const lv=i=>{const o=told[i]||{},a=al[i];let s=(NV[i]||0)+(RF[i]||0)+3*((o.p&&o.p!==a.p)+(o.a&&o.a!==a.a)+(o.t&&o.t!==a.t));rel.forEach(r=>{if(r.t!==i)return;if(r.ty==="sus"||r.ty==="dis")s+=2;else if(r.lb===cp+"の近くで目撃")s+=3});return s>=6?"H":s>=3?"M":"L"};
 const dn=x=>{const n=S[x][0];return n.endsWith("さん")?n:n+"さん"};
@@ -187,10 +188,11 @@ function draw(){
  document.querySelectorAll(".q").forEach(b=>b.onclick=()=>ask(+b.dataset.q));
 }
 function ask(q){
- const i=sel,rf=isA(q)&&Math.random()<(i===cul?.25:.12),hit=!rf&&i===cul&&isA(q),was=ag[i]>=PT;
+ const i=sel,rf=isA(q)&&Math.random()<(i===cul?.25:.12),fg=!rf&&Math.random()<.5,hit=!rf&&!fg&&i===cul&&isA(q),was=ag[i]>=PT;
  asked[i].add(q);turn++;
  let t;
  if(rf){const sp=Math.random()<(i===cul?.7:.35),a=RFS[sp?0:1];RF[i]=(RF[i]||0)+(sp?2:-1);t=PRE[i]+a[Math.floor(Math.random()*a.length)]+"。"}
+ else if(fg)t=PRE[i]+FG[Math.floor(Math.random()*FG.length)]+E[i];
  else{ag[i]=hit?ag[i]+1:0;if(hit)hits++;t=at(i,q);relAdd(i,q)}
  const L=$("log");
  L.insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>${qt(q)}</div><div class="b"><small>${S[i][1]} ${S[i][0]}</small>${t}</div>`);
