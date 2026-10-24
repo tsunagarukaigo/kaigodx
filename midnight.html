@@ -8,8 +8,8 @@
 :root[data-theme="dark"]{color-scheme:dark;--bg:#16120e;--card:#221c15;--ink:#f0e6d4;--sub:#a8987f;--acc:#e0555a;--line:#3a3023;--bub:#2d251b}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hiragino Mincho ProN","Yu Mincho",serif;line-height:1.6}
-main{max-width:720px;margin:0 auto;padding:12px}
-header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:center;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding:8px 0;z-index:2}
+main{max-width:720px;margin:0 auto;padding:12px;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;overflow:hidden}header,.sus{flex:none}.scr{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}.scr>*{flex:none}
+header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg);padding:4px 0}
 .turn{font-size:.85rem;color:var(--sub);font-weight:400;white-space:nowrap}
 .accuse{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer}
 .case{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:.72rem;line-height:1.45;color:var(--sub)}
@@ -33,19 +33,18 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 .rvh{display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--card);padding:2px 0 6px;z-index:1}.rvh h2{margin:0}.rvh .accuse{padding:6px 10px;font-size:.85rem}
 .btns{display:flex;gap:6px}.sub{background:var(--card);color:var(--ink);border:1px solid var(--line)}.tm{font-size:.85rem;color:var(--sub);font-weight:400;white-space:nowrap}
 .rl{font-size:.75rem;color:var(--sub);margin:4px 0 10px;line-height:1.5}.case b{color:var(--ink)}
-.sus{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
-@media(max-width:520px){.sus{grid-template-columns:repeat(2,1fr)}}
-.s{background:var(--card);border:2px solid var(--line);border-radius:10px;padding:8px;text-align:center;cursor:pointer;font:inherit;color:inherit}
+.sus{display:flex;justify-content:center;gap:6px;margin:4px 0 8px}
+.s{background:var(--card);flex:1;max-width:96px;min-width:0;border:2px solid var(--line);border-radius:8px;padding:4px 2px;text-align:center;cursor:pointer;font:inherit;color:inherit}
 .s.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
-.ic{font-size:2.6rem;display:block;line-height:1.2}
-.nm{font-weight:700}.ds{font-size:.75rem;color:var(--sub)}
+.ic{font-size:1.7rem;display:block;line-height:1.2}
+.nm{font-weight:700;font-size:.8rem}.ds{font-size:.6rem;line-height:1.3;color:var(--sub);display:block}
 .shake{animation:sh .7s infinite}
 @keyframes sh{0%,100%{transform:translate(0,0) rotate(0)}15%{transform:translate(-6px,2px) rotate(-8deg)}35%{transform:translate(6px,-2px) rotate(8deg)}55%{transform:translate(-5px,1px) rotate(-6deg)}75%{transform:translate(5px,-1px) rotate(6deg)}}
 .qs{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .q{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:left;font:inherit;color:inherit;cursor:pointer}
 .q:hover{border-color:var(--acc)}
 .hint{color:var(--sub);font-size:.9rem;text-align:center;padding:6px}
-.log{display:flex;flex-direction:column;gap:8px;height:34vh;min-height:180px;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin:0 0 12px}
+.log{display:flex;flex-direction:column;gap:8px;min-height:180px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin:0 0 12px}
 .log:empty::before{content:"ここに尋問の記録が残ります";color:var(--sub);font-size:.9rem;margin:auto}
 .b{max-width:88%;padding:8px 12px;border-radius:12px;background:var(--bub)}
 .b.me{align-self:flex-end;background:var(--card);border:1px solid var(--line)}
@@ -56,17 +55,17 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 .box h2{margin:0 0 8px;color:var(--acc)}
 </style></head><body><main>
 <header><div class="turn"><span id="turn"></span> <span id="tm" class="tm">⏱ 00:00</span></div><div class="btns"><button class="accuse sub" id="relb">推理メモ</button><button class="accuse" id="acc">犯人はお前だ！</button></div></header>
-<div class="case" id="case"></div>
 <div class="sus" id="sus"></div>
+<div class="scr" id="scr"><div class="case" id="case"></div>
 <div class="log" id="log"></div>
-<div id="qa"></div>
+<div id="qa"></div></div>
 </main>
 <div class="op" id="op"><div class="flash" id="fl"></div><svg class="fac" viewBox="0 0 300 140" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><rect x="-120" y="98" width="112" height="42"/><polygon points="-126,98 -64,80 -2,98"/><rect class="w" x="-106" y="110" width="8" height="11" style="--d:8.5s;--r:-2.8s"/><rect class="w" x="-84" y="110" width="8" height="11" style="--d:4.1s;--r:-3.1s"/><rect x="312" y="94" width="112" height="46"/><polygon points="306,94 368,74 430,94"/><rect class="w" x="326" y="108" width="8" height="11" style="--d:3.5s;--r:-4.9s"/><rect class="w" x="370" y="108" width="8" height="11" style="--d:8.8s;--r:-3.9s"/><rect x="10" y="70" width="80" height="70"/><rect x="90" y="40" width="120" height="100"/><rect x="112" y="22" width="76" height="18"/><rect x="210" y="70" width="80" height="70"/><rect x="134" y="108" width="32" height="4"/><rect x="135" y="112" width="3" height="28"/><rect x="162" y="112" width="3" height="28"/><polygon points="165,128 194,140 165,140"/><text class="sg" x="150" y="35.5" text-anchor="middle" font-size="10" font-family="Hiragino Mincho ProN,Yu Mincho,serif">つながる介護</text><rect class="w c" x="18" y="80" width="10" height="12" style="--d:6.2s;--r:-0.4s"/><rect class="w" x="36" y="80" width="10" height="12" style="--d:3.2s;--r:-2.8s"/><rect class="w" x="54" y="80" width="10" height="12" style="--d:6.1s;--r:-3.8s"/><rect class="w" x="72" y="80" width="10" height="12" style="--d:5.7s;--r:-1.7s"/><rect class="w" x="98" y="50" width="10" height="12" style="--d:4.7s;--r:-0.4s"/><rect class="w" x="134" y="50" width="10" height="12" style="--d:5.3s;--r:-5.7s"/><rect class="w" x="170" y="50" width="10" height="12" style="--d:8.5s;--r:-2.8s"/><rect class="w c" x="98" y="72" width="10" height="12" style="--d:6.8s;--r:-4.7s"/><rect class="w c" x="116" y="72" width="10" height="12" style="--d:5.0s;--r:-5.8s"/><rect class="w" x="152" y="72" width="10" height="12" style="--d:3.6s;--r:-0.4s"/><rect class="w" x="188" y="72" width="10" height="12" style="--d:5.7s;--r:-1.1s"/><rect class="w" x="116" y="94" width="10" height="12" style="--d:3.7s;--r:-2.5s"/><rect class="w" x="134" y="94" width="10" height="12" style="--d:8.8s;--r:-4.8s"/><rect class="w" x="152" y="94" width="10" height="12" style="--d:4.3s;--r:-2.4s"/><rect class="w" x="218" y="80" width="10" height="12" style="--d:4.3s;--r:-1.5s"/><rect class="w" x="254" y="80" width="10" height="12" style="--d:3.4s;--r:-0.5s"/><rect class="w" x="218" y="104" width="10" height="12" style="--d:5.2s;--r:-2.7s"/><rect class="w" x="254" y="104" width="10" height="12" style="--d:8.2s;--r:-1.1s"/><rect class="w" x="272" y="104" width="10" height="12" style="--d:7.9s;--r:-1.5s"/><rect class="w" x="142" y="114" width="16" height="26" style="--d:8s;--r:-1s"/></svg><div class="t l1">明けない夜は、ミッドナイト</div><h1 class="t">つながる介護の夜</h1><div class="t l2">犯人は、この中にいる。</div><button class="t accuse st" id="st">捜査を始める</button><div class="t note">※ 光の点滅演出があります</div></div>
 <div class="ov" id="ov"><div class="box"><h2 id="oh"></h2><div id="ot"></div><p style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="accuse sub" id="tw">Xにつぶやく</button><button class="accuse" id="rt">タイトルに戻る</button></p></div></div>
 <div class="ov" id="rv"><div class="box" style="max-width:420px;width:100%;max-height:88vh;overflow:auto"><div class="rvh"><h2>推理メモ</h2><button class="accuse sub" id="rvc">✕ 閉じる</button></div><div id="rvb"></div></div></div>
 <script>
 const MAX=16,SH=5,PT=3;
-const S=[["白鳥","🧓","理事長・72歳"],["サチ","👩‍🦳","ヘルパー・62歳"],["レン","🧑","介護士・22歳"],["ひなた","🧹","清掃員・19歳"],["神崎","👨‍⚕️","セラピスト・45歳"],["麗華","👩‍⚕️","ナース・38歳"],["ソラ","👦","家族（孫）・10歳"],["氷室","👩‍💼","ケアマネージャー・30歳"],["源さん","💂","守衛さん・58歳"],["鷹村","👨‍💼","事務長・50歳"]];
+const S=[["白鳥","👴","理事長・72歳"],["サチ","👩‍🦳","ヘルパー・62歳"],["レン","🧑‍🦱","介護士・22歳"],["ひなた","🧹","清掃員・19歳"],["神崎","🧘","セラピスト・45歳"],["麗華","💉","ナース・38歳"],["ソラ","👦","家族（孫）・10歳"],["氷室","📋","ケアマネージャー・30歳"],["源さん","💂","守衛さん・58歳"],["鷹村","🤵","事務長・50歳"]];
 const Q=["昨夜22時、あなたはどこにいましたか？","施設長とは、どんな関係ですか？","最近、お金に困っていませんか？","事件の夜、何か物音を聞きましたか？","他の人で、怪しいと思う人はいますか？","顔色が優れないようですが、どうされました？","事件の現場に、普段から出入りしていましたか？","施設長を恨んでいる人に心当たりは？","事件の前、{t}を最後に見たのはいつですか？","正直に答えてください。あなたがやったのですか？","そこで、何をしていましたか？","何時から何時まで、そこにいましたか？","そこで、誰かと会いましたか？","その間、一度でもそこを離れましたか？","昨夜の行動を、もう一度最初から話してください。","そこにいた証拠はありますか？","この中で、誰が一番怪しいと思いますか？","なぜ、その人が怪しいのですか？","他の人のアリバイは信用できますか？","事件のころ、施設内で誰かを見かけませんでしたか？"];
 const C=[["真夜中、介護施設「つながる介護」の給湯室から、施設長の秘蔵のカップラーメンが盗まれた。","施設長のカップラーメン"],["真夜中、介護施設「つながる介護」の施設長室で、施設長が殺された。","施設長"],["真夜中、介護施設「つながる介護」で、入居者ウメ子さんの通帳が居室から盗まれた。","ウメ子さんの通帳"],["真夜中、介護施設「つながる介護」の休憩室から、おやつが大量になくなった。","休憩室のおやつ"],["真夜中、介護施設「つながる介護」のリネン室から出火。シーツも備品も灰になった。","リネン室"],["真夜中、介護施設「つながる介護」の介護記録が書き換えられていた。本物の記録は行方不明だ。","本物の介護記録"]];
 const T=["アリバイ","施設長との関係","金銭事情","物音","他の容疑者","顔色・様子","現場の知識","恨み","最後の目撃","自白"];
@@ -90,6 +89,20 @@ const TM=["21:00〜23:00","21:30〜22:30","20:00〜23:00","21:50〜23:10","21:40
 const WT=["電話の相手","眠れない入居者さん","送迎のドライバー","宅配の配達員"];
 const PRE=["恐れながら、","あのねぇ、","……ああ、","えっとね！","ふむ。","ふふ、","んーとね、","事実のみ申し上げます。","……","ええとですね、"];
 const E=["のでございます。","のよぉ。","んだよ。","んだよ！","のだ。","のよ。","んだもん！","のです。","んじゃ。","んですよ。"];
+const G=[
+[["施設長には、普段からよく世話になっている","施設長とは、仕事の話をするくらいで、普通に接している","施設長のことは、尊敬している"],["施設長とは、特に何もないと思う","施設長とは、最近少し気まずい","施設長のことは、あまり話したくない"]],
+[["お金には、特に困っていない","貯金は少ないが、生活はできている","給料日前は、いつも財布が軽い"],["お金のことは、聞かないでほしい","ちょっとだけ、支払いが重なっている","お金に困っていると言えば、困っている"]],
+[["夜中に、遠くでドアの音がした","ナースコールの音しか聞こえなかった","何も聞こえなかった"],["物音なんて、気にも留めなかった","聞こえたような、聞こえなかったような気がする","何も聞いていないと言ったら、聞いていない"]],
+[["誰かを疑うのは、気が引ける","怪しい人は、特に思い当たらない","人影を見かけたが、誰かは分からなかった"],["私より、他の人のほうがずっと怪しい","怪しいのは、私以外の誰かに決まっている","細かいことは、他の人に聞いたほうがいい"]],
+[["夜勤続きで、少し疲れている","ただ寝不足なだけで、他に理由はない","夕食を食べそこねて、お腹が空いている"],["顔色なんて、なんでもないと言っている","別に、緊張なんかしていない","具合が悪いわけじゃない、本当に何でもない"]],
+[["仕事柄、現場にはよく出入りしている","場所は、職員なら誰でも知っている","入ったことはあるが、昨夜は行っていない"],["場所は、一応知っている","昨夜は入っていないと言うしかない","どこにあるかは、まあ分かっている"]],
+[["恨むほどの人は、思い当たらない","不満を言う人はいるが、恨みまでは聞かない","みんな忙しくて、恨む暇もない"],["恨みなら、誰にでもあるかもしれない","人の恨みなんて、私には分からない","あの人を恨む人は、少なくはない"]],
+[["夕方、{t}を見かけたのが最後だ","昼過ぎに、{t}を見たのが最後だ","夜勤の引き継ぎで、{t}を見たきりだ"],["{t}は、ずっと見ていないことにしておきたい","{t}を最後に見たのは、思い出せない","{t}は、夕方に見たような気がする"]],
+[["やっていない、絶対にやっていない","疑われるのは、心外でならない","私にそんなことをする理由は、ない"],["やっていないと、言うしかない","私がやったという証拠は、どこにもない","疑うなら、証拠を出してほしい"]]];
+const NV0=0;
+const pk=(i,q)=>{const c=i===cul,p=G[q-1][c?1:0],n=Math.floor(Math.random()*(p.length+1)),nv=Math.random()<(c?.6:.15),pre=nv?NERV[Math.floor(Math.random()*4)]:"";if(nv)NV[i]=(NV[i]||0)+1;const b=n<p.length?PRE[i]+p[n]+E[i]:A[i][q];return pre+b.replace("{t}",cs[1])};
+const LV={H:["高","var(--acc)",4],M:["中","#d98a1f",3],L:["低","var(--sub)",1.5]};
+const lv=i=>{const o=told[i]||{},a=al[i];let s=(NV[i]||0)+3*((o.p&&o.p!==a.p)+(o.a&&o.a!==a.a)+(o.t&&o.t!==a.t));rel.forEach(r=>{if(r.t!==i)return;if(r.ty==="sus"||r.ty==="dis")s+=2;else if(r.lb===cp+"の近くで目撃")s+=3});return s>=6?"H":s>=3?"M":"L"};
 const dn=x=>{const n=S[x][0];return n.endsWith("さん")?n:n+"さん"};
 const RS=x=>[dn(x)+"が昨夜、廊下を足早に歩くのを見た",dn(x)+"は話すとき、一度も目を合わせなかった",dn(x)+"は金に困っていると噂で聞いた",dn(x)+"の証言は、どこか不自然だった",dn(x)+"は事件のあと、妙に落ち着いていた",dn(x)+"が施設長と口論するのを耳にした"];
 const fm=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
@@ -104,13 +117,13 @@ const relAdd=(i,q)=>{const d=tg[i];let e=null;
 const relDraw=()=>{
  const P=[[160,44],[285,150],[160,256],[35,150]],pos={};sus.forEach((s,k)=>pos[s]=P[k]);
  const col={sus:"var(--acc)",dis:"#d98a1f",see:"#3a7bd5"},off={sus:16,dis:34,see:52};
- let s='<svg viewBox="0 0 320 330" style="width:100%;height:auto"><defs>'+Object.keys(col).map(k=>`<marker id="m${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:${col[k]}"/></marker>`).join("")+'</defs>';
+ let s='<svg viewBox="0 0 320 342" style="width:100%;height:auto"><defs>'+Object.keys(col).map(k=>`<marker id="m${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:${col[k]}"/></marker>`).join("")+'</defs>';
  rel.forEach(r=>{const a=pos[r.f],b=pos[r.t],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,o=off[r.ty];
   const x1=a[0]+ux*30,y1=a[1]+uy*30,x2=b[0]-ux*32,y2=b[1]-uy*32,cx=(a[0]+b[0])/2-uy*o*2,cy=(a[1]+b[1])/2+ux*o*2,lx=.25*x1+.5*cx+.25*x2,ly=.25*y1+.5*cy+.25*y2;
   s+=`<path d="M${x1} ${y1}Q${cx} ${cy} ${x2} ${y2}" style="fill:none;stroke:${col[r.ty]};stroke-width:1.8" marker-end="url(#m${r.ty})"/><text x="${lx}" y="${ly+3}" text-anchor="middle" font-size="9" style="fill:${col[r.ty]};stroke:var(--card);stroke-width:3;paint-order:stroke">${r.lb}</text>`});
  sus.forEach(i=>{const[x,y]=pos[i];
-  s+=`<circle cx="${x}" cy="${y}" r="28" style="fill:var(--card);stroke:${ag[i]>=PT?"var(--acc)":"var(--line)"};stroke-width:${ag[i]>=PT?3:1.5}"/><text x="${x}" y="${y+9}" text-anchor="middle" font-size="26">${S[i][1]}</text><text x="${x}" y="${y+44}" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--ink)">${S[i][0]}</text><text x="${x}" y="${y+57}" text-anchor="middle" font-size="9" style="fill:var(--sub)">📍${al[i].p}（証言）</text>`});
- return(rel.length?"":'<div class="rl">まだ関係は見えていません。「誰が怪しいか」「アリバイは信用できるか」「誰を見かけたか」などを聞くと、関係が描かれます。</div>')+s+'</svg><div class="rl"><span style="color:var(--acc)">赤→</span>怪しいと睨んでいる　<span style="color:#d98a1f">橙→</span>アリバイを疑っている　<span style="color:#3a7bd5">青→</span>目撃した</div>'};
+  s+=`<circle cx="${x}" cy="${y}" r="28" style="fill:var(--card);stroke:${LV[lv(i)][1]};stroke-width:${LV[lv(i)][2]}"/><text x="${x}" y="${y+9}" text-anchor="middle" font-size="26">${S[i][1]}</text><text x="${x}" y="${y+44}" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--ink)">${S[i][0]}</text><text x="${x}" y="${y+57}" text-anchor="middle" font-size="9" style="fill:var(--sub)">📍${al[i].p}（証言）</text><text x="${x}" y="${y+70}" text-anchor="middle" font-size="10" font-weight="700" style="fill:${LV[lv(i)][1]}">怪しさ：${LV[lv(i)][0]}</text>`});
+ return(rel.length?"":'<div class="rl">まだ関係は見えていません。「誰が怪しいか」「アリバイは信用できるか」「誰を見かけたか」などを聞くと、関係が描かれます。</div>')+s+'</svg><div class="rl"><span style="color:var(--acc)">赤→</span>怪しいと睨んでいる　<span style="color:#d98a1f">橙→</span>アリバイを疑っている　<span style="color:#3a7bd5">青→</span>目撃した</div><div class="rl">怪しさ：<span style="color:var(--acc)">高</span>／<span style="color:#d98a1f">中</span>／低　（反応・証言のズレ・他人の指摘・現場付近の目撃で変化）</div>'};
 const mm=s=>{const m=s.match(/(\d+):(\d+)〜(\d+):(\d+)/);return[+m[1]*60+ +m[2],+m[3]*60+ +m[4]]};
 const tlDraw=()=>{
  const X0=64,X1=312,T0=1200,T1=1440,xs=m=>X0+(m-T0)/(T1-T0)*(X1-X0);
@@ -131,7 +144,7 @@ const qt=q=>Q[q].replace("{t}",cs[1]);
 const at=(i,q)=>{
  const a=al[i],f=fk,e=E[i],c=i===cul,d=tg[i];
  if(q===0)return"昨夜22:00は"+(c?f.p:a.p)+"にいた"+e;
- if(q<10)return A[i][q].replace("{t}",cs[1]);
+ if(q<10)return pk(i,q);
  if(q<16){const z=c?f:a;return[z.a+"いた",z.t+"、そこにいた",c?"誰とも会わなかった":a.w+"と言葉を交わした",c?"少しだけ廊下に出た":"一度も"+a.p+"を離れていない",z.p+"で"+z.a+"いて、"+z.t+"、ずっとそこにいた",c?"証拠と言われても、見せられるものは何もない":a.w+"と言葉を交わした、それが何よりの証拠だ"][q-10]+e}
  if(q===16)return PRE[i]+dn(d.t)+"が一番怪しいと睨んでいる"+e;
  if(q===17)return PRE[i]+RS(d.t)[d.r]+e;
@@ -140,7 +153,7 @@ const at=(i,q)=>{
  return c?"誰も見かけなかった"+e:(v===cul?dn(v)+"を"+cp+"の近くで見かけた":dn(v)+"が"+al[v].p+"にいるのを見かけた")+e;
 };
 const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-let sus,cul,sharp,turn,sel,asked,over,cs,ag,cp,al,fk,tg,t0,tmr,rel,told,hits,last;
+let sus,cul,sharp,turn,sel,asked,over,cs,ag,cp,al,fk,tg,t0,tmr,rel,told,hits,last,NV;
 function init(){
  sus=sh([...Array(10).keys()]).slice(0,4);cul=sus[Math.floor(Math.random()*4)];
  sharp=new Set(sh([...Array(10).keys()]).slice(0,SH));
@@ -151,7 +164,7 @@ function init(){
  fk={p:pl[4],a:ac[4],t:tm[4]};
  tg={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),r=()=>o[Math.floor(Math.random()*o.length)];tg[i]={t:r(),u:r(),v:r(),r:Math.floor(Math.random()*6)}});
  $("case").innerHTML=cs[0]+"施設にいたのは4人の容疑者。犯人は、この中にいる。事件が起きたのは22:00ごろ。証言の矛盾を見抜け。<br><b>最初の証言</b>"+sus.map(i=>"<div>"+S[i][1]+" <b>"+S[i][0]+"</b>："+stm(i)+"</div>").join("");
- $("log").innerHTML="";rel=[];told={};hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
+ $("log").innerHTML="";rel=[];told={};NV={};hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
 }
 function draw(){
  $("turn").textContent="ターン "+Math.min(turn+1,MAX)+" / "+MAX;
@@ -175,8 +188,8 @@ function ask(q){
  relAdd(i,q);
  const L=$("log");
  L.insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>${qt(q)}</div><div class="b"><small>${S[i][1]} ${S[i][0]}</small>${t}</div>`);
- L.scrollTo({top:L.scrollHeight,behavior:"smooth"});
- if(ag[i]>=PT&&!was){L.insertAdjacentHTML("beforeend",`<div class="b me"><small>💦 異変</small>${S[i][0]}の様子がおかしい……体が震えている！</div>`);L.scrollTo({top:L.scrollHeight,behavior:"smooth"})}
+ {const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})};
+ if(ag[i]>=PT&&!was){L.insertAdjacentHTML("beforeend",`<div class="b me"><small>💦 異変</small>${S[i][0]}の様子がおかしい……体が震えている！</div>`);{const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
  draw();
 }
 $("acc").onclick=()=>{
