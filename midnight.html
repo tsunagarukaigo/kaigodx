@@ -106,7 +106,7 @@ const pk=(i,q)=>{const c=i===cul,p=G[q-1][c?1:0],n=Math.floor(Math.random()*(p.l
 const RFS=[["……その時間のことは、答えたくない","それは、言いたくない","黙秘する。話すつもりはない"],["利用者さんの個人情報に関わるので、その時間の話は言えない","守秘義務があるので、詳しくは言えない","時間のことは、記録を見てほしい。口頭では答えられない"]];
 const FG=["そのことは、よく覚えていない","記憶があいまいで、はっきり思い出せない","夜勤続きで、頭がぼんやりして覚えていない","忙しくて、いつのことだったか思い出せない","言われてみると、その辺りの記憶が飛んでいる","ちょうどその頃のことは、すっかり忘れてしまった","細かいことは、ちっとも覚えていない","年のせいか、すぐ忘れてしまう"];
 const LV={H:["高","var(--acc)",4],M:["中","#d98a1f",3],L:["低","var(--sub)",1.5]};
-const lv=i=>{const o=told[i]||{},a=al[i];let s=(NV[i]||0)+(RF[i]||0)+3*((o.p&&o.p!==a.p)+(o.a&&o.a!==a.a)+(o.t&&o.t!==a.t));rel.forEach(r=>{if(r.t!==i)return;if(r.ty==="sus"||r.ty==="dis")s+=2;else if(r.lb===cp+"の近くで目撃")s+=3});return s>=6?"H":s>=3?"M":"L"};
+const lv=i=>{const o=told[i]||{},a=al[i];let s=(NV[i]||0)+(RF[i]||0)+3*((o.p&&o.p!==a.p)+(o.a&&o.a!==a.a)+(o.t&&o.t!==a.t));rel.forEach(r=>{if(r.t!==i)return;if(r.ty==="sus"||r.ty==="dis")s+=2;else if(r.lb===cp+"の近くで目撃")s+=4});return s>=6?"H":s>=3?"M":"L"};
 const dn=x=>{const n=S[x][0];return n.endsWith("さん")?n:n+"さん"};
 const RS=x=>[dn(x)+"が昨夜、廊下を足早に歩くのを見た",dn(x)+"は話すとき、一度も目を合わせなかった",dn(x)+"は金に困っていると噂で聞いた",dn(x)+"の証言は、どこか不自然だった",dn(x)+"は事件のあと、妙に落ち着いていた",dn(x)+"が施設長と口論するのを耳にした"];
 const fm=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
@@ -138,7 +138,8 @@ const tlDraw=()=>{
  sus.forEach((i,k)=>{const y=16+k*54,a=al[i],[a0,a1]=mm(a.t),o=told[i]||{};
   s+=`<text x="2" y="${y+24}" font-size="10" font-weight="700" style="fill:var(--ink)">${S[i][1]}${S[i][0]}</text>`+lb(a.p+"｜"+a.a,xs(a0),y+10,"var(--ink)")+`<rect x="${xs(a0)}" y="${y+14}" width="${xs(a1)-xs(a0)}" height="10" rx="3" style="fill:#3a7bd5;opacity:.75"/>`;
   if(o.t||o.p||o.a){let bx=X0;if(o.t){const[b0,b1]=mm(o.t);bx=xs(b0);s+=`<rect x="${bx}" y="${y+28}" width="${xs(b1)-xs(b0)}" height="8" rx="3" style="fill:none;stroke:var(--acc);stroke-width:1.5;stroke-dasharray:3 2"/>`}
-   s+=lb("再証言："+(o.p||"？")+"｜"+(o.a||"？"),bx,y+48,"var(--acc)")}});
+   s+=lb("再証言："+(o.p||"？")+"｜"+(o.a||"？"),bx,y+48,"var(--acc)")}
+  if(rel.some(r=>r.t===i&&r.ty==="see"&&r.lb===cp+"の近くで目撃"))s+=`<circle cx="${xc}" cy="${y+19}" r="6" style="fill:var(--acc);stroke:var(--card);stroke-width:2"/><text x="${xc+9}" y="${y+22}" font-size="8.5" style="fill:var(--acc)">現場付近で目撃</text>`});
  return s+'</svg>'};
 const GAME_URL="https://claude.ai/artifact/92rgswc93zsyD4dbeZNvSD";
 const tweet=()=>{const r=last,tx=(r.ok?"🔍「つながる介護の夜」推理ゲームで犯人を見破った！":"🔍「つながる介護の夜」推理ゲームで犯人を取り逃がした…")+"\nランク："+r.rk+"\nターン："+r.turn+"\n推理時間："+fm(r.sc)+"\nスコア："+r.pt.toLocaleString()+"\n#つながる介護の夜";return"https://twitter.com/intent/tweet?text="+encodeURIComponent(tx)+"&url="+encodeURIComponent(GAME_URL)};
@@ -154,7 +155,7 @@ const at=(i,q)=>{
  if(q===17)return PRE[i]+RS(d.t)[d.r]+e;
  if(q===18)return PRE[i]+dn(d.u)+"のアリバイは、どうも信用できない気がしている"+e;
  const v=d.v;
- return c?"誰も見かけなかった"+e:(v===cul?dn(v)+"を"+cp+"の近くで見かけた":dn(v)+"が"+al[v].p+"にいるのを見かけた")+e;
+ return c?"誰も見かけなかった"+e:(v===cul?"22時過ぎ、"+dn(v)+"を"+cp+"の近くで見かけた":dn(v)+"が"+al[v].p+"にいるのを見かけた")+e;
 };
 const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 let sus,cul,sharp,turn,sel,asked,over,cs,ag,cp,al,fk,tg,t0,tmr,rel,told,hits,last,NV,RF,mad;
@@ -165,8 +166,8 @@ function init(){
  const ci=Math.floor(Math.random()*C.length);cs=C[ci];cp=CP[ci];
  const pl=sh(PL),ac=sh(AC),tm=sh(TM),wt=sh(WT);
  al={};sus.forEach((i,k)=>al[i]={p:pl[k],a:ac[k],t:tm[k],w:wt[k]});
- fk={p:pl[4],a:ac[4],t:tm[4]};
- tg={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),r=()=>o[Math.floor(Math.random()*o.length)];tg[i]={t:r(),u:r(),v:r(),r:Math.floor(Math.random()*6)}});
+ fk=Math.random()<.4?{p:al[cul].p,a:al[cul].a,t:al[cul].t}:{p:pl[4],a:ac[4],t:tm[4]};
+ tg={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),r=()=>o[Math.floor(Math.random()*o.length)];tg[i]={t:r(),u:r(),v:r(),r:Math.floor(Math.random()*6)}});{const w=sh(sus.filter(x=>x!==cul))[0];tg[w].v=cul}
  $("case").innerHTML=cs[0]+"施設にいたのは4人の容疑者。犯人は、この中にいる。事件が起きたのは22:00ごろ。証言の矛盾を見抜け。<br><b>最初の証言</b>"+sus.map(i=>"<div>"+S[i][1]+" <b>"+S[i][0]+"</b>："+stm(i)+"</div>").join("");
  $("log").innerHTML="";rel=[];told={};NV={};RF={};mad={};hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
 }
@@ -188,11 +189,11 @@ function draw(){
  document.querySelectorAll(".q").forEach(b=>b.onclick=()=>ask(+b.dataset.q));
 }
 function ask(q){
- const i=sel,rf=isA(q)&&Math.random()<(i===cul?.25:.12),fg=!rf&&Math.random()<.5,hit=!rf&&!fg&&i===cul&&isA(q),was=ag[i]>=PT;
+ const i=sel,rf=isA(q)&&Math.random()<(i===cul?.25:.12),fg=!rf&&!(q===19&&i!==cul&&tg[i].v===cul)&&Math.random()<.5,hit=!rf&&!fg&&i===cul&&isA(q),was=ag[i]>=PT;
  asked[i].add(q);turn++;
  let t;
  if(rf){const sp=Math.random()<(i===cul?.7:.35),a=RFS[sp?0:1];RF[i]=(RF[i]||0)+(sp?2:-1);t=PRE[i]+a[Math.floor(Math.random()*a.length)]+"。"}
- else if(fg)t=PRE[i]+FG[Math.floor(Math.random()*FG.length)]+E[i];
+ else if(fg){RF[i]=(RF[i]||0)+1;t=PRE[i]+FG[Math.floor(Math.random()*FG.length)]+E[i]}
  else{ag[i]=hit?ag[i]+1:0;if(hit)hits++;t=at(i,q);relAdd(i,q)}
  const L=$("log");
  L.insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>${qt(q)}</div><div class="b"><small>${S[i][1]} ${S[i][0]}</small>${t}</div>`);
