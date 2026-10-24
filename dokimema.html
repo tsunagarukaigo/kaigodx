@@ -5,11 +5,11 @@
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:#000;color:#fff;font-family:'DotGothic16','MS Gothic',monospace;overflow:hidden}
 .sc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:16px}
-#title{justify-content:space-between;text-align:center;padding-bottom:18vh}
+#title{justify-content:space-between;text-align:center;padding-bottom:calc(18vh - 34px)}#btns{display:flex;flex-direction:column;align-items:center;gap:10px}#mass{display:none;border:0;padding:4px 10px;font-size:15px;color:#aaa;background:none}#massS{display:none;justify-content:flex-start;overflow:auto;gap:8px}#massS h2{font-weight:400;font-size:22px;margin:4px 0}#mBarW{width:min(560px,92vw);height:14px;border:2px solid #fff;flex:none}#mBar{height:100%;width:0;background:#fff}#mTxt{font-size:13px;color:#aaa}#mAvg{font-size:18px;text-align:center;line-height:1.6}#mTbl{width:100%;display:flex;flex-wrap:wrap;gap:12px;justify-content:center}.mt{max-width:100%;overflow:auto}.mt h3{font-weight:400;font-size:15px;margin:4px 0;text-align:center}.mt table{border-collapse:collapse;font-size:11px;margin:0 auto}.mt th,.mt td{border:1px solid #fff;padding:2px 5px;text-align:right;white-space:nowrap}.mt th{background:#222;font-weight:400}#massS button{flex:none;margin:8px 0}
 #title h1{margin:auto 0 0;font-size:clamp(34px,10vw,84px);line-height:1.25;font-weight:400;letter-spacing:.05em}
 #title h1 small{display:block;font-size:.45em;color:#aaa}
 #title .old{font-size:64px;margin:20px 0 0}
-#title .old span{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;display:inline-block}
+#title .old span{touch-action:manipulation;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;display:inline-block}
 #title .old span:active{transform:scale(.92)}
 #emuT{color:#f33;font-size:18px;margin:auto 0 10px;min-height:1.4em;visibility:hidden}
 #emuT.on{visibility:visible}
@@ -45,7 +45,8 @@ button:active,button.on{background:#fff;color:#000}
 #over .g{font-size:80px}
 #over h2{font-size:clamp(26px,7vw,44px);margin:0;font-weight:400}
 </style></head><body>
-<div id="title" class="sc"><h1>老後<small>～ときどきメマイスル～</small></h1><div class="old"><span id="oji">👴</span><span id="oba">👵</span></div><div id="emuT">[エミュレーションモード]</div><button id="start">スタート</button></div>
+<div id="title" class="sc"><h1>老後<small>～ときどきメマイスル～</small></h1><div class="old"><span id="oji">👴</span><span id="oba">👵</span></div><div id="emuT">[エミュレーションモード]</div><div id="btns"><button id="mass">[3,624万人モード]</button><button id="start">スタート</button></div></div>
+<div id="massS" class="sc"><h2>3,624万人モード</h2><div id="mBarW"><div id="mBar"></div></div><div id="mTxt"></div><div id="mAvg"></div><div id="mTbl"></div><button id="mBack">戻る</button></div>
 <div id="game" class="sc">
  <div class="top"><div id="clock"></div><div class="r" id="stat"></div></div>
  <div id="room"><span id="man">👴</span></div>
@@ -257,13 +258,13 @@ const DX=[[/風邪をこじらせ肺炎/,[.04,.07,.11,.18]],[/誤嚥性肺炎で
 [/脱水症状になった/,[.01,.015,.025,.04]],[/入浴中にヒートショック/,[.08,.10,.13,.17]],
 [/餅をのどに詰まらせた/,[.08,.10,.12,.15]]];
 const cfMod=()=>ADM(0)*(S.dem?1.2:1)*(S.nu<40?1.3:1)*(S.care?1.1:1);
-function cfOf(t){const a=S.am/12|0;for(const[r,arr]of DX)if(r.test(t))return Math.min(.6,bf(arr,a)*cfMod());return null}
+function cfOf(t){const a=S.am/12|0;for(const[r,arr]of DX)if(r.test(t))return Math.min(.6,bf(arr,a)*cfMod()*EVS);return null}
 // 入院中の月あたり死亡率: 70-74/75-79/80-84/85-89/90歳以上。傷病名で補正
 const HDX=[['肺炎',1.3],['誤嚥性肺炎',1.6],['心不全',1.2],['脳梗塞',1.2],['大腿骨骨折',1],['尿路感染症',.8],['脱水症',.7],['COPD増悪',1.1]];
 const HM=[.012,.02,.035,.05,.07];
 function hospCheck(){
  if(S.hosp){const a=S.am/12|0,i=a<75?0:a<80?1:a<85?2:a<90?3:4;
-  const p=HM[i]*(a<70?.5:1)*S.hx[1]*cfMod();
+  const p=HM[i]*(a<70?.5:1)*S.hx[1]*cfMod()*HSC;
   if(R()<p){die(S.hx[0]+'（入院中の死亡）');return 1}
   if(R()<.68){S.hosp=0;say('🏥 退院した','good')}else say('🏥 入院中（'+S.hx[0]+'）','bad',1);return 1}
  if(R()<.032*ADM(1)*(S.care?1.25:1)*(S.dem?1.1:1)*(S.nu<40?1.25:1)*(S.dis.k||S.dis.s?1.3:1)){S.hosp=1;S.hx=HDX[R()*HDX.length|0];S.vit-=10;say('🏥 入院した（'+S.hx[0]+'）','bad');return 1}return 0}
@@ -482,6 +483,14 @@ function levelCheck(){if(!S.care)return;let w=.24,i=.09;const lg_=(S.run||0)>=12
   if(S.cl==1){if(S.home||R()<.5)return;S.care=false;S.cl=0;adlAdd(5);say('💪 要介護認定が外れた（自立に改善）','good')}
   else{const o=S.cl;S.cl--;adlAdd(4+R()*6);say('💪 要介護度が改善した（'+lvTxt(o)+'→'+lvTxt(S.cl)+'）','good')}}}
 // 疾病の発症: 栄養良好で0.92倍、食事・運動を12か月以上続けると0.9/0.92倍(野菜・果物でHR0.91〜0.93(JPHC)・生活習慣介入で糖尿病58%減(DPP)等を弱めた仮定)
+// 死亡率の補正(男女別・5歳階級 65-69,70-74,...,100-104,105+): 令和7年簡易生命表の平均余命に合わせて調整した値。[女,男]
+let CALG=[[.02,.01,.002,.002,.005,.015,.053,.088,.088],[.06,.03,.02,.015,.025,.04,.12,.16,.16]];
+let CALM=[[0.3,0.138,0.091,0.131,0.093,0.129,0.185,0.304,0.304],[0.5,0.387,0.326,0.315,0.21,0.221,0.257,0.342,0.342]];
+// 死因ごとの補正(がん,心疾患,脳血管,肺炎,誤嚥性肺炎,事故,老衰,腎不全,認知症,その他): 人口動態統計の死因割合に合わせた値
+let CSC=[1.324,0.833,0.404,0.928,0.502,0.6,0.628,1,0.7,1];
+let QBETA=.1;
+// 事象由来の死亡の強さ(1=元の設定): 入院中の死亡 / 急病・事故イベントの死亡 / 餓死。実際の平均余命に合わせて調整
+let HSC=.14,EVS=.2,STV=.01; // 基礎死亡率の年齢上昇率(1歳ごとの指数)
 const DISX=()=>(S.nu>=65?.92:1)*((S.run||0)>=12?(sel==0?.9:sel==1?.92:1):1);
 // 介護保険の自己負担: 割合は判定基準(合計所得160/220万円・年金収入+その他所得 単身280/340万円・2人以上346/463万円)で1〜3割
 // 合計所得≒年金収入−公的年金等控除110万−10万。その他所得は貯金の2%(運用益)と仮定。生活保護は介護扶助で0円
@@ -517,9 +526,9 @@ function adlTick(a){const i0=adIdx();S.exm=(S.exm||0)+[0,1,0,.2,.5,.3][sel];
   if(dr>=.5)adlAdd(-dr)}
 }
 function init(){
- const a=65+(R()*37|0);
+ const a=window.FA||65+(R()*37|0);
  S={am:a*12+(R()*12|0),m:0,mo:money(),pen:penR(),vit:40+R()*50,
-  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],hp:50,hist:[],out:0,perf:50,qol:50,px:1,kp:1,vamp:0,love:0,cause:'老衰',dead:0,face:R()<.5?'👴':'👵'};
+  adl:R()<prev(ADL,a),care:R()<prev(CARE,a),dem:R()<prev(DEM,a),dis:{},log:[],hp:50,hist:[],out:0,perf:50,qol:50,px:1,kp:1,vamp:0,love:0,cause:'老衰',dead:0,face:(window.FM==null?R()<.5:window.FM)?'👴':'👵'};
  for(const k in DIS)S.dis[k]=R()<DIS[k][1]*(a>74?1.5:1);
  if(S.care){S.cl=rollCL(a);const b=LVB[S.cl];S.as=b[0]+R()*(b[1]-b[0])}else{S.cl=0;S.as=S.adl?60+R()*24:85+R()*15}S.adl=S.as<85;S.exm=0;
  nutI(a);
@@ -938,6 +947,7 @@ const CB=[[65,[506,145,103,27,39,6,12,3,300]],[70,[783,252,191,66,63,24,25,8,500
 function cause(poor,a){
  let b=CB[0][1];for(const[x,v]of CB)if(a>=x)b=v;
  const W=[['悪性新生物（がん）',b[0]*(S.dis.k?4:1)*(poor?1.2:1)],['心疾患',b[1]*(poor?1.3:1)],['脳血管疾患',b[2]*(S.dis.s?4:1)*(poor?1.3:1)],['肺炎',b[3]*.55*(poor?2:1)],['誤嚥性肺炎',b[3]*.45*(S.dem?2:1)*(poor?2:1)],['不慮の事故（'+['転倒・転落','入浴中の溺死','窒息','熱中症'][R()*4|0]+'）',b[4]*(poor?3:1)*(S.adl?1.5:1)],['老衰',b[5]*(S.care?2:1)*(poor?.4:1)],['腎不全',b[6]*(S.dis.d?2:1)],['認知症',b[7]*(S.dem?4:1)],['その他',b[8]]];
+ for(let i=0;i<10;i++)W[i][1]*=CSC[i];
  let t=0;for(const x of W)t+=x[1];
  if(poor)W.push(['低栄養・衰弱',t*.07],['孤立死',t*.05],['生活困窮',t*.03]);if(!poor&&S.nu<30)W.push(['低栄養・衰弱',t*.1]);
  t=0;for(const x of W)t+=x[1];
@@ -949,7 +959,7 @@ function cause0(poor,a){
 function tick(){
  if(EMU&&S.evt==0)S.sn=evals();S.m++;S.am++;S.hp=Math.max(0,Math.min(100,S.hp+(50-S.hp)*.02+HS[sel][3]));if(S.vamp&&S.am>=6000){S.vamp=0;return die('吸血鬼の寿命（500歳）')}const a=S.am/12|0,A=ACT[sel];if(S.ls===sel)S.run++;else{S.ls=sel;S.run=1}if(sel==4)S.perf=Math.min(100,S.perf+.1);S.qol=Math.max(0,Math.min(100,S.qol+(sel==5?.35:sel==3?.25:(50-S.qol)*.02)+HS[sel][2]));
  const ex_=exp();S.out+=ex_;S.mo+=S.pen-ex_;let poor=false;if(S.mo<0){poor=true;S.mo*=1.0125}
- if(poor){S.vit-=.6;if(!S.wel&&S.nu<8&&R()<.02)return die('餓死')}
+ if(poor){S.vit-=.6;if(!S.wel&&S.nu<8&&R()<.02*STV)return die('餓死')}
  S.vit+=A[3]+HS[sel][0]-.1-(a-65)*.012+(S.love?.3:0)+(S.qol-50)/250;
  nutT(a);if(S.nu<40)S.vit-=S.nu<15?.7:.25;
  adlTick(a);
@@ -960,9 +970,9 @@ function tick(){
  if(spd){}else if(S.care&&!S.home&&R()<HOMEP[S.cl||1]){S.home=1;say('老人ホームに入居した（毎月20万円）','bad')}else if(S.mo<0&&R()<.3){if(dEv())return}else if(!S.sp&&S.ex&&R()<.0144){marry(1)}else if(!S.sp&&!S.ex&&R()<.04){love()}else if(S.sp&&R()<.12){if(spEv())return}
  else if(AE[sel]&&R()<.12){aEv()}else if(R()<.07){if(doEv(pickW(NW),'📰 '))return}else if(R()<.15){if(doEv(pickW(E),''))return}
  S.vit=Math.max(S.vamp?20:0,Math.min(100,S.vit));S.hist.push([S.am/12,S.hp]);
- let q=.007*Math.exp(.1*(a-65));
+ let q=.007*Math.exp(QBETA*(a-65));
  q*=Math.max(.5,Math.min(2.5,1+(60-S.vit)/75));
- q*=ADM(3)*(sel==1&&S.as<85?.85:1);if(S.care)q*=CLQ[S.cl||1];if(S.dem)q*=1.4;if(poor)q*=S.face=='👴'?3:2;if(S.nu<15)q*=1.8;else if(S.nu<40)q*=1.25;q*=EF[sel].q[bnd(a)]*qolQ()*(longSleep()?1.2:1);if(S.fxm>0){q*=2;S.fxm--}
+ q*=ADM(3)*(sel==1&&S.as<85?.85:1);if(S.care)q*=CLQ[S.cl||1];if(S.dem)q*=1.4;if(poor)q*=S.face=='👴'?3:2;if(S.nu<15)q*=1.8;else if(S.nu<40)q*=1.25;q*=EF[sel].q[bnd(a)]*qolQ()*(longSleep()?1.2:1)*CALG[S.face=='👴'?1:0][Math.min(8,Math.max(0,((a-65)/5)|0))];if(S.fxm>0){q*=2;S.fxm--}
  let w='老衰',mx=1;for(const k in S.dis)if(S.dis[k]){q*=DIS[k][3];if(DIS[k][3]>mx){mx=DIS[k][3];w=DIS[k][0]}}
  if(R()<1-Math.pow(1-Math.min(q,.9),1/12))return die(cause(poor,a));
  draw()}
@@ -974,11 +984,131 @@ $('lg').onclick=()=>{const l=$('ll');l.innerHTML='';
   i.textContent=e.k;sp.textContent=e.t;sp.className=e.c;d.appendChild(i);d.appendChild(sp);l.appendChild(d)});
  $('logv').style.display='flex';l.scrollTop=0};
 $('lc').onclick=()=>{$('logv').style.display='none'};
-let cj=0,cb=0;
-function emuTog(){cj=cb=0;EMU=!EMU;$('emuT').classList.toggle('on',EMU)}
-$('oji').onclick=()=>{cj=1;if(cj&&cb)emuTog()};
-$('oba').onclick=()=>{cb=1;if(cj&&cb)emuTog()};
+function emuTog(){EMU=!EMU;$('emuT').classList.toggle('on',EMU)}
+// 隠しコマンド: 爺→婆を1回ずつ(0.9秒止めると確定)でエミュレーションモード、爺3回→婆3回で[3,624万人モード]の表示/解除
+let hist='',hT1=0,hT2=0;
+function iconClick(k){hist+=k;clearTimeout(hT1);clearTimeout(hT2);
+ if(hist.slice(-6)=='JJJBBB'||hist.slice(-6)=='BBBJJJ'){hist='';const m=$('mass');m.style.display=m.style.display=='block'?'none':'block';return}
+ hT1=setTimeout(()=>{if(/^(JB|BJ)$/.test(hist)){hist='';emuTog()}},900);
+ hT2=setTimeout(()=>{hist=''},3000)}
+if(location.hash=='#mass')$('mass').style.display='block'; // 予備: リンクの末尾に #mass を付けても表示
+$('oji').onclick=()=>iconClick('J');
+$('oba').onclick=()=>iconClick('B');
 $('start').onclick=go;$('re').onclick=()=>{$('logv').style.display='none';clearInterval(tm);$('over').style.display='none';$('game').style.display='none';$('title').style.display='flex'};
 $('tw').onclick=()=>window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(S.txt)+'&url='+encodeURIComponent(location.href),'_blank');
+// ===== 3,624万人モード: 65歳以上の人口(3,624万人)を1人ずつ最期まで一気にシミュレーション =====
+// ゲーム本体の月次処理を、1年単位の軽量モデルにして高速化している(イベント・伴侶・入院などは省略)。過ごし方は毎年ランダムに選ぶ。
+const MC=['がん','心疾患','脳血管疾患','肺炎','誤嚥性肺炎','不慮の事故','老衰','腎不全','認知症','その他','低栄養・衰弱','孤立死','生活困窮'];
+// 3,624万人の年齢・男女の内訳: 令和8年(2026)人口推計(統計トピックスNo.149)。各区分(65-69,70-74,75-79,80-84,85-89,90-94,95-99,100歳以上)の万人
+const POPM=[348,352,398,236,154,66,16,1],POPF=[366,391,482,332,260,158,57,8];
+function massRun(n,seed,T,out){
+ let s=seed>>>0||1;const rnd=()=>{s=(s+0x6D2B79F5)|0;let t=s;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296};
+ const NC=13,NA=60,cnt=out.cnt,sum=out.sum,cn=out.cn,cd=out.cd;
+ const pv=(t,a)=>{let r=t[0][1];for(let i=0;i<t.length;i++)if(a>=t[i][0])r=t[i][1];return r/100};
+ const hzA=(t,a)=>Math.max(.03,(pv(t,a+5)-pv(t,a))/5/(1-pv(t,a)));
+ const HC=[],HD=[],PA=[],PC=[],PD=[],CBt=[],QB=[],INF=[];
+ for(let a=0;a<=130;a++){HC[a]=hzA(T.CARE,a);HD[a]=hzA(T.DEM,a);PA[a]=pv(T.ADL,a);PC[a]=pv(T.CARE,a);PD[a]=pv(T.DEM,a);QB[a]=.007*Math.exp(T.QBETA*(a-65));let b=T.CB[0][1];for(let i=0;i<T.CB.length;i++)if(a>=T.CB[i][0])b=T.CB[i][1];CBt[a]=b}
+ for(let t=0;t<80;t++)INF[t]=Math.pow(1.02,t);
+ const adI=x=>x>=85?0:x>=60?1:x>=40?2:x>=20?3:4;
+ const XC=[0,1,0,.2,.5,.3],NU=[1.4,-.3,0,0,0,0],X=T.ADX,DV=T.DISv,w=new Float64Array(13);
+ // 開始時の年齢・性別: 実際の人口構成(男性43.4%)。T.cal=較正用(65〜104歳を一様)、T.fixAge=開始年齢を固定
+ const cumM=[],cumF=[];let tm=0,tf=0;for(let i=0;i<8;i++){tm+=T.POPM[i];cumM.push(tm);tf+=T.POPF[i];cumF.push(tf)}
+ const pm=tm/(tm+tf);
+ for(let p=0;p<n;p++){
+  let male,a;
+  if(T.fixAge){male=T.fixMale;a=T.fixAge}
+  else if(T.cal){male=rnd()<.5?1:0;a=65+rnd()}
+  else{male=rnd()<pm?1:0;const cu=male?cumM:cumF,tt=male?tm:tf;let u=rnd()*tt,b=0;while(b<7&&u>cu[b])b++;a=b==7?100+rnd()*5:65+b*5+rnd()*5}
+  let ai=a|0;const s65=ai==65,a0=a,CF=T.CALM[male];
+  let r=rnd()*100,mo,x;
+  if(r<30.4)mo=0;else if(r<39.5)mo=rnd()*100;else if(r<43.8)mo=100+rnd()*100;else if(r<46.2)mo=200+rnd()*100;else if(r<50.7)mo=300+rnd()*100;else if(r<78.9){x=rnd();mo=400+1600*x*x}else{x=rnd();mo=2000+8000*x*x*x}
+  let pen=Math.max(0,Math.min(12,10+(rnd()+rnd()+rnd()-1.5)*3.5));
+  let care=rnd()<PC[ai]?1:0,cl=0,as,dem=rnd()<PD[ai]?1:0,home=0,wel=0,fx=0;
+  const dis=[0,0,0,0,0];for(let i=0;i<5;i++)dis[i]=rnd()<DV[i][1]*(ai>74?1.5:1)?1:0;
+  const rcl=(ag)=>{const f=ag>=85?[.8,.9,1.05,1.25,1.4]:ag<75?[1.3,1.1,.95,.8,.7]:[1,1,1,1,1];let t=0;for(let i=0;i<5;i++)t+=T.CLW[i]*f[i];let q=rnd()*t;for(let i=0;i<5;i++){q-=T.CLW[i]*f[i];if(q<=0)return i+1}return 1};
+  if(care){cl=rcl(ai);const b=T.LVB[cl];as=b[0]+rnd()*(b[1]-b[0])}else as=rnd()<PA[ai]?60+rnd()*24:85+rnd()*15;
+  let vit=40+rnd()*50,nu=rnd()<(.12+(ai>=80?.1:0)+(mo<0?.3:mo<50?.1:0))?15+rnd()*24:45+rnd()*45;
+  for(let t=0;;t++){
+   ai=a|0;const bi=ai<75?0:ai<85?1:2,act=(rnd()*6)|0,A=T.ACT[act],E=T.EF[act],inf=INF[Math.min(79,t)];
+   let ex=(home?20:10)*inf+A.cost+(dem&&!home?2:0);for(let i=0;i<5;i++)if(dis[i])ex+=DV[i][2];
+   if(care&&!wel){const c=T.CAPU[cl]*T.USE[cl]*inf,ot=Math.max(0,mo)*.02,pn=pen*12,tot=Math.max(0,pn-120)+ot,sm=pn+ot;
+    const rate=tot<160?1:(tot>=220&&sm>=340)?3:sm>=280?2:1;
+    const cap=(rt)=>rt==3?(sm>=700?14.01:sm>=400?9.3:4.44):sm<=80?1.5:sm<=155?2.46:4.44;
+    const f=Math.min(c*rate/10,cap(rate));ex+=home?Math.max(0,f-Math.min(c/10,cap(1))):f}
+   mo+=(pen-ex)*12;if(mo<0){mo*=1.15;if(!wel&&rnd()<.12){wel=1;pen+=7.722}}
+   const poor=mo<0&&!wel;
+   vit+=(A.vit-.1-(ai-65)*.012)*12+(rnd()-.5)*8-(poor?7.2:0);vit=vit<0?0:vit>100?100:vit;
+   nu+=(NU[act]-(ai>=75?.15:.05)-(dem?.3:0)-(poor?1.2:0))*12;nu=nu<0?0:nu>100?100:nu;
+   let d=(ai<75?.6:ai<85?1.5:3)*(vit<30?1.5:vit>70?.8:1)*(nu<40?1.3:nu>=65?.9:1)*(dem?1.2:1)*(dis[4]?1.3:1);
+   if(act==1){d*=.16;if(as<95)d-=1.65}else if(act==3||act==5)d*=.93;
+   as-=d+as*rnd()*T.ADLYR*(1-XC[act]);
+   if(!care&&rnd()<1-Math.exp(-HC[ai]*X[8][adI(as)])){care=1;cl=rcl(ai);const b=T.LVB[cl];if(as>b[1])as=b[0]+rnd()*(b[1]-b[0])}
+   if(!dem&&rnd()<1-Math.exp(-HD[ai]*T.DLV[cl]*E.n[bi]))dem=1;
+   const a4=X[4][adI(as)];
+   for(let i=0;i<5;i++)if(!dis[i]&&rnd()<DV[i][1]/10*(ai>74?1.5:1)*E.d[bi]*a4*(nu<40?1.15:1)*(nu>=65?.92:1))dis[i]=1;
+   if(care&&!home&&rnd()<1-Math.pow(1-T.HOMEP[cl],12))home=1;
+   if(care){let wv=.24,iv=.09;if(act==1){wv*=.75;iv*=1.5}else if(act==0){wv*=.92;iv*=1.15}
+    if(nu>=65){wv*=.85;iv*=1.3}else if(nu<40){wv*=1.35;iv*=.6}if(dem)wv*=1.3;wv*=X[9][adI(as)];
+    wv=wv>.9?.9:wv;iv=iv>.9?.9:iv;const u=rnd();
+    if(u<wv){if(cl<5){cl++;as-=5+rnd()*8}}else if(u<wv+iv){if(cl==1){if(!home&&rnd()<.5){care=0;cl=0;as+=5}}else{cl--;as+=4+rnd()*6}}}
+   fx=0;{const fa=(ai<75?.22:ai<85?.30:.36)*T.FLV[cl]*X[2][adI(as)]*(dem?1.3:1)*(nu<40?1.25:1)*(vit<30?1.2:1)*(act==1?.77:1);
+    if(rnd()<Math.min(.9,fa)*.015){fx=1;as-=6+rnd()*15;if(care&&cl<5&&rnd()<.3)cl++}}
+   as=as<0?0:as>100?100:as;
+   // 死亡判定(ゲームと同じ式)。男女差と年齢帯ごとの補正(CALM)で実際の生命表に合わせる
+   let q=QB[ai]*Math.max(.5,Math.min(2.5,1+(60-vit)/75))*X[3][adI(as)]*(act==1&&as<85?.85:1);
+   if(care)q*=T.CLQ[cl];if(dem)q*=1.4;if(poor)q*=male?3:2;if(nu<15)q*=1.8;else if(nu<40)q*=1.25;
+   q*=E.q[bi];if(fx)q*=2;for(let i=0;i<5;i++)if(dis[i])q*=DV[i][3];
+   q*=CF[ai>=105?8:((ai-65)/5)|0];
+   if(cn)cn[male*NA+Math.min(NA-1,ai-65)]++;
+   if(rnd()<(q>.9?.9:q)){
+    if(cd)cd[male*NA+Math.min(NA-1,ai-65)]++;
+    const b=CBt[ai];
+    w[0]=b[0]*(dis[3]?4:1)*(poor?1.2:1);w[1]=b[1]*(poor?1.3:1);w[2]=b[2]*(dis[4]?4:1)*(poor?1.3:1);w[3]=b[3]*.55*(poor?2:1);
+    w[4]=b[3]*.45*(dem?2:1)*(poor?2:1);w[5]=b[4]*(poor?3:1)*(as<85?1.5:1);w[6]=b[5]*(care?2:1)*(poor?.4:1);w[7]=b[6]*(dis[1]?2:1);w[8]=b[7]*(dem?4:1);w[9]=b[8];
+    for(let i=0;i<10;i++)w[i]*=T.CSC[i];
+    let tw=0;for(let i=0;i<10;i++)tw+=w[i];
+    w[10]=poor?tw*.07:0;w[11]=poor?tw*.05:0;w[12]=poor?tw*.03:0;tw*=poor?1.15:1;
+    let u=rnd()*tw,c=0;for(;c<12;c++){u-=w[c];if(u<=0)break}
+    const ad=a+rnd(),ix=Math.min(NA-1,(ad|0)-65);
+    cnt[(male*NA+ix)*NC+c]++;sum[male*2]+=ad;sum[male*2+1]++;if(s65){sum[4+male*2]+=ad;sum[5+male*2]++}
+    if(out.ls){out.ls[male*2]+=ad-a0;out.ls[male*2+1]++;if(ad-a0<5)out.ls[4+male]++}
+    break}
+   a+=1}
+ }
+}
+let mWk=[],mTm=0,mRun=0;
+function mTable(name,off,cnt){const NA=60,NC=13,tot=new Array(NC).fill(0);let rows='';
+ for(let i=0;i<NA;i++){let r=0;const cs=[];for(let c=0;c<NC;c++){const v=cnt[(off*NA+i)*NC+c];cs.push(v);r+=v;tot[c]+=v}
+  if(r)rows+='<tr><td>'+(i==NA-1?(65+i)+'歳以上':(65+i)+'歳')+'</td>'+cs.map(v=>'<td>'+(v?v.toLocaleString():'')+'</td>').join('')+'<td>'+r.toLocaleString()+'</td></tr>'}
+ const all=tot.reduce((a,b)=>a+b,0);
+ return '<div class="mt"><h3>'+name+'（'+all.toLocaleString()+'人）</h3><table><tr><th>死亡年齢</th>'+MC.map(c=>'<th>'+c+'</th>').join('')+'<th>計</th></tr>'+rows+
+  '<tr><th>合計</th>'+tot.map(v=>'<th>'+v.toLocaleString()+'</th>').join('')+'<th>'+all.toLocaleString()+'</th></tr>'+
+  '<tr><th>構成比</th>'+tot.map(v=>'<th>'+(all?(v/all*100).toFixed(1):'0.0')+'%</th>').join('')+'<th>100%</th></tr></table></div>'}
+function mRender(cnt,sum,done,total){
+ const f=(x,n)=>n?(x/n).toFixed(2)+'歳':'—',sx=Math.round((performance.now()-mTm)/100)/10;
+ $('mBar').style.width=(done/total*100)+'%';
+ $('mTxt').textContent=done.toLocaleString()+' / '+total.toLocaleString()+'人（'+(done/total*100).toFixed(1)+'%）'+sx+'秒';
+ $('mAvg').innerHTML='平均寿命（死亡時の年齢の平均）<br>全体 '+f(sum[0]+sum[2],sum[1]+sum[3])+'　男性 '+f(sum[2],sum[3])+'　女性 '+f(sum[0],sum[1])+'<br><span style="font-size:12px;color:#aaa">65歳でスタートした人: 男性 '+f(sum[6],sum[7])+'　女性 '+f(sum[4],sum[5])+'</span>';
+ $('mTbl').innerHTML=mTable('男性',1,cnt)+mTable('女性',0,cnt)}
+function massGo(){
+ const total=window.MASSN||36240000,len=2*60*13;mRun++;const id=mRun;
+ $('title').style.display='none';$('massS').style.display='flex';mTm=performance.now();
+ const T={CB,ADL,CARE,DEM,ADX,CLW,LVB,DLV,CLQ,HOMEP,CAPU,USE,FLV,ADLYR:ADL_YR,EF:EF.map(e=>({q:e.q,d:e.d,n:e.n})),ACT:ACT.map((a,i)=>({cost:a[2],vit:a[3]+HS[i][0]})),DISv:[DIS.h,DIS.d,DIS.l,DIS.k,DIS.s],POPM,POPF,CALM,CSC,QBETA};
+ const merged=()=>{const c=new Uint32Array(len),sm=new Float64Array(8);let d=0;for(const k of mWk){if(!k.cnt)continue;for(let i=0;i<len;i++)c[i]+=k.cnt[i];for(let i=0;i<8;i++)sm[i]+=k.sum[i];d+=k.done}return[c,sm,d]};
+ mRender(new Uint32Array(len),new Float64Array(8),0,total);
+ mWk.forEach(k=>k.w&&k.w.terminate());mWk=[];
+ const fallback=()=>{mWk=[{cnt:null,sum:null,done:0}];const out={cnt:new Uint32Array(len),sum:new Float64Array(8)};let d=0;
+  const step=()=>{if(id!=mRun)return;const c=Math.min(20000,total-d);massRun(c,(d*40503+12345)>>>0,T,out);d+=c;mWk[0]={cnt:out.cnt,sum:out.sum,done:d};const m=merged();mRender(m[0],m[1],m[2],total);if(d<total)setTimeout(step,0)};setTimeout(step,0)};
+ let k=Math.max(1,Math.min(8,navigator.hardwareConcurrency||4)),ok=false;
+ try{const src='const massRun='+massRun.toString()+';onmessage=e=>{const o=e.data,out={cnt:new Uint32Array('+len+'),sum:new Float64Array(8)};let left=o.n,d=0;while(left>0){const c=Math.min(left,200000);massRun(c,(o.seed*2654435761+d*40503+12345)>>>0,o.T,out);d+=c;left-=c;postMessage({done:d,cnt:out.cnt.slice(),sum:out.sum.slice()})}};';
+  const url=URL.createObjectURL(new Blob([src],{type:'text/javascript'}));const per=Math.ceil(total/k);
+  for(let i=0;i<k;i++){const w=new Worker(url),rec={w,cnt:null,sum:null,done:0};
+   w.onmessage=e=>{if(id!=mRun)return;rec.cnt=e.data.cnt;rec.sum=e.data.sum;rec.done=e.data.done;ok=true;const m=merged();mRender(m[0],m[1],m[2],total)};
+   w.onerror=()=>{if(!ok&&id==mRun){mWk.forEach(q=>q.w&&q.w.terminate());mWk=[];fallback()}};
+   mWk.push(rec);w.postMessage({n:Math.min(per,total-per*i),seed:i+1,T})}}
+ catch(e){mWk.forEach(q=>q.w&&q.w.terminate());mWk=[];fallback()}}
+$('mass').onclick=massGo;
+$('mBack').onclick=()=>{mRun++;mWk.forEach(k=>k.w&&k.w.terminate());mWk=[];$('massS').style.display='none';$('title').style.display='flex'};
 </script></body></html>
+
 
