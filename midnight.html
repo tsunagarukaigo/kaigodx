@@ -35,7 +35,7 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 .rl{font-size:.75rem;color:var(--sub);margin:4px 0 10px;line-height:1.5}.case b{color:var(--ink)}
 .tl{flex:none;position:relative;height:30px;margin:0 6px 2px}.trk{position:relative;height:12px;border-radius:6px;background:var(--line);overflow:hidden}.trk .fl{height:100%;width:0;background:var(--acc);transition:width .4s}.trk .tk{position:absolute;top:0;bottom:0;width:1px;background:var(--bg);opacity:.7}.trk .tk.h{width:2px;opacity:1}.tl .lb{position:absolute;top:14px;font-size:.62rem;color:var(--sub);white-space:nowrap}
 .evp{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50}.evp.show{display:flex}.evb{background:var(--card);border:2px solid var(--acc);border-radius:14px;padding:22px;max-width:300px;text-align:center}.evb h3{margin:6px 0;color:var(--acc)}.evi{font-size:3.5rem}.evp.show .evb{animation:pp .35s}@keyframes pp{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}.q.ev{border-color:var(--acc);background:var(--acc);color:#fff;font-weight:700}
-.stp .trk{background:#555}.stp .trk .fl{background:#fff}.lvb{display:block;font-size:.62rem;font-weight:700;margin-top:2px}
+.ib{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 12px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card)}.ib b{font-size:.85rem}.it{font-size:1.5rem;width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--card);cursor:pointer}.it:hover{border-color:var(--acc)}.stp .trk{background:#555}.stp .trk .fl{background:#fff}.lvb{display:block;font-size:.62rem;font-weight:700;margin-top:2px}
 .sus{display:flex;justify-content:center;gap:6px;margin:4px 0 8px}
 .s{background:var(--card);flex:1;max-width:96px;min-width:0;border:2px solid var(--line);border-radius:8px;padding:4px 2px;text-align:center;cursor:pointer;font:inherit;color:inherit}
 .s.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
@@ -118,12 +118,25 @@ const D=[[["毎日ご飯を聞いてくれる、ええ子じゃて。","金？ �
 [["いつも書類にハンコくれる、優しい上司ですぅ。","ネイル代でカツカツですけど、平気ですよぉ。","コピー機が、ウィーンって鳴ってましたぁ。","噂は好きですけど、人を疑うのは苦手ですぅ。","月末の経費精算で、お疲れなだけですよぉ。","書類を届けに、しょっちゅう行ってますぅ。","経費でもめてる人は、噂で聞きましたぁ。","{t}は、午後に書類を届けるとき見ましたぁ。","私が！？ ハンコにかけて違いますぅ！"],["えっとぉ、上司ですぅ…ハンコ、くれないんですよぉ…。","ち、ちょっとネイル代が…でも関係ないですぅ！","コ、コピー機の音ですぅ！ ほんとですよぉ！","わ、私より、他の人のほうが怪しいですよぉ！","か、顔色ですかぁ！？ チ、チークの色ですぅ！","し、書類は届けましたけどぉ…昨日は行ってませんよぉ。","う、噂で聞いただけですぅ！ 私は何も…ですぅ！","{t}は…あ、あれぇ？ 見たような見てないような…ですぅ。","ち、違いますぅ！ …手が汗でハンコ押せなくなってきましたぁ。"]]];
 const fv=i=>pick(F[i-10][i===cul?1:0]);
 const pk2=(i,q)=>{const c=i===cul,nv=Math.random()<(c?.6:.15),pre=nv?pick(NERV):"";if(nv)NV[i]=(NV[i]||0)+1;return pre+(Math.random()<.5?fv(i):"")+D[i-10][c?1:0][q-1].replace("{t}",cs[1])};
-function itemFind(){const t=[[10,"dent","🦷","入れ歯","トメさん","話してくれる"],[12,"bau","📟","バウリンガル（翻訳機）","ぽち","言葉が分かる"]].find(x=>sus.includes(x[0])&&!IT[x[1]]);if(!t||turn>=MAX||Math.random()>=.05)return;IT[t[1]]=1;$("evh").textContent="アイテムを発見！";$("evi").textContent=t[2];$("evt").textContent="「"+t[3]+"」が見つかった！ "+t[4]+"に使えば、"+t[5]+"かもしれない……。質問欄の一番下に、使うボタンが現れた。";$("evp").classList.add("show")}
+function itemFind(){const t=[[10,"dent","🦷","入れ歯","トメさん","話してくれる"],[12,"bau","📟","バウリンガル（翻訳機）","ぽち","言葉が分かる"]].find(x=>sus.includes(x[0])&&!IT[x[1]]);if(!t||turn>=MAX||Math.random()>=.05)return;IT[t[1]]=1;$("evh").textContent="アイテムを発見！";$("evi").textContent=t[2];$("evt").textContent="「"+t[3]+"」が見つかった！ "+t[4]+"に使えば、"+t[5]+"かもしれない……。アイテム欄から使える。";$("evp").classList.add("show")}
 function useItem(){const i=sel;if(over||turn>=MAX||unl[i])return;unl[i]=1;$("log").insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>${i===10?"🦷 トメさん、入れ歯が見つかりましたよ。どうぞ。":"📟 ぽち、このバウリンガルを使ってみてくれ。"}</div><div class="b"><small>${S[i][1]} ${S[i][0]}</small>${i===10?"（入れ歯をはめた）……ほっほ、ありがたやぁ。これで、ちゃんと話せるわい。":"🔊 ワン！ やっと言葉が通じるワン！ なんでも聞いてほしいワン！"}</div>`);rc();draw();const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}
 const GR=["どうも苦手に思っている","いつも小言を言われて、好きになれない","顔を合わせると気まずい","シフトで揉めて以来、許せない","正直、あまり好きではない"];
 function LKG(){lk={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),f=pick(o),g=pick(o.filter(x=>x!==f));lk[i]={f,g,r:Math.floor(Math.random()*GR.length)}});const L=lk[cul],oc=sus.filter(x=>x!==cul);lkf={r:L.r,g:Math.random()<.35?L.g:pick(oc.filter(x=>x!==L.g)),f:Math.random()<.5?L.f:pick(oc.filter(x=>x!==L.f))}}
 const adv=()=>{if(swc>0)swc--;else turn++};
 function swFind(){if(swGot||turn>=MAX||$("evp").classList.contains("show")||Math.random()>=.01)return;swGot=1;swc=3;$("evh").textContent="アイテムを発見！";$("evi").textContent="⏱️";$("evt").textContent="「ストップウォッチ」を手に入れた！ 3回まで、時間（ターン）の進行を止められる……！";$("evp").classList.add("show")}
+const bar=()=>{const a=[];
+if(evOn&&!evUsed)a.push(["ev",ev[1],"証拠品「"+ev[0]+"」：現場に落ちていた。持ち主だと思う人を選んでつきつけよう（人違いだと証拠は消える）"]);
+if(IT.dent&&!unl[10])a.push(["dent","🦷","入れ歯：トメさんに差し上げると、ちゃんと話してくれる"]);
+if(IT.bau&&!unl[12])a.push(["bau","📟","バウリンガル（翻訳機）：ぽちに向けると、言葉が分かる"]);
+if(IT.tab)a.push(["tab","🚬","たばこ：怒った相手に差し出す。50%の確率で機嫌が直る（使うとなくなる）"]);
+if(swc>0)a.push(["sw","⏱️","ストップウォッチ：効果中（ターンが進まない）"]);
+return '<div class="ib"><b>アイテム：</b>'+(a.length?a.map(x=>`<button class="it" data-k="${x[0]}" title="${x[2]}">${x[1]}</button>`).join(""):'<span style="color:var(--sub);font-size:.8rem">なし</span>')+"</div>"};
+const wire=()=>{document.querySelectorAll(".q").forEach(b=>b.onclick=()=>ask(+b.dataset.q));document.querySelectorAll(".it").forEach(b=>b.onclick=()=>useIt(b.dataset.k))};
+function useIt(k){if(over||turn>=MAX||sel===null)return;
+if(k==="ev")present();
+else if((k==="dent"&&sel===10)||(k==="bau"&&sel===12))useItem();
+else if(k==="tab"&&IT.tab&&mad[sel]>turn){IT.tab=0;const ok=Math.random()<.5;if(ok)mad[sel]=0;$("log").insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>🚬 まあ、一服どうぞ。</div><div class="b"><small>${S[sel][1]} ${S[sel][0]}</small>${ok?"……ふぅ。悪かったな、少し頭が冷えた。もう話してもいいぞ。":"……そんなもので機嫌が直ると思うな。（たばこは無駄になった）"}</div>`);draw();const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
+function tbFind(){if(tbGot||turn>=MAX||$("evp").classList.contains("show")||Math.random()>=.04)return;tbGot=1;IT.tab=1;$("evh").textContent="アイテムを発見！";$("evi").textContent="🚬";$("evt").textContent="「たばこ」を手に入れた！ 怒らせてしまった相手に差し出せば、機嫌が直るかもしれない……。（アイテム欄から使える）";$("evp").classList.add("show")}
 const NV0=0;
 const pk=(i,q)=>{if(i>=10)return pk2(i,q);const c=i===cul,p=G[q-1][c?1:0],n=Math.floor(Math.random()*(p.length+1)),nv=Math.random()<(c?.6:.15),pre=nv?NERV[Math.floor(Math.random()*4)]:"";if(nv)NV[i]=(NV[i]||0)+1;const b=n<p.length?PRE[i]+p[n]+E[i]:A[i][q];return pre+b.replace("{t}",cs[1])};
 const RFS=[["……その時間のことは、答えたくない","それは、言いたくない","黙秘する。話すつもりはない"],["利用者さんの個人情報に関わるので、その時間の話は言えない","守秘義務があるので、詳しくは言えない","時間のことは、記録を見てほしい。口頭では答えられない"]];
@@ -183,7 +196,7 @@ const at0=(i,q)=>{
  return c?"誰も見かけなかった"+e:(v===cul?"22時過ぎ、"+dn(v)+"を"+cp+"の近くで見かけた":dn(v)+"が"+al[v].p+"にいるのを見かけた")+e;
 };
 const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-let sus,cul,sharp,turn,sel,asked,over,cs,ag,cp,al,fk,tg,t0,tmr,rel,told,hits,last,NV,RF,mad,MDn,evOn,evUsed,ev,evBad,AL,MD2,IT,unl,rc,lk,lkf,swc,swGot;
+let sus,cul,sharp,turn,sel,asked,over,cs,ag,cp,al,fk,tg,t0,tmr,rel,told,hits,last,NV,RF,mad,MDn,evOn,evUsed,ev,evBad,AL,MD2,IT,unl,rc,lk,lkf,swc,swGot,tbGot;
 function init(){
  sus=sh([...Array(S.length).keys()]).slice(0,4);cul=sus[Math.floor(Math.random()*4)];
  sharp=new Set(sh([...Array(S.length).keys()]).slice(0,SH));
@@ -195,7 +208,7 @@ function init(){
  sus.forEach(i=>{if(SPA[i]){al[i].a=sh(SPA[i])[0];al[i].w=SW[i]}});if(SPA[cul])fk.a=(fk.p===al[cul].p&&fk.t===al[cul].t)?al[cul].a:sh(SPA[cul].filter(x=>x!==al[cul].a))[0];
  LKG();tg={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),r=()=>o[Math.floor(Math.random()*o.length)];tg[i]={t:r(),u:r(),v:r(),r:Math.floor(Math.random()*6)}});{const c0=sus.filter(x=>x!==cul),c1=c0.filter(x=>x!==10&&x!==12),w=sh(c1.length?c1:c0)[0];tg[w].v=cul}
  rc=()=>$("case").innerHTML=cs[0]+"施設にいたのは4人の容疑者。犯人は、この中にいる。事件が起きたのは22:00ごろ。証言の矛盾を見抜け。<br><b>最初の証言</b>"+sus.map(i=>"<div>"+S[i][1]+" <b>"+S[i][0]+"</b>："+stmS(i)+"</div>").join("");
- IT={};unl={};swc=0;swGot=0;rc();$("log").innerHTML="";rel=[];told={};NV={};RF={};AL={};MD2={};mad={};MDn=0;evOn=false;evUsed=false;evBad=0;ev=null;$("evp").classList.remove("show");hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
+ IT={};unl={};swc=0;swGot=0;tbGot=0;rc();$("log").innerHTML="";rel=[];told={};NV={};RF={};AL={};MD2={};mad={};MDn=0;evOn=false;evUsed=false;evBad=0;ev=null;$("evp").classList.remove("show");hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
 }
 const hm=m=>Math.floor(m/60)+":"+String(m%60).padStart(2,"0");
 function tlBar(){const e=$("tl");if(!e.firstChild){let h='<div class="trk"><div class="fl" id="tlf"></div>';for(let k=1;k<MAX;k++)h+='<i class="tk'+(k%4?'':' h')+'" style="left:'+k/MAX*100+'%"></i>';h+='</div>';for(let k=0;k<=4;k++)h+='<span class="lb" style="left:'+k*25+'%;transform:translateX(-'+k*25+'%)">'+k+':00</span>';e.innerHTML=h}$("tlf").style.width=turn/MAX*100+"%";e.classList.toggle("stp",swc>0)}
@@ -206,13 +219,13 @@ function draw(){
  const qa=$("qa");
  if(turn>=MAX){qa.innerHTML='<div class="hint">調査は終了した。犯人を指名せよ！</div>';return}
  if(sel===null){qa.innerHTML='<div class="hint">質問したい被疑者を選んでください</div>';return}
- if(mad[sel]>turn){qa.innerHTML='<div class="hint">💢 '+S[sel][0]+'は機嫌を損ねて口をきいてくれない……（あと'+(mad[sel]-turn)+'ターン）</div>';return}
+ if(mad[sel]>turn){qa.innerHTML='<div class="hint">💢 '+S[sel][0]+'は機嫌を損ねて口をきいてくれない……（あと'+(mad[sel]-turn)+'ターン）</div>'+bar();wire();return}
  const rem=[...Array(22).keys()].filter(q=>!asked[sel].has(q)&&!(q>=10&&q<=15&&!asked[sel].has(0))&&!(q===17&&!asked[sel].has(16)));
  const sp=sh(rem.filter(isA)).slice(0,2);
- const left=sh([...sp,...sh(rem.filter(q=>!sp.includes(q))).slice(0,(evOn&&!evUsed?2:3)-sp.length)]);
- const ib=(sel===10?IT.dent:sel===12?IT.bau:0)&&!unl[sel];if(!left.length&&!(evOn&&!evUsed)&&!ib){qa.innerHTML='<div class="hint">この人物にはもう聞くことがない</div>';return}
- qa.innerHTML='<div class="qs">'+(evOn&&!evUsed?`<button class="q ev" data-q="-1">🔍 証拠品をつきつける（${ev[0]}）</button>`:"")+left.map(q=>`<button class="q" data-q="${q}">${qt(q)}</button>`).join("")+(ib?`<button class="q ev" data-q="-2">${sel===10?"🦷 入れ歯を差し上げる":"📟 バウリンガルを向ける"}</button>`:"")+"</div>";
- document.querySelectorAll(".q").forEach(b=>b.onclick=()=>+b.dataset.q===-2?useItem():+b.dataset.q<0?present():ask(+b.dataset.q));
+ const left=sh([...sp,...sh(rem.filter(q=>!sp.includes(q))).slice(0,3-sp.length)]);
+ if(!left.length){qa.innerHTML='<div class="hint">この人物にはもう聞くことがない</div>'+bar();wire();return}
+ qa.innerHTML='<div class="qs">'+left.map(q=>`<button class="q" data-q="${q}">${qt(q)}</button>`).join("")+"</div>"+bar();wire();
+ 
 }
 function ask(q){
  const i=sel,mt=isMute(i),rf=!mt&&isA(q)&&Math.random()<(i===cul?.25:.12),fg=!mt&&!rf&&(q===0||q===3||q===8||q===19||(q>=10&&q<=15))&&!(q===19&&i!==cul&&tg[i].v===cul)&&Math.random()<.35,hit=!rf&&!fg&&i===cul&&isA(q),was=ag[i]>=PT;
@@ -226,7 +239,7 @@ function ask(q){
  {const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})};
  if(ag[i]>=PT&&!was){L.insertAdjacentHTML("beforeend",`<div class="b me"><small>💦 異変</small>${S[i][0]}の様子がおかしい……体が震えている！</div>`);{const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
  if(Math.random()<(q===9&&i!==cul?.25:.03)+(asked[i].size>=7?.08:0)){mad[i]=turn+3;MDn++;MD2[i]=(MD2[i]||0)+1;L.insertAdjacentHTML("beforeend",`<div class="b me"><small>💢 異変</small>${S[i][0]}は機嫌を損ねてしまった……しばらく話してくれない。</div>`);{const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
- itemFind();swFind();if(!evOn&&!$("evp").classList.contains("show")&&turn<MAX&&Math.random()<.06){evOn=true;$("evh").textContent="重要な証拠品を発見！";ev=Math.random()<.5?["服のボタン","🔘"]:["ネックレス","📿"];$("evi").textContent=ev[1];$("evt").textContent="現場から「"+ev[0]+"」が見つかった！ 持ち主は、この中にいる……。";$("evp").classList.add("show")}
+ itemFind();swFind();tbFind();if(!evOn&&!$("evp").classList.contains("show")&&turn<MAX&&Math.random()<.06){evOn=true;$("evh").textContent="重要な証拠品を発見！";ev=Math.random()<.5?["服のボタン","🔘"]:["ネックレス","📿"];$("evi").textContent=ev[1];$("evt").textContent="現場から「"+ev[0]+"」が見つかった！ 持ち主は、この中にいる……。（アイテム欄に入った）";$("evp").classList.add("show")}
  draw();
 }
 function present(){const i=sel;if(over||!evOn||evUsed)return;evUsed=true;adv();const L=$("log");
@@ -241,9 +254,9 @@ $("acc").onclick=()=>{
  over=true;const ok=sel===cul&&ag[sel]>=PT;
  $("oh").textContent=ok?"事件解決！":"バッドエンド";
  $("ot").innerHTML=ok?`${S[cul][1]} ${S[cul][0]}が犯人でした。動揺を見逃さない、見事な推理です！<br>（${turn}ターンで解決）`:sel===cul?`${S[sel][0]}は確かに犯人だった。だが震えるほどの動揺を引き出せず、証拠不十分のまま取り逃がしてしまった……。`:`${S[sel][0]}は犯人ではなかった……。無実の人を告発してしまった。<br>真犯人は ${S[cul][1]} ${S[cul][0]} でした。`;
- clearInterval(tmr);const sc=Math.floor((Date.now()-t0)/1000),b=calc(ok,turn,sc,hits,-MDn*5000-evBad*50000),pt=ok?b.tot:-(5000+Math.round(Math.max(0,450-sc)*50)+Math.max(0,MAX-turn)*2500),rk=ok?rank(pt):"D",f=n=>n.toLocaleString();
+ clearInterval(tmr);const ib2=ok?(unl[10]?30000:0)+(unl[12]?30000:0):0,sc=Math.floor((Date.now()-t0)/1000),b=calc(ok,turn,sc,hits,-MDn*5000-evBad*50000+ib2),pt=ok?b.tot:-(5000+Math.round(Math.max(0,450-sc)*50)+Math.max(0,MAX-turn)*2500),rk=ok?rank(pt):"D",f=n=>n.toLocaleString();
  last={ok,turn,sc,pt,rk};
- $("ot").innerHTML+=`<p>ターン <b>${turn}</b>　推理時間 <b>${fm(sc)}</b><br>ランク <b style="font-size:2rem;color:var(--acc)">${rk}</b>${ok?"":"（失敗）"}</p><hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0">スコア：<b style="font-size:1.5rem">${f(pt)}</b></p>${ok?`<p style="line-height:1.8;margin:0;font-size:.9rem;color:var(--sub)">時間ボーナス：${f(b.sb)}<br>ターンボーナス：${f(b.tb)}<br>推理力：${f(b.hp+b.cl+b.sk)}</p>`:""}`;
+ $("ot").innerHTML+=`<p>ターン <b>${turn}</b>　推理時間 <b>${fm(sc)}</b><br>ランク <b style="font-size:2rem;color:var(--acc)">${rk}</b>${ok?"":"（失敗）"}</p><hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0">スコア：<b style="font-size:1.5rem">${f(pt)}</b></p>${ok?`<p style="line-height:1.8;margin:0;font-size:.9rem;color:var(--sub)">時間ボーナス：${f(b.sb)}<br>ターンボーナス：${f(b.tb)}<br>推理力：${f(b.hp+b.cl+b.sk)}${ib2?`<br>アイテムボーナス：${f(ib2)}`:""}</p>`:""}`;
  $("ov").classList.add("show");
 };
 const memo=k=>{$("rvb").innerHTML=k?'<div class="rl"><b>関係図</b></div>'+relDraw():'<div class="rl"><b>アリバイ・タイムグラフ</b>（青＝最初の証言／赤の破線＝質問で聞き直した答え）</div>'+tlDraw();$("tt").classList.toggle("on",!k);$("tr").classList.toggle("on",!!k)};
