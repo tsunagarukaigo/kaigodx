@@ -278,7 +278,7 @@ const hm=m=>Math.floor(m/60)+":"+String(m%60).padStart(2,"0");
 function tlBar(){const e=$("tl");if(!e.firstChild){let h='<div class="trk"><div class="fl" id="tlf"></div>';for(let k=1;k<MAX;k++)h+='<i class="tk'+(k%4?'':' h')+'" style="left:'+k/MAX*100+'%"></i>';h+='</div>';for(let k=0;k<=4;k++)h+='<span class="lb" style="left:'+k*25+'%;transform:translateX(-'+k*25+'%)">'+k+':00</span>';e.innerHTML=h}$("tlf").style.width=turn/MAX*100+"%";e.classList.toggle("stp",swc>0)}
 function draw(){
  $("turn").textContent="🌙 "+hm(turn*15);tlBar();
- $("sus").innerHTML=sus.map(i=>`<button class="s${sel===i?" on":""}" data-i="${i}"><span class="ic${ag[i]>=PT?" shake":""}" id="ic${i}">${S[i][1]}</span><span class="nm">${S[i][0]}${mad[i]>turn?"💢":""}</span><br><span class="ds">${S[i][2]}</span><span class="lvb" style="font-size:.9rem">${SWT[i]?"💦":"&nbsp;"}</span></button>`).join("");
+ $("sus").innerHTML=sus.map(i=>`<button class="s${sel===i?" on":""}" data-i="${i}"><span class="ic${ag[i]>=PT?" shake":""}" id="ic${i}">${S[i][1]}</span><span class="nm">${S[i][0]}${mad[i]>turn?"💢":""}${SWT[i]?"💦":""}</span><br><span class="ds">${S[i][2]}</span></button>`).join("");
  document.querySelectorAll(".s").forEach(b=>b.onclick=()=>{if(!over){sel=+b.dataset.i;draw()}});
  const qa=$("qa");
  if(turn>=MAX){qa.innerHTML='<div class="hint">調査は終了した。犯人を指名せよ！</div>';return}
