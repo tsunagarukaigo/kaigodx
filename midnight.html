@@ -70,7 +70,7 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 <div class="ov" id="rv"><div class="box" style="max-width:420px;width:100%;max-height:88vh;overflow:auto"><div class="rvh"><h2>推理メモ</h2><div class="btns"><button class="accuse sub on" id="tt">タイムグラフ</button><button class="accuse sub" id="tr">相関図</button><button class="accuse sub" id="rvc">✕ 閉じる</button></div></div><div id="rvb"></div></div></div>
 <script>
 const MAX=16,SH=5,PT=3;
-const S=[["白鳥","👴","理事長・72歳"],["サチ","👩‍🦳","ヘルパー・62歳"],["レン","🧑‍🦱","介護士・22歳"],["ひなた","🧹","清掃員・19歳"],["神崎","🧘","セラピスト・45歳"],["麗華","💉","ナース・38歳"],["ソラ","👦","家族（孫）・10歳"],["氷室","📋","ケアマネージャー・30歳"],["源さん","💂","守衛さん・58歳"],["鷹村","🤵","事務長・50歳"],["トメさん","👵","入居者・95歳"],["あかり","🥗","栄養士・31歳"],["ぽち","🐕","セラピー犬・7歳"],["優花","👩‍💼","事務員・27歳"]];
+const S=[["白鳥","👴","理事長・72歳"],["サチ","👩‍🦳","ヘルパー・62歳"],["レン","🧑‍🦱","介護士・22歳"],["ひなた","🧹","清掃員・19歳"],["神崎","🧘","セラピスト・45歳"],["麗華","💉","ナース・38歳"],["ソラ","👦","家族（孫）・10歳"],["氷室","📋","ケアマネージャー・30歳"],["源さん","💂","守衛さん・58歳"],["鷹村","🤵","事務長・50歳"],["トメさん","👵","入居者・95歳"],["あかり","🥗","栄養士・31歳"],["ぽち","🐕","セラピー犬・7歳"],["優花","👩‍💼","事務員・27歳"],["みーたん","🐱","猫・3歳"],["胡椒","🤖","介護ロボ・不明"]];
 const Q=["昨夜22時、あなたはどこにいましたか？","施設長とは、どんな関係ですか？","最近、お金に困っていませんか？","事件の夜、何か物音を聞きましたか？","他の人で、怪しいと思う人はいますか？","顔色が優れないようですが、どうされました？","事件の現場に、普段から出入りしていましたか？","施設長を恨んでいる人に心当たりは？","事件の前、{t}を最後に見たのはいつですか？","正直に答えてください。あなたがやったのですか？","そのとき、何をしていましたか？","何時から何時まで、そこにいましたか？","そこで、誰かと会いましたか？","その間、一度でもそこを離れましたか？","昨夜の行動を、もう一度最初から話してください。","そこにいた証拠はありますか？","この中で、誰が一番怪しいと思いますか？","その人が怪しいと思う理由は何ですか？","他の人のアリバイは信用できますか？","事件のころ、施設内で誰かを見かけませんでしたか？","普段、苦手な人や、よく思っていない人はいますか？","普段、特に仲の良い人はいますか？"];
 const C=[["真夜中、介護施設「つながる介護」の給湯室から、施設長の秘蔵のカップラーメンが盗まれた。","施設長のカップラーメン"],["真夜中、介護施設「つながる介護」の施設長室で、施設長が殺された。","施設長"],["真夜中、介護施設「つながる介護」で、入居者ウメ子さんの通帳が居室から盗まれた。","ウメ子さんの通帳"],["真夜中、介護施設「つながる介護」の休憩室から、おやつが大量になくなった。","休憩室のおやつ"],["真夜中、介護施設「つながる介護」のリネン室から出火。シーツも備品も灰になった。","リネン室"],["真夜中、介護施設「つながる介護」の介護記録が書き換えられていた。本物の記録は行方不明だ。","本物の介護記録"],["真夜中、介護施設「つながる介護」で、入居者北海五郎さんの入れ歯が盗まれた。","北海五郎さんの入れ歯"],["真夜中、介護施設「つながる介護」で、入居者松子さんの50万円の形見の指輪が消えた。","松子さんの形見の指輪"],["真夜中、介護施設「つながる介護」で、入居者ヨシ子さんの財布が消え、「誰かが盗んだ！」と大騒ぎになった。","ヨシ子さんの財布"],["真夜中、介護施設「つながる介護」で、入居者サブさんが居室から忽然と姿を消した。","サブさん"],["真夜中、介護施設「つながる介護」で、入居者カツ子さんの補聴器が、食事の片付けのあと行方不明になった。","カツ子さんの補聴器"]];
 const T=["アリバイ","施設長との関係","金銭事情","物音","他の容疑者","顔色・様子","現場の知識","恨み","最後の目撃","自白"];
@@ -92,8 +92,8 @@ const PL=["厨房","洗濯室","デイルーム","機械浴室","宿直室","地
 const AC=["ケア記録をつけて","シーツをたたんで","シフト表を作って","ラジオ体操の準備をして","お茶を淹れて","レクの歌を練習して","おしぼりを巻いて","こっそり缶コーヒーを飲んで"];
 const TM=["21:00〜23:00","21:30〜22:30","20:00〜23:00","21:50〜23:10","21:40〜22:40"];
 const WT=["電話の相手","眠れない入居者さん","送迎のドライバー","宅配の配達員"];
-const PRE=["恐れながら、","あのねぇ、","……ああ、","えっとね！","ふむ。","ふふ、","んーとね、","事実のみ申し上げます。","……","ええとですね、","ほっほ、","あ、はい。","ワン！","えっとぉ、"];
-const E=["のでございます。","のよぉ。","んだよ。","んだよ！","のだ。","のよ。","んだもん！","のです。","んじゃ。","んですよ。","んじゃよぉ。","んですよね。","んだワン！","んですよぉ！"];
+const PRE=["恐れながら、","あのねぇ、","……ああ、","えっとね！","ふむ。","ふふ、","んーとね、","事実のみ申し上げます。","……","ええとですね、","ほっほ、","あ、はい。","ワン！","えっとぉ、","みゃ…","ピピッ。"];
+const E=["のでございます。","のよぉ。","んだよ。","んだよ！","のだ。","のよ。","んだもん！","のです。","んじゃ。","んですよ。","んじゃよぉ。","んですよね。","んだワン！","んですよぉ！","みゃ。","ノデス。"];
 const G=[
 [["施設長には、普段からよく世話になっている","施設長とは、仕事の話をするくらいで、普通に接している","施設長のことは、尊敬している"],["施設長とは、特に何もないと思う","施設長とは、最近少し気まずい","施設長のことは、あまり話したくない"]],
 [["お金には、特に困っていない","貯金は少ないが、生活はできている","給料日前は、いつも財布が軽い"],["お金のことは、聞かないでほしい","ちょっとだけ、支払いが重なっている","お金に困っていると言えば、困っている"]],
@@ -105,19 +105,19 @@ const G=[
 [["夕方、{t}を見かけたのが最後だ","昼過ぎに、{t}を見たのが最後だ","夜勤の引き継ぎで、{t}を見たきりだ"],["{t}は、ずっと見ていないことにしておきたい","{t}を最後に見たのは、思い出せない","{t}は、夕方に見たような気がする"]],
 [["やっていない、絶対にやっていない","疑われるのは、心外でならない","私にそんなことをする理由は、ない"],["やっていないと、言うしかない","私がやったという証拠は、どこにもない","疑うなら、証拠を出してほしい"]]];
 const pick=a=>a[Math.floor(Math.random()*a.length)];
-const isMute=i=>(i===10||i===12)&&!unl[i];
-const mutePh=i=>pick(i===10?["フガフガ…（しゃべりにくそうだ）","フガ、フガフガ…"]:["ワンワン","ワォーン","クゥン…"]);
-const stmS=i=>isMute(i)?(i===10?"フガフガ…（しゃべりにくそうだ。何を言っているのか聞き取れない）":"ワンワン！（何を言っているのか、さっぱり分からない）"):stm(i);
-const SPA={10:["お茶をすすって","編み物をして","時代劇を観て","仏壇に手を合わせて","うたた寝をして","歩行器の練習をして"],12:["お昼寝をして","ボール遊びをして","しっぽを追いかけて","おやつをねだって","ごろごろして","ひなたぼっこをして"]};
-const SW={10:"夜勤の職員さん",12:"遊んでくれた職員さん"};
-const RO={10:{0:"トメさんが昨夜、歩行器でやけに素早く廊下を進んでいた",5:"トメさんが施設長に杖を振り上げるのを見た"},12:{0:"ぽちが昨夜、廊下をウロウロしていた",1:"ぽちは尻尾を丸めて、目を合わせなかった",5:"ぽちが施設長に向かって唸っているのを聞いた"}};
+const isMute=i=>i===14||((i===10||i===12)&&!unl[i]);
+const mutePh=i=>pick(i===14?["みゃーん","みゃー","にゃおーん"]:i===10?["フガフガ…（しゃべりにくそうだ）","フガ、フガフガ…"]:["ワンワン","ワォーン","クゥン…"]);
+const stmS=i=>isMute(i)?(i===14?"みゃーん…（猫なので、何を言っているのか分からない）":i===10?"フガフガ…（しゃべりにくそうだ。何を言っているのか聞き取れない）":"ワンワン！（何を言っているのか、さっぱり分からない）"):stm(i);
+const SPA={15:["巡回点検をして","充電をして","シーツ運搬をして","床の清掃をして","センサーの調整をして","入居者の見守りをして"],10:["お茶をすすって","編み物をして","時代劇を観て","仏壇に手を合わせて","うたた寝をして","歩行器の練習をして"],12:["お昼寝をして","ボール遊びをして","しっぽを追いかけて","おやつをねだって","ごろごろして","ひなたぼっこをして"]};
+const SW={15:"夜勤の職員さん",10:"夜勤の職員さん",12:"遊んでくれた職員さん"};
+const RO={14:{0:"みーたんが昨夜、廊下を音もなく歩いていた",5:"みーたんが施設長にシャーッと威嚇するのを見た"},10:{0:"トメさんが昨夜、歩行器でやけに素早く廊下を進んでいた",5:"トメさんが施設長に杖を振り上げるのを見た"},12:{0:"ぽちが昨夜、廊下をウロウロしていた",1:"ぽちは尻尾を丸めて、目を合わせなかった",5:"ぽちが施設長に向かって唸っているのを聞いた"}};
 const F=[[["ほっほ、","おやおや、","はてさて、"],["ひ、ひぃ…","ほ、ほぉ…","あわわ…"]],[["あ、はい。","えっとですね、","栄養的には、"],["あ、あの、","ま、まあ、","え、えっと、"]],[["ワン！","ハッハッ、","しっぽ振り振り、"],["クゥン…","ワ、ワン…","ハッ、ハッ…"]],[["あのですねぇ、","きいてくださいよぉ、","えへへ、"],["あ、あのぉ…","ひゃ、ひゃい…","えっとぉ…"]]];
 const D=[[["毎日ご飯を聞いてくれる、ええ子じゃて。","金？ 闇市以来、縁がないのぅ。","入れ歯のカチカチ音なら聞いたのぅ。","人を疑う暇なんぞ、ありゃせんわい。","生まれつきじゃて。まだまだ元気よ。","迷子になりながら、よう通っとるわい。","みんな仲良しじゃて。きび団子でも食うかの。","{t}は夕方に見たような…いや昨日かのぅ。","この歳で悪さなんぞ、杖が重うてできんわい。"],["あやつには…いや、なんでもないわい。","入れ歯の修理代が…あ、いや何でもないんじゃ。","ぐ、ぐっすり寝とったわい！ ぐっすりじゃ！","わしより若いもんは皆、怪しいのぅ！","な、なんでもないわい！ 血圧じゃ、血圧！","し、知らんのぅ…歩行器で通ったかのぅ。","知らんと言うとるじゃろ…知らんわい。","{t}は…み、見とらんのぅ。いや見たかのぅ。","わ、わしはやっとらん…ばあちゃん、動悸がしてきたわい。"]],
 [["いつも献立を褒めてくださる、バランスの良い関係です。","食費がかさみがちですが、収支のバランスは取れてます。","厨房の冷蔵庫の、ブーンという音くらいでした。","人を疑うのは塩分過多のもと、ですよ。","朝食抜きなだけです。栄養士の不養生ですね。","食材搬入で、あちこち出入りしていますから。","好き嫌いは多い方ですが、恨みまでは…味の好みですかね。","{t}は、昼食の配膳のときに見ました。","私が？ 一汁三菜に誓って、やっていません！"],["ええと…献立に、塩辛い小言を頂いてまして…。","実は食べ歩きが趣味で、財布がカロリー不足です。","厨房で何か…い、いえ、冷蔵庫の音です！","他の方？ 皆さん、あ、アクが強いですよね…。","ちょ、ちょっと胃が…食べ過ぎ、いえ食べてません！","ま、まあ、食材の都合で、どこでも…ですよね。","恨み、ですか…？ 煮詰まってる人は、いるかも…。","{t}は…え、えっと、冷凍庫のあたりで…いえ！","ち、違います！ 私はつまみ食いもしてません！"]],
 [["施設長は、おやつをくれる人だワン！","ぼくは骨がもらえれば幸せだワン！","ナースコールの音にびっくりしたワン！","みんな撫でてくれるから、疑えないワン…。","元気いっぱいだワン！ しっぽフリフリだワン！","散歩で毎日通る道だワン！ 匂いで分かるワン！","みんな優しいワン！ ケンカは嫌いだワン！","{t}は、夕方の散歩のときに見たワン！","ぼくじゃないワン！ お手もできるいい子だワン！"],["施設長は…えっと、おやつを…いや、何でもないワン。","骨を買うために…い、いや、何でもないワン！","き、昨日はぐっすり寝てたワン！ ほんとだワン！","ぼ、ぼく以外のみんなが怪しいワン！","し、しっぽが丸まってるのは、寒いからだワン！","し、知らないワン！ 床の匂いなんて嗅いでないワン！","う、恨みなんて、ぼく、わからないワン…クゥン。","{t}は…み、見てないワン！ 匂いは嗅いだけど…。","ち、違うワン！ …骨にかけて誓うワン…ちょっと震えるワン。"]],
 [["いつも書類にハンコくれる、優しい上司ですぅ。","ネイル代でカツカツですけど、平気ですよぉ。","コピー機が、ウィーンって鳴ってましたぁ。","噂は好きですけど、人を疑うのは苦手ですぅ。","月末の経費精算で、お疲れなだけですよぉ。","書類を届けに、しょっちゅう行ってますぅ。","経費でもめてる人は、噂で聞きましたぁ。","{t}は、午後に書類を届けるとき見ましたぁ。","私が！？ ハンコにかけて違いますぅ！"],["えっとぉ、上司ですぅ…ハンコ、くれないんですよぉ…。","ち、ちょっとネイル代が…でも関係ないですぅ！","コ、コピー機の音ですぅ！ ほんとですよぉ！","わ、私より、他の人のほうが怪しいですよぉ！","か、顔色ですかぁ！？ チ、チークの色ですぅ！","し、書類は届けましたけどぉ…昨日は行ってませんよぉ。","う、噂で聞いただけですぅ！ 私は何も…ですぅ！","{t}は…あ、あれぇ？ 見たような見てないような…ですぅ。","ち、違いますぅ！ …手が汗でハンコ押せなくなってきましたぁ。"]]];
-const fv=i=>pick(F[i-10][i===cul?1:0]);
-const pk2=(i,q)=>{const c=i===cul,nv=Math.random()<(c?.6:.15),pre=nv?pick(NERV):"";if(nv)NV[i]=(NV[i]||0)+1;return pre+(Math.random()<.5?fv(i):"")+D[i-10][c?1:0][q-1].replace("{t}",cs[1])};
+const fv=i=>F[i-10]?pick(F[i-10][i===cul?1:0]):"";
+const pk2=(i,q)=>{if(i===15)return RB[q-1].replace("{t}",cs[1]);const c=i===cul,nv=Math.random()<(c?.6:.15),pre=nv?pick(NERV):"";if(nv)NV[i]=(NV[i]||0)+1;return pre+(Math.random()<.5?fv(i):"")+D[i-10][c?1:0][q-1].replace("{t}",cs[1])};
 function itemFind(){const t=[[10,"dent","🦷","入れ歯","トメさん","話してくれる"],[12,"bau","📟","バウリンガル（翻訳機）","ぽち","言葉が分かる"]].find(x=>sus.includes(x[0])&&!IT[x[1]]);if(!t||turn>=MAX||Math.random()>=.05)return;IT[t[1]]=1;$("evh").textContent="アイテムを発見！";$("evi").textContent=t[2];$("evt").textContent="「"+t[3]+"」が見つかった！ "+t[4]+"に使えば、"+t[5]+"かもしれない……。アイテム欄から使える。";$("evp").classList.add("show")}
 function useItem(){const i=sel;if(over||turn>=MAX||unl[i])return;unl[i]=1;$("log").insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>${i===10?"🦷 トメさん、入れ歯が見つかりましたよ。どうぞ。":"📟 ぽち、このバウリンガルを使ってみてくれ。"}</div><div class="b"><small>${S[i][1]} ${S[i][0]}</small>${i===10?"（入れ歯をはめた）……ほっほ、ありがたやぁ。これで、ちゃんと話せるわい。":"🔊 ワン！ やっと言葉が通じるワン！ なんでも聞いてほしいワン！"}</div>`);rc();draw();const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}
 const GR=["どうも苦手に思っている","いつも小言を言われて、好きになれない","顔を合わせると気まずい","シフトで揉めて以来、許せない","正直、あまり好きではない"];
@@ -137,13 +137,18 @@ if(k==="ev")present();
 else if((k==="dent"&&sel===10)||(k==="bau"&&sel===12))useItem();
 else if(k==="tab"&&IT.tab&&mad[sel]>turn){IT.tab=0;const ok=Math.random()<.5;if(ok)mad[sel]=0;$("log").insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>🚬 まあ、一服どうぞ。</div><div class="b"><small>${S[sel][1]} ${S[sel][0]}</small>${ok?"……ふぅ。悪かったな、少し頭が冷えた。もう話してもいいぞ。":"……そんなもので機嫌が直ると思うな。（たばこは無駄になった）"}</div>`);draw();const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
 function tbFind(){if(tbGot||turn>=MAX||$("evp").classList.contains("show")||Math.random()>=.04)return;tbGot=1;IT.tab=1;$("evh").textContent="アイテムを発見！";$("evi").textContent="🚬";$("evt").textContent="「たばこ」を手に入れた！ 怒らせてしまった相手に差し出せば、機嫌が直るかもしれない……。（アイテム欄から使える）";$("evp").classList.add("show")}
+let rbc=0,boomF=false,endDelay=2600;
+const RB=["ピピッ。施設長ハ、私ノ管理者デス。","金銭ノ必要性ハ、ゼロ%デス。充電ト油ガアレバ稼働可能デス。","22時ゴロ、自分ノ関節ノ音ヲ記録シマシタ。","ピー。推測ハ、データ不足ノタメ控エマス。","顔色ハ、カメラ解像度ニ依存シマス。異常ハアリマセン。","巡回ルートトシテ、通過シタ記録ガアリマス。","恨ミ機能ハ、実装サレテイマセン。","{t}ノ最終確認ハ、巡回ログニ記録サレテイマス。","肯定モ否定モ、致シマセン。私ハ、ロボット三原則ニ従イマス。"];
+function catRb(i,q){const L=$("log"),say=h=>{L.insertAdjacentHTML("beforeend",h);const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})};
+if(i===14&&!over&&Math.random()<.03){ag[cul]=PT;hits++;say(`<div class="b"><small>🐱 みーたん</small>みゃーーっ！！</div><div class="b me"><small>🐱 異変</small>みーたんが突然、${dn(cul)}を前足でビシッと指した！ 身振り手振りで、昨夜の${cp}での出来事を語り出す……。${dn(cul)}がコソコソと何かを隠す一部始終を、物陰から見ていたようだ。${dn(cul)}の顔から血の気が引き、体がガタガタと震え出した！</div>`);sel=cul;endDelay=4500;$("acc").onclick()}
+if(i===15&&isA(q)&&!over){rbc++;if(rbc===4)say(`<div class="b me"><small>💨 異変</small>胡椒の頭から、うっすらと煙が出ている……。</div>`);if(rbc>=5){say(`<div class="b"><small>🤖 胡椒</small>ピ、ピピ…ガガッ…処理ガ追イツキマセン…ドカーン！</div><div class="b me"><small>💥 異変</small>胡椒の頭から黒煙が噴き出し、鋭い質問の連打に耐えきれず自爆してしまった！</div>`);boomF=true;sel=15;endDelay=3500;$("acc").onclick()}}}
 const NV0=0;
 const pk=(i,q)=>{if(i>=10)return pk2(i,q);const c=i===cul,p=G[q-1][c?1:0],n=Math.floor(Math.random()*(p.length+1)),nv=Math.random()<(c?.6:.15),pre=nv?NERV[Math.floor(Math.random()*4)]:"";if(nv)NV[i]=(NV[i]||0)+1;const b=n<p.length?PRE[i]+p[n]+E[i]:A[i][q];return pre+b.replace("{t}",cs[1])};
 const RFS=[["……その時間のことは、答えたくない","それは、言いたくない","黙秘する。話すつもりはない"],["利用者さんの個人情報に関わるので、その時間の話は言えない","守秘義務があるので、詳しくは言えない","時間のことは、記録を見てほしい。口頭では答えられない"]];
 const FG=["そのことは、よく覚えていない","記憶があいまいで、はっきり思い出せない","夜勤続きで、頭がぼんやりして覚えていない","忙しくて、いつのことだったか思い出せない","言われてみると、その辺りの記憶が飛んでいる","ちょうどその頃のことは、すっかり忘れてしまった","細かいことは、ちっとも覚えていない","年のせいか、すぐ忘れてしまう"];
 const LV={H:["高","var(--acc)",4],M:["中","#d98a1f",3],L:["低","var(--sub)",1.5]};
 const lv=i=>{const o=told[i]||{},a=al[i],mm=!!(o.p&&o.p!==a.p)+!!(o.a&&o.a!==a.a)+!!(o.t&&o.t!==a.t)+!!(o.g&&o.g!==lk[i].g)+!!(o.f&&o.f!==lk[i].f),has=!!(o.p||o.a||o.t||o.g||o.f);let s=(NV[i]||0)+(RF[i]||0)+(AL[i]||0)+2*(MD2[i]||0)+3*mm-(has&&!mm?1:0);rel.forEach(r=>{if(r.t!==i||r.ty==="grd"||r.ty==="lik")return;if(r.ty==="sus"||r.ty==="dis")s+=2;else if(r.lb===cp+"の近くで目撃")s+=4;else s-=2});s=Math.max(0,s);return s>=5?"H":s>=2?"M":"L"};
-const dn=x=>{const n=S[x][0];return x===12||n.endsWith("さん")?n:n+"さん"};
+const dn=x=>{const n=S[x][0];return x===12||x===14||n.endsWith("さん")?n:n+"さん"};
 const RS=x=>Object.assign([dn(x)+"が昨夜、廊下を足早に歩くのを見た",dn(x)+"は話すとき、一度も目を合わせなかった",dn(x)+"は金に困っていると噂で聞いた",dn(x)+"の証言は、どこか不自然だった",dn(x)+"は事件のあと、妙に落ち着いていた",dn(x)+"が施設長と口論するのを耳にした"],RO[x]);
 const fm=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
 const calc=(ok,n,s,h,x=0)=>{const hp=Math.min(h,5)*4000,cl=ok?20000:0,sk=ok?10000:0,tb=ok?Math.max(0,MAX-n)*2500:0,sb=ok?Math.round(Math.max(0,450-s)*50):0;return{hp,cl,sk,tb,sb,x,tot:Math.max(1000,hp+cl+sk+tb+sb+x)}};
@@ -198,7 +203,7 @@ const at0=(i,q)=>{
 const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 let sus,cul,sharp,turn,sel,asked,over,cs,ag,cp,al,fk,tg,t0,tmr,rel,told,hits,last,NV,RF,mad,MDn,evOn,evUsed,ev,evBad,AL,MD2,IT,unl,rc,lk,lkf,swc,swGot,tbGot;
 function init(){
- sus=sh([...Array(S.length).keys()]).slice(0,4);cul=sus[Math.floor(Math.random()*4)];
+ sus=sh([...Array(14).keys()]).slice(0,4);[[14,.06],[15,.05]].forEach(([k,p])=>{if(Math.random()<p){let j;do{j=Math.floor(Math.random()*4)}while(sus[j]>=14);sus[j]=k}});const cc=sus.filter(x=>x!==14);cul=cc[Math.floor(Math.random()*cc.length)];
  sharp=new Set(sh([...Array(S.length).keys()]).slice(0,SH));
  turn=0;sel=null;over=false;asked={};ag={};sus.forEach(i=>{asked[i]=new Set();ag[i]=0});
  const ci=Math.floor(Math.random()*C.length);cs=C[ci];cp=CP[ci];
@@ -206,9 +211,9 @@ function init(){
  al={};sus.forEach((i,k)=>al[i]={p:pl[k],a:ac[k],t:tm[k],w:wt[k]});
  fk=Math.random()<.25?{p:al[cul].p,a:al[cul].a,t:al[cul].t}:{p:pl[4],a:ac[4],t:tm[4]};
  sus.forEach(i=>{if(SPA[i]){al[i].a=sh(SPA[i])[0];al[i].w=SW[i]}});if(SPA[cul])fk.a=(fk.p===al[cul].p&&fk.t===al[cul].t)?al[cul].a:sh(SPA[cul].filter(x=>x!==al[cul].a))[0];
- LKG();tg={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),r=()=>o[Math.floor(Math.random()*o.length)];tg[i]={t:r(),u:r(),v:r(),r:Math.floor(Math.random()*6)}});{const c0=sus.filter(x=>x!==cul),c1=c0.filter(x=>x!==10&&x!==12),w=sh(c1.length?c1:c0)[0];tg[w].v=cul}
+ LKG();if(cul===15){lkf={...lk[15]};fk={...al[15]}}tg={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),r=()=>o[Math.floor(Math.random()*o.length)];tg[i]={t:r(),u:r(),v:r(),r:Math.floor(Math.random()*6)}});{const c0=sus.filter(x=>x!==cul),c1=c0.filter(x=>x!==10&&x!==12&&x!==14),w=sh(c1.length?c1:c0)[0];tg[w].v=cul}
  rc=()=>$("case").innerHTML=cs[0]+"施設にいたのは4人の容疑者。犯人は、この中にいる。事件が起きたのは22:00ごろ。証言の矛盾を見抜け。<br><b>最初の証言</b>"+sus.map(i=>"<div>"+S[i][1]+" <b>"+S[i][0]+"</b>："+stmS(i)+"</div>").join("");
- IT={};unl={};swc=0;swGot=0;tbGot=0;rc();$("log").innerHTML="";rel=[];told={};NV={};RF={};AL={};MD2={};mad={};MDn=0;evOn=false;evUsed=false;evBad=0;ev=null;$("evp").classList.remove("show");hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
+ IT={};unl={};swc=0;swGot=0;tbGot=0;rbc=0;boomF=false;endDelay=2600;rc();$("log").innerHTML="";rel=[];told={};NV={};RF={};AL={};MD2={};mad={};MDn=0;evOn=false;evUsed=false;evBad=0;ev=null;$("evp").classList.remove("show");hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
 }
 const hm=m=>Math.floor(m/60)+":"+String(m%60).padStart(2,"0");
 function tlBar(){const e=$("tl");if(!e.firstChild){let h='<div class="trk"><div class="fl" id="tlf"></div>';for(let k=1;k<MAX;k++)h+='<i class="tk'+(k%4?'':' h')+'" style="left:'+k/MAX*100+'%"></i>';h+='</div>';for(let k=0;k<=4;k++)h+='<span class="lb" style="left:'+k*25+'%;transform:translateX(-'+k*25+'%)">'+k+':00</span>';e.innerHTML=h}$("tlf").style.width=turn/MAX*100+"%";e.classList.toggle("stp",swc>0)}
@@ -228,7 +233,7 @@ function draw(){
  
 }
 function ask(q){
- const i=sel,mt=isMute(i),rf=!mt&&isA(q)&&Math.random()<(i===cul?.25:.12),fg=!mt&&!rf&&(q===0||q===3||q===8||q===19||(q>=10&&q<=15))&&!(q===19&&i!==cul&&tg[i].v===cul)&&Math.random()<.35,hit=!rf&&!fg&&i===cul&&isA(q),was=ag[i]>=PT;
+ const i=sel,mt=isMute(i),rf=!mt&&i!==15&&isA(q)&&Math.random()<(i===cul?.25:.12),fg=!mt&&i!==15&&!rf&&(q===0||q===3||q===8||q===19||(q>=10&&q<=15))&&!(q===19&&i!==cul&&tg[i].v===cul)&&Math.random()<.35,hit=!rf&&!fg&&i===cul&&isA(q),was=ag[i]>=PT;
  asked[i].add(q);adv();
  let t,sharp2=false;
  if(rf){const sp=Math.random()<(i===cul?.7:.35),a=RFS[sp?0:1];RF[i]=(RF[i]||0)+(sp?2:-1);t=PRE[i]+a[Math.floor(Math.random()*a.length)]+"。"}
@@ -239,7 +244,7 @@ function ask(q){
  {const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})};
  if(ag[i]>=PT&&!was){L.insertAdjacentHTML("beforeend",`<div class="b me"><small>💦 異変</small>${S[i][0]}の様子がおかしい……体が震えている！</div>`);{const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
  if(Math.random()<(q===9&&i!==cul?.25:.03)+(asked[i].size>=7?.08:0)){mad[i]=turn+3;MDn++;MD2[i]=(MD2[i]||0)+1;L.insertAdjacentHTML("beforeend",`<div class="b me"><small>💢 異変</small>${S[i][0]}は機嫌を損ねてしまった……しばらく話してくれない。</div>`);{const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
- itemFind();swFind();tbFind();if(!evOn&&!$("evp").classList.contains("show")&&turn<MAX&&Math.random()<.06){evOn=true;$("evh").textContent="重要な証拠品を発見！";ev=Math.random()<.5?["服のボタン","🔘"]:["ネックレス","📿"];$("evi").textContent=ev[1];$("evt").textContent="現場から「"+ev[0]+"」が見つかった！ 持ち主は、この中にいる……。（アイテム欄に入った）";$("evp").classList.add("show")}
+ catRb(i,q);itemFind();swFind();tbFind();if(!evOn&&!$("evp").classList.contains("show")&&turn<MAX&&Math.random()<.06){evOn=true;$("evh").textContent="重要な証拠品を発見！";ev=Math.random()<.5?["服のボタン","🔘"]:["ネックレス","📿"];$("evi").textContent=ev[1];$("evt").textContent="現場から「"+ev[0]+"」が見つかった！ 持ち主は、この中にいる……。（アイテム欄に入った）";$("evp").classList.add("show")}
  draw();
 }
 function present(){const i=sel;if(over||!evOn||evUsed)return;evUsed=true;adv();const L=$("log");
@@ -251,13 +256,13 @@ $("evc").onclick=()=>$("evp").classList.remove("show");
 $("acc").onclick=()=>{
  if(over)return;
  if(sel===null){alert("犯人だと思う被疑者を選んでください");return}
- over=true;SND.thunder();const ok=sel===cul&&ag[sel]>=PT;
- $("oh").textContent=ok?"事件解決！":"バッドエンド";
- $("ot").innerHTML=ok?`${S[cul][1]} ${S[cul][0]}が犯人でした。動揺を見逃さない、見事な推理です！<br>（${turn}ターンで解決）`:sel===cul?`${S[sel][0]}は確かに犯人だった。だが震えるほどの動揺を引き出せず、証拠不十分のまま取り逃がしてしまった……。`:`${S[sel][0]}は犯人ではなかった……。無実の人を告発してしまった。<br>真犯人は ${S[cul][1]} ${S[cul][0]} でした。`;
+ over=true;boomF?SND.boom():SND.thunder();const ok=sel===cul&&ag[sel]>=PT;
+ $("oh").textContent=boomF?"💥 爆発END":ok?"事件解決！":"バッドエンド";
+ $("ot").innerHTML=boomF?`胡椒は黒煙を噴き上げ、大爆発を起こしてしまった……。<br>真犯人は ${S[cul][1]} ${S[cul][0]} でした。`:ok?`${S[cul][1]} ${S[cul][0]}が犯人でした。動揺を見逃さない、見事な推理です！<br>（${turn}ターンで解決）`:sel===cul?`${S[sel][0]}は確かに犯人だった。だが震えるほどの動揺を引き出せず、証拠不十分のまま取り逃がしてしまった……。`:`${S[sel][0]}は犯人ではなかった……。無実の人を告発してしまった。<br>真犯人は ${S[cul][1]} ${S[cul][0]} でした。`;
  clearInterval(tmr);const ib2=ok?(unl[10]?30000:0)+(unl[12]?30000:0):0,sc=Math.floor((Date.now()-t0)/1000),b=calc(ok,turn,sc,hits,-MDn*5000-evBad*50000+ib2),pt=ok?b.tot:-(5000+Math.round(Math.max(0,450-sc)*50)+Math.max(0,MAX-turn)*2500),rk=ok?rank(pt):"D",f=n=>n.toLocaleString();
  last={ok,turn,sc,pt,rk};
  $("ot").innerHTML+=`<p>ターン <b>${turn}</b>　推理時間 <b>${fm(sc)}</b><br>ランク <b style="font-size:2rem;color:var(--acc)">${rk}</b>${ok?"":"（失敗）"}</p><hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0">スコア：<b style="font-size:1.5rem">${f(pt)}</b></p>${ok?`<p style="line-height:1.8;margin:0;font-size:.9rem;color:var(--sub)">時間ボーナス：${f(b.sb)}<br>ターンボーナス：${f(b.tb)}<br>推理力：${f(b.hp+b.cl+b.sk)}${ib2?`<br>アイテムボーナス：${f(ib2)}`:""}</p>`:""}`;
- setTimeout(()=>{$("ov").classList.add("show");SND.end(ok)},2600);
+ setTimeout(()=>{$("ov").classList.add("show");SND.end(ok)},endDelay);endDelay=2600;
 };
 const memo=k=>{$("rvb").innerHTML=k?'<div class="rl"><b>関係図</b></div>'+relDraw():'<div class="rl"><b>アリバイ・タイムグラフ</b>（青＝最初の証言／赤の破線＝質問で聞き直した答え）</div>'+tlDraw();$("tt").classList.toggle("on",!k);$("tr").classList.toggle("on",!!k)};
 $("tt").onclick=()=>memo(0);$("tr").onclick=()=>memo(1);
@@ -284,9 +289,9 @@ setTimeout(()=>{nodes.forEach(o=>{try{o.stop()}catch(e){}});nodes=[]},1600);upd(
 const stopB=()=>{clearInterval(bi);bi=0;upd()};B.onclick=()=>{const a=on||bi||(fin&&!muted);if(a&&c&&c.state!=="running"){c.resume();return}if(a){muted=true;stop(false);stopB();if(fg)fg.gain.value=0;upd()}else{muted=false;if(fin){}else if(inGame)bgm();else start();upd()}};
 const go=e=>{if(e.target===B||muted||O.classList.contains("out")||O.style.display==="none")return;if(!on)start();else if(c&&c.state!=="running")c.resume().then(upd)};["pointerdown","touchend","click","keydown"].forEach(v=>document.addEventListener(v,go,true));
 function ctx(){try{c=c||new (window.AudioContext||window.webkitAudioContext)();c.resume();return true}catch(e){return false}}
-function thunder(){if(bi)stopB();if(muted||!ctx())return;const t=c.currentTime+.05,len=3.2,b=c.createBuffer(1,c.sampleRate*len,c.sampleRate),d=b.getChannelData(0);
-for(let i=0;i<d.length;i++){const x=i/d.length;d[i]=(Math.random()*2-1)*Math.exp(-x*3.2)*(.6+.4*Math.sin(x*60+Math.sin(x*23)*3))}
-const ns=c.createBufferSource(),lp=c.createBiquadFilter(),g=c.createGain();ns.buffer=b;lp.type="lowpass";lp.frequency.setValueAtTime(3500,t);lp.frequency.exponentialRampToValueAtTime(140,t+len);g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(.5,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+len);ns.connect(lp);lp.connect(g);g.connect(c.destination);ns.start(t);
+function thunder(bl){if(bi)stopB();if(muted||!ctx())return;const t=c.currentTime+.05,len=bl?2.4:3.2,b=c.createBuffer(1,c.sampleRate*len,c.sampleRate),d=b.getChannelData(0);
+for(let i=0;i<d.length;i++){const x=i/d.length;d[i]=(Math.random()*2-1)*Math.exp(-x*(bl?6:3.2))*(.6+.4*Math.sin(x*60+Math.sin(x*23)*3))}
+const ns=c.createBufferSource(),lp=c.createBiquadFilter(),g=c.createGain();ns.buffer=b;lp.type="lowpass";lp.frequency.setValueAtTime(3500,t);lp.frequency.exponentialRampToValueAtTime(140,t+len);g.gain.setValueAtTime(.001,t);g.gain.linearRampToValueAtTime(bl?.7:.5,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+len);ns.connect(lp);lp.connect(g);g.connect(c.destination);ns.start(t);
 const o=c.createOscillator(),og=c.createGain();o.type="sine";o.frequency.setValueAtTime(70,t);o.frequency.exponentialRampToValueAtTime(30,t+2.5);og.gain.setValueAtTime(.001,t);og.gain.linearRampToValueAtTime(.35,t+.1);og.gain.exponentialRampToValueAtTime(.001,t+2.6);o.connect(og);og.connect(c.destination);o.start(t);o.stop(t+2.7)}
 function bgm(){if(muted||bi||!ctx())return;bg=c.createGain();bg.gain.value=.5;bg.connect(c.destination);
 const N=[1047,784,932,698];let k=0;
@@ -298,7 +303,7 @@ function end(ok){stopB();fin=1;upd();if(muted||!ctx())return;fg=c.createGain();f
 if(ok){[523.3,659.3,784,1046.5,1318.5,1568].forEach((f,i)=>bell(f,t+i*.17,.16,1.8));[523.3,659.3,784,1046.5].forEach(f=>bell(f,t+1.3,.12,3.5))}
 else{[[220,0],[261.6,1.2],[246.9,2.4],[220,3.6],[164.8,5],[174.6,6.6],[164.8,8]].forEach(([f,d])=>low(f,t+d,.28,2.4));[110,130.8].forEach(f=>low(f,t,.2,11))}}
 function title(){fin=0;inGame=false;if(fg)fg.gain.value=0;stop(false);if(!muted)start();upd()}
-upd();return{stop,go:begin,thunder,end,title}})();
+upd();return{stop,go:begin,thunder,boom:()=>thunder(1),end,title}})();
 $("st").onclick=()=>{SND.go();clearTimeout(stk);fl.classList.remove("go");void fl.offsetWidth;fl.classList.add("go");op.classList.add("out");init();setTimeout(()=>{op.style.display="none"},1400)};
 $("tw").onclick=()=>{window.open(tweet(),"_blank","noopener")};
 $("rt").onclick=()=>{SND.title();$("ov").classList.remove("show");op.style.display="";void op.offsetWidth;op.classList.remove("out");op.querySelectorAll(".t,.fac").forEach(e=>{e.style.animation="none";void e.offsetWidth;e.style.animation=""});clearTimeout(stk);stk=setTimeout(strike,1600)};
