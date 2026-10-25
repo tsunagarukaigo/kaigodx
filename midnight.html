@@ -70,7 +70,7 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 <div class="ov" id="rv"><div class="box" style="max-width:420px;width:100%;max-height:88vh;overflow:auto"><div class="rvh"><h2>捜査ログ</h2><div class="btns"><button class="accuse sub" id="lgt">尋問記録</button><button class="accuse sub on" id="tt">タイムグラフ</button><button class="accuse sub" id="tr">相関図</button><button class="accuse sub" id="rvc">✕ 閉じる</button></div></div><div id="rvb"></div></div></div>
 <script>
 const MAX=16,SH=5,PT=3;
-const S=[["白鳥","👴","理事長・72歳"],["サチ","👩‍🦳","ヘルパー・62歳"],["レン","🧑‍🦱","介護士・22歳"],["ひなた","🧹","清掃員・19歳"],["神崎","🧘","セラピスト・45歳"],["麗華","💉","ナース・38歳"],["ソラ","👦","家族（孫）・10歳"],["氷室","📋","ケアマネージャー・30歳"],["源さん","💂","守衛さん・58歳"],["鷹村","🤵","事務長・50歳"],["トメさん","👵","入居者・95歳"],["あかり","🥗","栄養士・31歳"],["ぽち","🐕","セラピー犬・7歳"],["優花","👩‍💼","事務員・27歳"],["みーたん","🐱","猫・3歳"],["胡椒","🤖","介護ロボ・不明"]];
+const S=[["白鳥","👴","理事長・72歳"],["サチ","👩‍🦳","ヘルパー・62歳"],["レン","🧑‍🦱","介護士・22歳"],["ひなた","🧹","清掃員・19歳"],["神崎","🧘","セラピスト・45歳"],["麗華","💉","ナース・38歳"],["ソラ","👦","家族（孫）・10歳"],["氷室","📋","ケアマネージャー・30歳"],["源さん","💂","守衛さん・58歳"],["鷹村","🤵","事務長・50歳"],["トメさん","👵","入居者・95歳"],["あかり","🥗","栄養士・31歳"],["ぽち","🐕","セラピー犬・7歳"],["優花","👩‍💼","事務員・27歳"],["みーたん","🐱","猫・3歳"],["胡椒","🤖","介護ロボ・不明"],["シロメガネ","👨‍🦲👓","コンサル・50歳"]];
 const Q=["昨夜22時、あなたはどこにいましたか？","施設長とは、どんな関係ですか？","最近、お金に困っていませんか？","事件の夜、何か物音を聞きましたか？","他の人で、怪しいと思う人はいますか？","顔色が優れないようですが、どうされました？","事件の現場に、普段から出入りしていましたか？","施設長を恨んでいる人に心当たりは？","事件の前、{t}を最後に見たのはいつですか？","正直に答えてください。あなたがやったのですか？","そのとき、何をしていましたか？","何時から何時まで、そこにいましたか？","そこで、誰かと会いましたか？","その間、一度でもそこを離れましたか？","昨夜の行動を、もう一度最初から話してください。","そこにいた証拠はありますか？","この中で、誰が一番怪しいと思いますか？","その人が怪しいと思う理由は何ですか？","他の人のアリバイは信用できますか？","事件のころ、施設内で誰かを見かけませんでしたか？","普段、苦手な人や、よく思っていない人はいますか？","普段、特に仲の良い人はいますか？"];
 const C=[["真夜中、介護施設「つながる介護」の給湯室から、施設長の秘蔵のカップラーメンが盗まれた。","施設長のカップラーメン"],["真夜中、介護施設「つながる介護」の施設長室で、施設長が殺された。","施設長"],["真夜中、介護施設「つながる介護」で、入居者ウメ子さんの通帳が居室から盗まれた。","ウメ子さんの通帳"],["真夜中、介護施設「つながる介護」の休憩室から、おやつが大量になくなった。","休憩室のおやつ"],["真夜中、介護施設「つながる介護」のリネン室から出火。シーツも備品も灰になった。","リネン室"],["真夜中、介護施設「つながる介護」の介護記録が書き換えられていた。本物の記録は行方不明だ。","本物の介護記録"],["真夜中、介護施設「つながる介護」で、入居者北海五郎さんの入れ歯が盗まれた。","北海五郎さんの入れ歯"],["真夜中、介護施設「つながる介護」で、入居者松子さんの50万円の形見の指輪が消えた。","松子さんの形見の指輪"],["真夜中、介護施設「つながる介護」で、入居者ヨシ子さんの財布が消え、「誰かが盗んだ！」と大騒ぎになった。","ヨシ子さんの財布"],["真夜中、介護施設「つながる介護」で、入居者サブさんが居室から忽然と姿を消した。","サブさん"],["真夜中、介護施設「つながる介護」で、入居者カツ子さんの補聴器が、食事の片付けのあと行方不明になった。","カツ子さんの補聴器"]];
 const T=["アリバイ","施設長との関係","金銭事情","物音","他の容疑者","顔色・様子","現場の知識","恨み","最後の目撃","自白"];
@@ -92,8 +92,8 @@ const PL=["厨房","洗濯室","デイルーム","機械浴室","宿直室","地
 const AC=["ケア記録をつけて","シーツをたたんで","シフト表を作って","ラジオ体操の準備をして","お茶を淹れて","レクの歌を練習して","おしぼりを巻いて","こっそり缶コーヒーを飲んで"];
 const TM=["21:00〜23:00","21:30〜22:30","20:00〜23:00","21:50〜23:10","21:40〜22:40"];
 const WT=["電話の相手","眠れない入居者さん","送迎のドライバー","宅配の配達員"];
-const PRE=["恐れながら、","あのねぇ、","……ああ、","えっとね！","ふむ。","ふふ、","んーとね、","事実のみ申し上げます。","……","ええとですね、","ほっほ、","あ、はい。","ワン！","えっとぉ、","みゃ…","ピピッ。"];
-const E=["のでございます。","のよぉ。","んだよ。","んだよ！","のだ。","のよ。","んだもん！","のです。","んじゃ。","んですよ。","んじゃよぉ。","んですよね。","んだワン！","んですよぉ！","みゃ。","ノデス。"];
+const PRE=["恐れながら、","あのねぇ、","……ああ、","えっとね！","ふむ。","ふふ、","んーとね、","事実のみ申し上げます。","……","ええとですね、","ほっほ、","あ、はい。","ワン！","えっとぉ、","みゃ…","ピピッ。","ほな、"];
+const E=["のでございます。","のよぉ。","んだよ。","んだよ！","のだ。","のよ。","んだもん！","のです。","んじゃ。","んですよ。","んじゃよぉ。","んですよね。","んだワン！","んですよぉ！","みゃ。","ノデス。","んやで。"];
 const G=[
 [["施設長には、普段からよく世話になっている","施設長とは、仕事の話をするくらいで、普通に接している","施設長のことは、尊敬している"],["施設長とは、特に何もないと思う","施設長とは、最近少し気まずい","施設長のことは、あまり話したくない"]],
 [["お金には、特に困っていない","貯金は少ないが、生活はできている","給料日前は、いつも財布が軽い"],["お金のことは、聞かないでほしい","ちょっとだけ、支払いが重なっている","お金に困っていると言えば、困っている"]],
@@ -108,8 +108,8 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const isMute=i=>i===14||((i===10||i===12)&&!unl[i]);
 const mutePh=i=>pick(i===14?["みゃーん","みゃー","にゃおーん"]:i===10?["フガフガ…（しゃべりにくそうだ）","フガ、フガフガ…"]:["ワンワン","ワォーン","クゥン…"]);
 const stmS=i=>isMute(i)?(i===14?"みゃーん…（猫なので、何を言っているのか分からない）":i===10?"フガフガ…（しゃべりにくそうだ。何を言っているのか聞き取れない）":"ワンワン！（何を言っているのか、さっぱり分からない）"):stm(i);
-const SPA={15:["巡回点検をして","充電をして","シーツ運搬をして","床の清掃をして","センサーの調整をして","入居者の見守りをして"],10:["お茶をすすって","編み物をして","時代劇を観て","仏壇に手を合わせて","うたた寝をして","歩行器の練習をして"],12:["お昼寝をして","ボール遊びをして","しっぽを追いかけて","おやつをねだって","ごろごろして","ひなたぼっこをして"]};
-const SW={15:"夜勤の職員さん",10:"夜勤の職員さん",12:"遊んでくれた職員さん"};
+const SPA={16:["パワポを作って","スプレッドシートを睨んで","ホワイトボードに何か書いて","オンライン会議をして","経費を精算して","名刺を整理して"],15:["巡回点検をして","充電をして","シーツ運搬をして","床の清掃をして","センサーの調整をして","入居者の見守りをして"],10:["お茶をすすって","編み物をして","時代劇を観て","仏壇に手を合わせて","うたた寝をして","歩行器の練習をして"],12:["お昼寝をして","ボール遊びをして","しっぽを追いかけて","おやつをねだって","ごろごろして","ひなたぼっこをして"]};
+const SW={16:"夜勤の職員さん",15:"夜勤の職員さん",10:"夜勤の職員さん",12:"遊んでくれた職員さん"};
 const RO={14:{0:"みーたんが昨夜、廊下を音もなく歩いていた",5:"みーたんが施設長にシャーッと威嚇するのを見た"},10:{0:"トメさんが昨夜、歩行器でやけに素早く廊下を進んでいた",5:"トメさんが施設長に杖を振り上げるのを見た"},12:{0:"ぽちが昨夜、廊下をウロウロしていた",1:"ぽちは尻尾を丸めて、目を合わせなかった",5:"ぽちが施設長に向かって唸っているのを聞いた"}};
 const F=[[["ほっほ、","おやおや、","はてさて、"],["ひ、ひぃ…","ほ、ほぉ…","あわわ…"]],[["あ、はい。","えっとですね、","栄養的には、"],["あ、あの、","ま、まあ、","え、えっと、"]],[["ワン！","ハッハッ、","しっぽ振り振り、"],["クゥン…","ワ、ワン…","ハッ、ハッ…"]],[["あのですねぇ、","きいてくださいよぉ、","えへへ、"],["あ、あのぉ…","ひゃ、ひゃい…","えっとぉ…"]]];
 const D=[[["毎日ご飯を聞いてくれる、ええ子じゃて。","金？ 闇市以来、縁がないのぅ。","入れ歯のカチカチ音なら聞いたのぅ。","人を疑う暇なんぞ、ありゃせんわい。","生まれつきじゃて。まだまだ元気よ。","迷子になりながら、よう通っとるわい。","みんな仲良しじゃて。きび団子でも食うかの。","{t}は夕方に見たような…いや昨日かのぅ。","この歳で悪さなんぞ、杖が重うてできんわい。"],["あやつには…いや、なんでもないわい。","入れ歯の修理代が…あ、いや何でもないんじゃ。","ぐ、ぐっすり寝とったわい！ ぐっすりじゃ！","わしより若いもんは皆、怪しいのぅ！","な、なんでもないわい！ 血圧じゃ、血圧！","し、知らんのぅ…歩行器で通ったかのぅ。","知らんと言うとるじゃろ…知らんわい。","{t}は…み、見とらんのぅ。いや見たかのぅ。","わ、わしはやっとらん…ばあちゃん、動悸がしてきたわい。"]],
@@ -142,6 +142,23 @@ const RB=["ピピッ。施設長ハ、私ノ管理者デス。","金銭ノ必要
 function catRb(i,q){const L=$("log"),say=h=>{L.insertAdjacentHTML("beforeend",h);const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})};
 if(i===14&&!over&&Math.random()<.03){ag[cul]=PT;hits++;say(`<div class="b"><small>🐱 みーたん</small>みゃーーっ！！</div><div class="b me"><small>🐱 異変</small>みーたんが突然、${dn(cul)}を前足でビシッと指した！ 身振り手振りで、昨夜の${cp}での出来事を語り出す……。${dn(cul)}がコソコソと何かを隠す一部始終を、物陰から見ていたようだ。${dn(cul)}の顔から血の気が引き、体がガタガタと震え出した！</div>`);sel=cul;endDelay=4500;$("acc").onclick()}
 if(i===15&&isA(q)&&!over){rbc++;if(rbc===4)say(`<div class="b me"><small>💨 異変</small>胡椒の頭から、うっすらと煙が出ている……。</div>`);if(rbc>=5){say(`<div class="b"><small>🤖 胡椒</small>ピ、ピピ…ガガッ…処理ガ追イツキマセン…ドカーン！</div><div class="b me"><small>💥 異変</small>胡椒の頭から黒煙が噴き出し、鋭い質問の連打に耐えきれず自爆してしまった！</div>`);boomF=true;sel=15;endDelay=3500;$("acc").onclick()}}}
+let SHz={};
+const SHT=["…知らんけど！","…いや、ほんまかいな！","…たぶんな！","…って誰がやねん！"];
+const SHL=[["施設長とは赤の他人や。…毎日ランチ一緒やけどな！","施設長？ ワシ、その人のコンサルやった。…ちゃうちゃう敵や！"],["金？ 腐るほどあるで。…今月ピンチやけどな！","金なんか興味ない。コンサル料は前払いで頼むわ！"],["物音？ 何も聞いてへん。ドカーンって鳴ったけどな！","静かな夜やったで。…耳栓しとったから知らんけど！"],["怪しいんは…ワシや。ちゃうちゃう、ワシやない。いや、ワシや！","みんな怪しい！ …みんなええ人やで？ どっちやねん！"],["顔色？ 元気ハツラツや！ …三日寝てへんけどな！","白いんは生まれつきや。メガネも白いで。…関係あらへんな！"],["現場なんか来たことない。…毎日掃除しとるけどな！","出入り？ ワシ、入口でUターンや。なんでやねん！"],["恨んどる人？ 一人もおらん。…いや一万人はおるな！","恨んでる人は…ワシの口から言えんな。…今言うたけど！"],["{t}？ 昨日見たで。…一昨年やったかな！","{t}？ 見てへんけど、ずっと見とったで！"],["ワシがやった。…ちゃうちゃう、やってない！ ほんまやで？","やってへん！ …あ、やったことにしとく？ なんでやねん！"]];
+function shAt(q){const P=pick(PL),A=pick(AC),T=pick(TM),t=pick(SHT);SHz={p:P,a:A,t:T};
+if(q===0)return "昨夜22時やろ？ "+P+"におったで。"+t;
+if(q===10)return A+"いたんや。"+t;
+if(q===11)return T+"、そこにおったわ。"+t;
+if(q===12)return pick(["誰とも会うてへんで。…あ、課長と会うたわ。"+t,"ワシ、ずっと一人や。隣に夜勤さんおったけど！"]);
+if(q===13)return pick(["一歩も動いてへん。トイレは10回行ったけどな！","ずっとおったで。廊下は3往復したけど！"]);
+if(q===14)return "最初から言うで。"+T+"、"+P+"で"+A+"いたんや。…さっきと違う？ 気のせいや！";
+if(q===15)return pick(["証拠？ 領収書ならあるで。宛名は『上』で！","防犯カメラに映っとる。…カメラ壊れとったけどな！"]);
+if(q===16)return pick(["怪しいんはワシ以外や。…いや、ワシも怪しいわ！","犯人は…あんたや！ …冗談やがな！"]);
+if(q===17)return "ワシ、見たで！ …何も見てへんけどな！"+t;
+if(q===18)return "アリバイ？ ワシのが一番ガバガバや！ ははは！";
+if(q===19)return "誰も見てへん。…いや、全員見たで。どっちやねん！";
+if(q>19)return pick(["苦手なんはナスや。ナス以外は全員好きやで！","好きなんは全員や。嫌いなんも全員やけどな！"]);
+return pick(SHL[q-1]).replace("{t}",cs[1])}
 const NV0=0;
 const pk=(i,q)=>{if(i>=10)return pk2(i,q);const c=i===cul,p=G[q-1][c?1:0],n=Math.floor(Math.random()*(p.length+1)),nv=Math.random()<(c?.6:.15),pre=nv?NERV[Math.floor(Math.random()*4)]:"";if(nv)NV[i]=(NV[i]||0)+1;const b=n<p.length?PRE[i]+p[n]+E[i]:A[i][q];return pre+b.replace("{t}",cs[1])};
 const RFS=[["……その時間のことは、答えたくない","それは、言いたくない","黙秘する。話すつもりはない"],["利用者さんの個人情報に関わるので、その時間の話は言えない","守秘義務があるので、詳しくは言えない","時間のことは、記録を見てほしい。口頭では答えられない"]];
@@ -154,7 +171,7 @@ const fm=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2
 const calc=(ok,n,s,h,x=0)=>{const hp=Math.min(h,5)*4000,cl=ok?20000:0,sk=ok?10000:0,tb=ok?Math.max(0,MAX-n)*2500:0,sb=ok?Math.round(Math.max(0,450-s)*50):0;return{hp,cl,sk,tb,sb,x,tot:Math.max(1000,hp+cl+sk+tb+sb+x)}};
 const rank=p=>p>=80000?"S":p>=65000?"A":p>=50000?"B":"C";
 const relAdd=(i,q)=>{const d=tg[i];let e=null;
- const z=i===cul?fk:al[i],o=told[i]||(told[i]={});if(q===0||q===14)o.p=z.p;if(q===10||q===14)o.a=z.a;if(q===11||q===14)o.t=z.t;if(q===20)o.g=(i===cul?lkf:lk[i]).g;if(q===21)o.f=(i===cul?lkf:lk[i]).f;
+ const z=i===16?SHz:i===cul?fk:al[i],o=told[i]||(told[i]={});if(q===0||q===14)o.p=z.p;if(q===10||q===14)o.a=z.a;if(q===11||q===14)o.t=z.t;if(q===20)o.g=(i===cul?lkf:lk[i]).g;if(q===21)o.f=(i===cul?lkf:lk[i]).f;
  if(q===16||q===17)e=[d.t,"sus","怪しい"];
  else if(q===18)e=[d.u,"dis","アリバイ不信"];
  else if(q===19&&i!==cul)e=[d.v,"see",d.v===cul?cp+"の近くで目撃":al[d.v].p+"で目撃"];
@@ -183,12 +200,12 @@ const tlDraw=()=>{
   if(rel.some(r=>r.t===i&&r.ty==="see"&&r.lb===cp+"の近くで目撃"))s+=`<circle cx="${xc}" cy="${y+19}" r="6" style="fill:var(--acc);stroke:var(--card);stroke-width:2"/><text x="${xc+9}" y="${y+22}" font-size="8.5" style="fill:var(--acc)">現場付近で目撃</text>`});
  return s+'</svg>'};
 const GAME_URL="https://claude.ai/artifact/92rgswc93zsyD4dbeZNvSD";
-const tweet=()=>{const r=last,tx=(r.ok?"🔍「つながる介護の夜」推理ゲームで犯人を見破った！":"🔍「つながる介護の夜」推理ゲームで犯人を取り逃がした…")+"\nランク："+r.rk+"\nターン："+r.turn+"\n推理時間："+fm(r.sc)+"\nスコア："+r.pt.toLocaleString()+(r.ok?"\n犯人は"+S[cul][0]:"")+"\n#つながる介護の夜";return"https://twitter.com/intent/tweet?text="+encodeURIComponent(tx)+"&url="+encodeURIComponent(GAME_URL)};
+const tweet=()=>{const r=last,tx=(r.ok?"🔍「つながる介護の夜」推理ゲームで犯人を見破った！":"🔍「つながる介護の夜」推理ゲームで犯人を取り逃がした…")+"\nランク："+r.rk+"\nターン："+r.turn+"\n推理時間："+fm(r.sc)+"\nスコア："+r.pt.toLocaleString()+(r.ok?"\n犯人は"+S[cul][1]+S[cul][0]:"")+"\n#つながる介護の夜";return"https://twitter.com/intent/tweet?text="+encodeURIComponent(tx)+"&url="+encodeURIComponent(GAME_URL)};
 const isA=q=>q===0||(q>=10&&q<=15)||q>=20;
 const stm=i=>{const a=al[i];return PRE[i]+a.t+"、ずっと"+a.p+"で"+a.a+"いた"+E[i]+a.w+"と言葉も交わした"+E[i]+dn(lk[i].f)+"とは気が合う"+E[i]+dn(lk[i].g)+"は"+GR[lk[i].r]+E[i]};
 const qt=q=>Q[q].replace("{t}",cs[1]);
 const at=(i,q)=>{const r=at0(i,q);return i>=10&&(q===0||q>9)&&Math.random()<.6?fv(i)+r:r};
-const at0=(i,q)=>{
+const at0=(i,q)=>{if(i===16)return shAt(q);
  const a=al[i],f=fk,e=E[i],c=i===cul,d=tg[i];
  if(q>19){const z=c?lkf:lk[i],t=q===20?z.g:z.f;return PRE[i]+(q===20?dn(t)+"は"+GR[lk[i].r]:dn(t)+"とは気が合う")+e}
  if(q===0)return"昨夜22:00は"+(c?f.p:a.p)+"にいた"+e;
@@ -203,7 +220,7 @@ const at0=(i,q)=>{
 const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 let sus,cul,sharp,turn,sel,asked,over,cs,ag,cp,al,fk,tg,t0,tmr,rel,told,hits,last,NV,RF,mad,MDn,evOn,evUsed,ev,evBad,AL,MD2,IT,unl,rc,lk,lkf,swc,swGot,tbGot;
 function init(){
- sus=sh([...Array(14).keys()]).slice(0,4);[[14,.06],[15,.05]].forEach(([k,p])=>{if(Math.random()<p){let j;do{j=Math.floor(Math.random()*4)}while(sus[j]>=14);sus[j]=k}});const cc=sus.filter(x=>x!==14);cul=cc[Math.floor(Math.random()*cc.length)];
+ sus=sh([...Array(14).keys()]).slice(0,4);[[14,.06],[15,.05],[16,.05]].forEach(([k,p])=>{if(Math.random()<p){let j;do{j=Math.floor(Math.random()*4)}while(sus[j]>=14);sus[j]=k}});const cc=sus.filter(x=>x!==14&&x!==16);cul=cc[Math.floor(Math.random()*cc.length)];
  sharp=new Set(sh([...Array(S.length).keys()]).slice(0,SH));
  turn=0;sel=null;over=false;asked={};ag={};sus.forEach(i=>{asked[i]=new Set();ag[i]=0});
  const ci=Math.floor(Math.random()*C.length);cs=C[ci];cp=CP[ci];
@@ -211,7 +228,7 @@ function init(){
  al={};sus.forEach((i,k)=>al[i]={p:pl[k],a:ac[k],t:tm[k],w:wt[k]});
  fk=Math.random()<.25?{p:al[cul].p,a:al[cul].a,t:al[cul].t}:{p:pl[4],a:ac[4],t:tm[4]};
  sus.forEach(i=>{if(SPA[i]){al[i].a=sh(SPA[i])[0];al[i].w=SW[i]}});if(SPA[cul])fk.a=(fk.p===al[cul].p&&fk.t===al[cul].t)?al[cul].a:sh(SPA[cul].filter(x=>x!==al[cul].a))[0];
- LKG();if(cul===15){lkf={...lk[15]};fk={...al[15]}}tg={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),r=()=>o[Math.floor(Math.random()*o.length)];tg[i]={t:r(),u:r(),v:r(),r:Math.floor(Math.random()*6)}});{const c0=sus.filter(x=>x!==cul),c1=c0.filter(x=>x!==10&&x!==12&&x!==14),w=sh(c1.length?c1:c0)[0];tg[w].v=cul}
+ LKG();if(cul===15){lkf={...lk[15]};fk={...al[15]}}tg={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),r=()=>o[Math.floor(Math.random()*o.length)];tg[i]={t:r(),u:r(),v:r(),r:Math.floor(Math.random()*6)}});{const c0=sus.filter(x=>x!==cul),c1=c0.filter(x=>x!==10&&x!==12&&x!==14&&x!==16),w=sh(c1.length?c1:c0)[0];tg[w].v=cul}
  rc=()=>$("case").innerHTML=cs[0]+"施設にいたのは4人の容疑者。犯人は、この中にいる。事件が起きたのは22:00ごろ。証言の矛盾を見抜け。<br><b>最初の証言</b>"+sus.map(i=>"<div>"+S[i][1]+" <b>"+S[i][0]+"</b>："+stmS(i)+"</div>").join("");
  IT={};unl={};swc=0;swGot=0;tbGot=0;rbc=0;boomF=false;endDelay=2600;rc();$("log").innerHTML="";rel=[];told={};NV={};RF={};AL={};MD2={};mad={};MDn=0;evOn=false;evUsed=false;evBad=0;ev=null;$("evp").classList.remove("show");hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
 }
@@ -233,7 +250,7 @@ function draw(){
  
 }
 function ask(q){
- const i=sel,mt=isMute(i),rf=!mt&&i!==15&&isA(q)&&Math.random()<(i===cul?.25:.12),fg=!mt&&i!==15&&!rf&&(q===0||q===3||q===8||q===19||(q>=10&&q<=15))&&!(q===19&&i!==cul&&tg[i].v===cul)&&Math.random()<.35,hit=!rf&&!fg&&i===cul&&isA(q),was=ag[i]>=PT;
+ const i=sel,mt=isMute(i),rf=!mt&&i!==15&&i!==16&&isA(q)&&Math.random()<(i===cul?.25:.12),fg=!mt&&i!==15&&i!==16&&!rf&&(q===0||q===3||q===8||q===19||(q>=10&&q<=15))&&!(q===19&&i!==cul&&tg[i].v===cul)&&Math.random()<.35,hit=!rf&&!fg&&i===cul&&isA(q),was=ag[i]>=PT;
  asked[i].add(q);adv();
  let t,sharp2=false;
  if(rf){const sp=Math.random()<(i===cul?.7:.35),a=RFS[sp?0:1];RF[i]=(RF[i]||0)+(sp?2:-1);t=PRE[i]+a[Math.floor(Math.random()*a.length)]+"。"}
