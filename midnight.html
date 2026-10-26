@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>つながる介護の夜 ─ 10回くらいは楽しめる推理ゲーム</title>
+<title>つながる介護の夜 ─ 10回くらいは遊べる推理ゲーム</title>
 <style>
 :root{--bg:#f4efe6;--card:#fffaf0;--ink:#2a2118;--sub:#7a6a58;--acc:#a3262a;--line:#d8cbb6;--bub:#ece2cf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#16120e;--card:#221c15;--ink:#f0e6d4;--sub:#a8987f;--acc:#e0555a;--line:#3a3023;--bub:#2d251b}}
@@ -48,6 +48,7 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 .shake{animation:sh .7s infinite}
 @keyframes sh{0%,100%{transform:translate(0,0) rotate(0)}15%{transform:translate(-6px,2px) rotate(-8deg)}35%{transform:translate(6px,-2px) rotate(8deg)}55%{transform:translate(-5px,1px) rotate(-6deg)}75%{transform:translate(5px,-1px) rotate(6deg)}}
 #qa{flex:none;max-height:44vh;overflow-y:auto;border-top:1px solid var(--line);padding-top:6px}
+.s.gone{filter:brightness(.2) grayscale(1);opacity:.6;pointer-events:none}
 .qs{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
 .q{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:left;font:inherit;color:inherit;cursor:pointer}
 .q:hover{border-color:var(--acc)}
@@ -119,8 +120,8 @@ const G=[
 [["夕方、{t}を見かけたのが最後だ","昼過ぎに、{t}を見たのが最後だ","夜勤の引き継ぎで、{t}を見たきりだ"],["{t}は、ずっと見ていないことにしておきたい","{t}を最後に見たのは、思い出せない","{t}は、夕方に見たような気がする"]],
 [["やっていない、絶対にやっていない","疑われるのは、心外でならない","私にそんなことをする理由は、ない"],["やっていないと、言うしかない","私がやったという証拠は、どこにもない","疑うなら、証拠を出してほしい"]]];
 const pick=a=>a[Math.floor(Math.random()*a.length)];
-const isMute=i=>i===14||((i===10||i===12)&&!unl[i]);
-const mutePh=i=>pick(i===14?["みゃーん","みゃー","にゃおーん"]:i===10?["フガフガ…（しゃべりにくそうだ）","フガ、フガフガ…"]:["ワンワン","ワォーン","クゥン…"]);
+const isMute=i=>i===14||((i===10||i===12)&&!unl[i])||medT[i]>turn;
+const mutePh=i=>medT[i]>turn?(i===10?"Zzz…":sp(i,"あわわ…誤薬だ…")):pick(i===14?["みゃーん","みゃー","にゃおーん"]:i===10?["フガフガ…（しゃべりにくそうだ）","フガ、フガフガ…"]:["ワンワン","ワォーン","クゥン…"]);
 const stmS=i=>i===17&&!unl[17]?kata(stm(17)):isMute(i)?(i===14?"みゃーん…（猫なので、何を言っているのか分からない）":i===10?"フガフガ…（しゃべりにくそうだ。何を言っているのか聞き取れない）":"ワンワン！（何を言っているのか、さっぱり分からない）"):stm(i);
 const SPA={17:["ベッドメイクをして","おむつ交換の準備をして","日本語の勉強をして","故郷の家族に電話をして","入居者の見守りをして","洗濯物をたたんで"],16:["パワポを作って","スプレッドシートを睨んで","ホワイトボードに何か書いて","オンライン会議をして","経費を精算して","名刺を整理して"],15:["巡回点検をして","充電をして","シーツ運搬をして","床の清掃をして","センサーの調整をして","入居者の見守りをして"],10:["お茶をすすって","編み物をして","時代劇を観て","仏壇に手を合わせて","うたた寝をして","歩行器の練習をして"],12:["お昼寝をして","ボール遊びをして","しっぽを追いかけて","おやつをねだって","ごろごろして","ひなたぼっこをして"]};
 const SW={17:"夜勤の職員さん",16:"夜勤の職員さん",15:"夜勤の職員さん",10:"夜勤の職員さん",12:"遊んでくれた職員さん"};
@@ -140,6 +141,7 @@ const adv=()=>{if(swc>0)swc--;else turn++};
 function swFind(){if(swGot||turn>=MAX||$("evp").classList.contains("show")||Math.random()>=.01)return;swGot=1;swc=3;$("evh").textContent="アイテムを発見！";$("evi").textContent="⏱️";$("evt").textContent="「ストップウォッチ」を手に入れた！ 3回まで、時間（ターン）の進行を止められる……！";$("evp").classList.add("show")}
 const bar=()=>{const a=[];
 if(evOn&&!evUsed)a.push(["ev",ev[1],"証拠品「"+ev[0]+"」："+(ev[1]==="📄"?"現場に残されていた。示された人物だと思う人を選んでつきつけよう":"現場に落ちていた。持ち主だと思う人を選んでつきつけよう")+"（人違いだと証拠は消える）"]);
+if(IT.med)a.push(["med","💊","？？？"]);if(IT.sen)a.push(["sen","🛏","？？？"]);
 if(IT.dent&&!unl[10])a.push(["dent","🦷","入れ歯：トメさんに差し上げると、ちゃんと話してくれる"]);
 if(IT.bau&&((sus.includes(12)&&!unl[12])||(sus.includes(17)&&!unl[17])))a.push(["bau","📟","バウリンガル（翻訳機）：ぽち／アディラに向けると、言葉が正しく分かる"]);
 if(IT.cake)a.push(["cake","🍰","ショートケーキ：女性にあげると喜ぶ"]);if(IT.cash)a.push(["cash","💴","札束：みんなだいすき"]);
@@ -147,10 +149,18 @@ if(IT.tab)a.push(["tab","🚬","たばこ：怒った相手に差し出す。50%
 if(swc>0)a.push(["sw","⏱️","ストップウォッチ：効果中（ターンが進まない）"]);
 return '<div class="ib"><b>アイテム：</b>'+(a.length?a.map(x=>`<button class="it" data-k="${x[0]}" title="${x[2]}">${x[1]}</button>`).join(""):'<span style="color:var(--sub);font-size:.8rem">なし</span>')+"</div>"};
 const wire=()=>{document.querySelectorAll(".q").forEach(b=>b.onclick=()=>ask(+b.dataset.q));document.querySelectorAll(".it").forEach(b=>b.onclick=()=>useIt(b.dataset.k))};
-var CT=false,TP={},SWT={},cakeGot=0,cashGot=0;
+var CT=false,medT={},senT={},medGot=0,senGot=0,TP={},SWT={},cakeGot=0,cashGot=0;
 function rollSW(){sus.forEach(i=>{const l=lv(i);SWT[i]=l==="H"?Math.random()<.4:l==="M"?Math.random()<.3:false})}
 const FEM=[1,3,5,7,10,11,13,17];
 function nwFind(){if(turn>=MAX||$("evp").classList.contains("show"))return;const k=!IT.cake&&!cakeGot&&Math.random()<.05?"cake":!IT.cash&&!cashGot&&Math.random()<.01?"cash":null;if(!k)return;if(k==="cake"){cakeGot=1;IT.cake=1}else{cashGot=1;IT.cash=1}$("evh").textContent="アイテムを発見！";$("evi").textContent=k==="cake"?"🍰":"💴";$("evt").textContent=k==="cake"?"「ショートケーキ」を手に入れた！ 女性にあげると喜ぶかもしれない……。（アイテム欄から使える）":"「札束」を手に入れた！ みんなだいすき……。（アイテム欄から使える）";$("evp").classList.add("show")}
+function nw2(){if(turn>=MAX||$("evp").classList.contains("show"))return;const a=!medGot&&Math.random()<.03,b=!senGot&&Math.random()<.03,k=a?"med":b?"sen":null;if(!k)return;if(k==="med"){medGot=1;IT.med=1}else{senGot=1;IT.sen=1}$("evh").textContent="アイテムを発見！";$("evi").textContent=k==="med"?"💊":"🛏";$("evt").textContent="謎のアイテム「？？？」を手に入れた！ 使い道は分からない……。（アイテム欄から使える）";$("evp").classList.add("show")}
+const STF=[0,9,7,5,4,11,2,1,17,13,3,8],SEN={0:"ご入居者様の身に何かあったやもしれません！ 失礼いたします！",9:"利用者様のお部屋で反応が！ ちょっと失礼しますよ！",7:"センサーに反応あり。利用者様が危険です、確認に向かいます！",5:"大変！ 入居者さんがベッドから落ちそうよ！ 行ってくるわ！",4:"転倒の恐れがある。直ちに向かう！",11:"入居者さんが大変ですっ！ ちょっと見てきますっ！",2:"やべ、入居者さんが！ 行ってくる！",1:"あらやだ、入居者さんが大変よぉ！ 飛んでいくわぁ！",17:"入居者さんが大変です！ 行ってきます！",13:"入居者さんが大変です！ 書類置いてすぐ行きます！",3:"入居者さんが大変だよ！ モップ置いて行ってくる！",8:"入居者さんが大変じゃ！ 見回りに行ってくるわい！"};
+function useMed(k){const i=sel,L=$("log"),say=h=>{L.insertAdjacentHTML("beforeend",h);const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})};
+ if(!(k==="med"?STF.includes(i)||i===10:STF.includes(i))){say(`<div class="b me"><small>探偵</small>${k==="med"?"💊":"🛏"} ……この人には、使えなさそうだ。</div>`);return}
+ IT[k]=0;
+ if(k==="med"){medT[i]=turn+3;say(`<div class="b me"><small>探偵</small>💊 くすりを差し出した。</div><div class="b me"><small>💊 異変</small>${i===10?"トメさんは、うとうとし始めた……。":S[i][0]+"の顔が青ざめた……！"}</div>`)}
+ else{senT[i]=turn+3;say(`<div class="b me"><small>探偵</small>🛏 見守りセンサーを突きつけた！</div><div class="b"><small>${S[i][1]} ${S[i][0]}</small>${sp(i,SEN[i])}</div><div class="b me"><small>🛏 異変</small>${S[i][0]}は、慌てて走り去っていった……。</div>`);sel=null}
+ draw()}
 function giveGift(k){const i=sel,L=$("log"),mt=isMute(i)||(i===17&&!unl[17]),f=FEM.includes(i),say=(me,he)=>{L.insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>${me}</div>`+(he?`<div class="b"><small>${S[i][1]} ${S[i][0]}</small>${he}</div>`:""));const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})};
  if(mt){say(k==="cake"?"🍰 どうぞ。":"💴 これを受け取ってくれ。","……（言葉が通じず、よく伝わらなかったようだ）");return}
  if(k==="cake"&&!f){say("🍰 ショートケーキをどうぞ。","……甘い物は、あまり得意ではないな。");return}
@@ -159,6 +169,7 @@ function giveGift(k){const i=sel,L=$("log"),mt=isMute(i)||(i===17&&!unl[17]),f=F
 function useIt(k){if(over||turn>=MAX||sel===null)return;
 if(k==="ev")present();
 else if(k==="cake"||k==="cash")giveGift(k);
+else if(k==="med"||k==="sen")useMed(k);
 else if((k==="dent"&&sel===10)||(k==="bau"&&(sel===12||sel===17)))useItem();
 else if(k==="tab"&&IT.tab&&mad[sel]>turn){IT.tab=0;const ok=Math.random()<.5;if(ok)mad[sel]=0;$("log").insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>🚬 まあ、一服どうぞ。</div><div class="b"><small>${S[sel][1]} ${S[sel][0]}</small>${ok?"……ふぅ。悪かったな、少し頭が冷えた。もう話してもいいぞ。":"……そんなもので機嫌が直ると思うな。（たばこは無駄になった）"}</div>`);draw();const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
 function tbFind(){if(tbGot||turn>=MAX||$("evp").classList.contains("show")||Math.random()>=.04)return;tbGot=1;IT.tab=1;$("evh").textContent="アイテムを発見！";$("evi").textContent="🚬";$("evt").textContent="「たばこ」を手に入れた！ 怒らせてしまった相手に差し出せば、機嫌が直るかもしれない……。（アイテム欄から使える）";$("evp").classList.add("show")}
@@ -233,7 +244,7 @@ const tlDraw=()=>{
   if(rel.some(r=>r.t===i&&r.ty==="see"&&r.lb===cp+"の近くで目撃"))s+=`<circle cx="${xc}" cy="${y+19}" r="6" style="fill:var(--acc);stroke:var(--card);stroke-width:2"/><text x="${xc+9}" y="${y+22}" font-size="8.5" style="fill:var(--acc)">現場付近で目撃</text>`});
  return s+'</svg>'};
 const GAME_URL="https://tsunagarukaigo.github.io/kaigodx/midnight.html";
-const tweet=()=>{const n=plays,avg=n?Math.round(totPt/n):0,rk2=avg<1000?"ランク外":rank(avg),hd=streak>=3?"🔥"+streak+"連続事件解決中！名探偵、夜を明かす…":streak>=1?"🕵️ 事件解決中！真夜中の介護施設で推理バトル":"🌙 真犯人を取り逃がした…リベンジ捜査中",tx="🔍「つながる介護の夜」\n"+hd+"\n⏱ 推理時間："+fm(totSec)+"　解決事件数："+solved+"/"+n+"\n🏅 探偵ランク："+rk2+" / "+totPt.toLocaleString()+"点\n#つながる介護の夜 #推理ゲーム";return"https://twitter.com/intent/tweet?text="+encodeURIComponent(tx)+"&url="+encodeURIComponent(GAME_URL)};
+const tweet=()=>{const n=plays,avg=n?Math.round(totPt/n):0,rk2=avg<1000?"ランク外":rank(avg),hd=streak>=3?"🔥"+streak+"連続事件解決中！名探偵、夜を明かす…":streak>=1?"🕵️ 事件解決！真夜中の介護施設で名推理":"🌙 真犯人を取り逃がした…リベンジ捜査中",tx="🔍「つながる介護の夜」\n"+hd+"\n⏱ 推理時間："+fm(totSec)+"　解決事件数："+solved+"\n🏅 探偵ランク："+rk2+" / "+totPt.toLocaleString()+"点\n#つながる介護の夜 #推理ゲーム";return"https://twitter.com/intent/tweet?text="+encodeURIComponent(tx)+"&url="+encodeURIComponent(GAME_URL)};
 const isA=q=>q===0||(q>=10&&q<=15)||q>=20;
 const stm=i=>{const a=al[i];return PRE[i]+a.t+"、ずっと"+a.p+"で"+a.a+"いた"+E[i]+a.w+"と言葉も交わした"+E[i]+dn(lk[i].f)+"とは気が合う"+E[i]+dn(lk[i].g)+"は"+GR[lk[i].r]+E[i]};
 const qt=q=>Q[q].replace("{t}",cs[1]);
@@ -321,14 +332,14 @@ function init(){
  sus.forEach(i=>{if(SPA[i]){al[i].a=sh(SPA[i])[0];al[i].w=SW[i]}});if(SPA[cul])fk.a=(fk.p===al[cul].p&&fk.t===al[cul].t)?al[cul].a:sh(SPA[cul].filter(x=>x!==al[cul].a))[0];
  LKG();if(cul===15){lkf={...lk[15]};fk={...al[15]}}tg={};sus.forEach(i=>{const o=sus.filter(x=>x!==i),r=()=>o[Math.floor(Math.random()*o.length)];tg[i]={t:r(),u:r(),v:r(),r:Math.floor(Math.random()*6)}});{const c0=sus.filter(x=>x!==cul),c1=c0.filter(x=>x!==10&&x!==12&&x!==14&&x!==16),w=sh(c1.length?c1:c0)[0];tg[w].v=cul}
  rc=()=>$("case").innerHTML=cs[0]+"施設にいたのは4人の容疑者。犯人は、この中にいる。事件が起きたのは22:00ごろ。証言の矛盾を見抜け。<br><b>最初の証言</b>"+sus.map(i=>"<div>"+S[i][1]+" <b>"+S[i][0]+"</b>："+stmS(i)+"</div>").join("");
- CT=false;IT={};unl={};TP={};SWT={};cakeGot=0;cashGot=0;swc=0;swGot=0;tbGot=0;rbc=0;boomF=false;endDelay=2600;rc();$("log").innerHTML="";rel=[];told={};NV={};RF={};AL={};MD2={};mad={};MDn=0;evOn=false;evUsed=false;evBad=0;ev=null;$("evp").classList.remove("show");hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
+ CT=false;IT={};unl={};TP={};SWT={};medT={};senT={};medGot=0;senGot=0;cakeGot=0;cashGot=0;swc=0;swGot=0;tbGot=0;rbc=0;boomF=false;endDelay=2600;rc();$("log").innerHTML="";rel=[];told={};NV={};RF={};AL={};MD2={};mad={};MDn=0;evOn=false;evUsed=false;evBad=0;ev=null;$("evp").classList.remove("show");hits=0;t0=Date.now();clearInterval(tmr);$("tm").textContent="⏱ 00:00";tmr=setInterval(()=>{$("tm").textContent="⏱ "+fm(Math.floor((Date.now()-t0)/1000))},1000);$("ov").classList.remove("show");draw();
 }
 const hm=m=>Math.floor(m/60)+":"+String(m%60).padStart(2,"0");
 function tlBar(){const e=$("tl");if(!e.firstChild){let h='<div class="trk"><div class="fl" id="tlf"></div>';for(let k=1;k<MAX;k++)h+='<i class="tk'+(k%4?'':' h')+'" style="left:'+k/MAX*100+'%"></i>';h+='</div>';for(let k=0;k<=4;k++)h+='<span class="lb" style="left:'+k*25+'%;transform:translateX(-'+k*25+'%)">'+k+':00</span>';e.innerHTML=h}$("tlf").style.width=turn/MAX*100+"%";e.classList.toggle("stp",swc>0)}
 function draw(){
  $("turn").textContent="🌙 "+hm(turn*15);tlBar();
- $("sus").innerHTML=sus.map(i=>`<button class="s${sel===i?" on":""}" data-i="${i}"><span class="ic${ag[i]>=PT?" shake":""}" id="ic${i}">${S[i][1]}</span><span class="nm">${S[i][0]}${mad[i]>turn?"💢":""}${SWT[i]?"💦":""}</span><br><span class="ds">${S[i][2]}</span></button>`).join("");
- document.querySelectorAll(".s").forEach(b=>b.onclick=()=>{if(!over){sel=+b.dataset.i;draw()}});
+ $("sus").innerHTML=sus.map(i=>`<button class="s${sel===i?" on":""}${senT[i]>turn?" gone":""}" data-i="${i}"><span class="ic${ag[i]>=PT?" shake":""}" id="ic${i}">${S[i][1]}</span><span class="nm">${S[i][0]}${mad[i]>turn?"💢":""}${SWT[i]?"💦":""}${medT[i]>turn?(i===10?"💤":"😰"):""}</span><br><span class="ds">${S[i][2]}</span></button>`).join("");
+ document.querySelectorAll(".s").forEach(b=>b.onclick=()=>{if(!over&&!(senT[+b.dataset.i]>turn)){sel=+b.dataset.i;draw()}});
  const qa=$("qa");
  if(turn>=MAX){qa.innerHTML='<div class="hint">調査は終了した。犯人を指名せよ！</div>';return}
  if(sel===null){qa.innerHTML='<div class="hint">質問したい被疑者を選んでください</div>';return}
@@ -355,8 +366,8 @@ function ask(q){
  if(i===17&&!unl[17]&&!mt)t=kata(t);if(i===12&&!mt)t="🔊"+t;L.insertAdjacentHTML("beforeend",`<div class="b me"><small>探偵</small>${qt(q)}</div><div class="b"><small>${S[i][1]} ${S[i][0]}</small>${t}</div>`);
  {const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})};
  if(ag[i]>=PT&&!was){L.insertAdjacentHTML("beforeend",`<div class="b me"><small>💦 異変</small>${S[i][0]}の様子がおかしい……体が震えている！</div>`);{const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
- if(q!==22&&Math.random()<(q===9&&i!==cul?.25:.03)+(asked[i].size>=7?.08:0)){mad[i]=turn+3;MDn++;MD2[i]=(MD2[i]||0)+1;L.insertAdjacentHTML("beforeend",`<div class="b me"><small>💢 異変</small>${S[i][0]}は機嫌を損ねてしまった……しばらく話してくれない。</div>`);{const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
- CT=Math.random()<.05;rollSW();catRb(i,q);itemFind();swFind();tbFind();nwFind();if(!evOn&&!$("evp").classList.contains("show")&&turn<MAX&&Math.random()<.06){evOn=true;$("evh").textContent="重要な証拠品を発見！";ev=pick([["服のボタン","🔘"],["ネックレス","📿"],["ダイイングメッセージ","📄"]]);$("evi").textContent=ev[1];$("evt").textContent=ev[1]==="📄"?"現場に「"+ev[0]+"」が残されていた！ 示された人物は、この中にいる……。（アイテム欄に入った）":"現場から「"+ev[0]+"」が見つかった！ 持ち主は、この中にいる……。（アイテム欄に入った）";$("evp").classList.add("show")}
+ if(q!==22&&!mt&&Math.random()<(q===9&&i!==cul?.25:.03)+(asked[i].size>=7?.08:0)){mad[i]=turn+3;MDn++;MD2[i]=(MD2[i]||0)+1;L.insertAdjacentHTML("beforeend",`<div class="b me"><small>💢 異変</small>${S[i][0]}は機嫌を損ねてしまった……しばらく話してくれない。</div>`);{const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})}}
+ CT=Math.random()<.05;rollSW();catRb(i,q);itemFind();swFind();tbFind();nwFind();nw2();if(!evOn&&!$("evp").classList.contains("show")&&turn<MAX&&Math.random()<.06){evOn=true;$("evh").textContent="重要な証拠品を発見！";ev=pick([["服のボタン","🔘"],["ネックレス","📿"],["ダイイングメッセージ","📄"]]);$("evi").textContent=ev[1];$("evt").textContent=ev[1]==="📄"?"現場に「"+ev[0]+"」が残されていた！ 示された人物は、この中にいる……。（アイテム欄に入った）":"現場から「"+ev[0]+"」が見つかった！ 持ち主は、この中にいる……。（アイテム欄に入った）";$("evp").classList.add("show")}
  draw();
 }
 function present(){const i=sel;if(over||!evOn||evUsed)return;evUsed=true;adv();const L=$("log");
@@ -373,7 +384,7 @@ $("acc").onclick=()=>{
  $("ot").innerHTML=boomF?`胡椒は黒煙を噴き上げ、大爆発を起こしてしまった……。<br>真犯人は ${S[cul][1]} ${S[cul][0]} でした。`:ok?`${S[cul][1]} ${S[cul][0]}が犯人でした。動揺を見逃さない、見事な推理です！<br>（${turn}ターンで解決）`:sel===cul?`${S[sel][0]}は確かに犯人だった。だが震えるほどの動揺を引き出せず、証拠不十分のまま取り逃がしてしまった……。`:`${S[sel][0]}は犯人ではなかった……。無実の人を告発してしまった。<br>真犯人は ${S[cul][1]} ${S[cul][0]} でした。`;
  clearInterval(tmr);const ib2=ok?(unl[10]?30000:0)+(unl[12]?30000:0)+(unl[17]?30000:0):0,sc=Math.floor((Date.now()-t0)/1000),b=calc(ok,turn,sc,hits,-MDn*5000-evBad*50000+ib2),pt=ok?b.tot:-(50000+5000+Math.round(Math.max(0,450-sc)*50)+Math.max(0,MAX-turn)*2500),rk=ok?rank(pt):"ランク外",f=n=>n.toLocaleString();
  plays++;if(ok){solved++;streak++}else streak=0;totPt+=pt;totSec+=sc;last={ok,turn,sc,pt,rk};
- $("ot").innerHTML+=`<p>ターン <b>${turn}</b>　推理時間 <b>${fm(sc)}</b><br>${ok?"ランク ":""}<b style="font-size:2rem;color:var(--acc)">${rk}</b></p><hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0">スコア：<b style="font-size:1.5rem">${f(pt)}</b></p>${ok?`<p style="line-height:1.8;margin:0;font-size:.9rem;color:var(--sub)">時間ボーナス：${f(b.sb)}<br>ターンボーナス：${f(b.tb)}<br>推理力：${f(b.hp+b.cl+b.sk)}${ib2?`<br>アイテムボーナス：${f(ib2)}`:""}</p>`:""}${plays>=2?`<hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0;font-size:.95rem">解決事件数：<b>${solved} / ${plays}</b>　通算スコア：<b>${f(totPt)}</b></p>`:""}`;
+ $("ot").innerHTML+=`<p>ターン <b>${turn}</b>　推理時間 <b>${fm(sc)}</b><br>${ok?"ランク ":""}<b style="font-size:2rem;color:var(--acc)">${rk}</b></p><hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0">スコア：<b style="font-size:1.5rem">${f(pt)}</b></p>${ok?`<p style="line-height:1.8;margin:0;font-size:.9rem;color:var(--sub)">時間ボーナス：${f(b.sb)}<br>ターンボーナス：${f(b.tb)}<br>推理力：${f(b.hp+b.cl+b.sk)}${ib2?`<br>アイテムボーナス：${f(ib2)}`:""}</p>`:""}${plays>=2?`<hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0;font-size:.95rem">解決事件数：<b>${solved}</b>　通算スコア：<b>${f(totPt)}</b></p>`:""}`;
  setTimeout(()=>{$("ov").classList.add("show");SND.end(ok)},endDelay);endDelay=2600;
 };
 const PF=[
