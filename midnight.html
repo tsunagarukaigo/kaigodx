@@ -222,7 +222,7 @@ const tlDraw=()=>{
    s+=lb("再証言："+(o.p||"？")+"｜"+(o.a||"？"),bx,y+48,"var(--acc)")}
   if(rel.some(r=>r.t===i&&r.ty==="see"&&r.lb===cp+"の近くで目撃"))s+=`<circle cx="${xc}" cy="${y+19}" r="6" style="fill:var(--acc);stroke:var(--card);stroke-width:2"/><text x="${xc+9}" y="${y+22}" font-size="8.5" style="fill:var(--acc)">現場付近で目撃</text>`});
  return s+'</svg>'};
-const GAME_URL="https://tsunagarukaigo.github.io/kaigodx/midnirht.hyml";
+const GAME_URL="https://tsunagarukaigo.github.io/kaigodx/midnirht.html";
 const tweet=()=>{const r=last,tx=(r.ok?"🔍「つながる介護の夜」推理ゲームで犯人を見破った！":"🔍「つながる介護の夜」推理ゲームで犯人を取り逃がした…")+"\nランク："+r.rk+"\nターン："+r.turn+"\n推理時間："+fm(r.sc)+"\nスコア："+r.pt.toLocaleString()+(r.ok?"\n犯人は"+S[cul][1]+S[cul][0]:"")+"\n#つながる介護の夜";return"https://twitter.com/intent/tweet?text="+encodeURIComponent(tx)+"&url="+encodeURIComponent(GAME_URL)};
 const isA=q=>q===0||(q>=10&&q<=15)||q>=20;
 const stm=i=>{const a=al[i];return PRE[i]+a.t+"、ずっと"+a.p+"で"+a.a+"いた"+E[i]+a.w+"と言葉も交わした"+E[i]+dn(lk[i].f)+"とは気が合う"+E[i]+dn(lk[i].g)+"は"+GR[lk[i].r]+E[i]};
