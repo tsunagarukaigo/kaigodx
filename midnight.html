@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>つながる介護の夜 ─ 10回くらいは遊べる推理ゲーム</title>
+<title>つながる介護の夜 ─ 推理ゲーム</title>
 <style>
 :root{--bg:#f4efe6;--card:#fffaf0;--ink:#2a2118;--sub:#7a6a58;--acc:#a3262a;--line:#d8cbb6;--bub:#ece2cf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#16120e;--card:#221c15;--ink:#f0e6d4;--sub:#a8987f;--acc:#e0555a;--line:#3a3023;--bub:#2d251b}}
@@ -79,12 +79,12 @@ header{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:cen
 <button class="accuse" id="gdc">捜査開始！</button></div></div>
 <div class="evp" id="evp"><div class="evb"><div class="evi" id="evi"></div><h3 id="evh">重要な証拠品を発見！</h3><p id="evt"></p><button class="accuse" id="evc">OK</button></div></div>
 <div class="op" id="op"><div class="flash" id="fl"></div><svg class="fac" viewBox="0 0 300 140" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><rect x="-120" y="98" width="112" height="42"/><polygon points="-126,98 -64,80 -2,98"/><rect class="w" x="-106" y="110" width="8" height="11" style="--d:8.5s;--r:-2.8s"/><rect class="w" x="-84" y="110" width="8" height="11" style="--d:4.1s;--r:-3.1s"/><rect x="312" y="94" width="112" height="46"/><polygon points="306,94 368,74 430,94"/><rect class="w" x="326" y="108" width="8" height="11" style="--d:3.5s;--r:-4.9s"/><rect class="w" x="370" y="108" width="8" height="11" style="--d:8.8s;--r:-3.9s"/><rect x="10" y="70" width="80" height="70"/><rect x="90" y="40" width="120" height="100"/><rect x="112" y="22" width="76" height="18" data-sign="1" style="pointer-events:auto;cursor:pointer"/><rect x="210" y="70" width="80" height="70"/><rect x="134" y="108" width="32" height="4"/><rect x="135" y="112" width="3" height="28"/><rect x="162" y="112" width="3" height="28"/><polygon points="165,128 194,140 165,140"/><text class="sg" data-sign="1" x="150" y="35.5" text-anchor="middle" font-size="10" font-family="Hiragino Mincho ProN,Yu Mincho,serif">つながる介護</text><rect class="w c" x="18" y="80" width="10" height="12" style="--d:6.2s;--r:-0.4s"/><rect class="w" x="36" y="80" width="10" height="12" style="--d:3.2s;--r:-2.8s"/><rect class="w" x="54" y="80" width="10" height="12" style="--d:6.1s;--r:-3.8s"/><rect class="w" x="72" y="80" width="10" height="12" style="--d:5.7s;--r:-1.7s"/><rect class="w" x="98" y="50" width="10" height="12" style="--d:4.7s;--r:-0.4s"/><rect class="w" x="134" y="50" width="10" height="12" style="--d:5.3s;--r:-5.7s"/><rect class="w" x="170" y="50" width="10" height="12" style="--d:8.5s;--r:-2.8s"/><rect class="w c" x="98" y="72" width="10" height="12" style="--d:6.8s;--r:-4.7s"/><rect class="w c" x="116" y="72" width="10" height="12" style="--d:5.0s;--r:-5.8s"/><rect class="w" x="152" y="72" width="10" height="12" style="--d:3.6s;--r:-0.4s"/><rect class="w" x="188" y="72" width="10" height="12" style="--d:5.7s;--r:-1.1s"/><rect class="w" x="116" y="94" width="10" height="12" style="--d:3.7s;--r:-2.5s"/><rect class="w" x="134" y="94" width="10" height="12" style="--d:8.8s;--r:-4.8s"/><rect class="w" x="152" y="94" width="10" height="12" style="--d:4.3s;--r:-2.4s"/><rect class="w" x="218" y="80" width="10" height="12" style="--d:4.3s;--r:-1.5s"/><rect class="w" x="254" y="80" width="10" height="12" style="--d:3.4s;--r:-0.5s"/><rect class="w" x="218" y="104" width="10" height="12" style="--d:5.2s;--r:-2.7s"/><rect class="w" x="254" y="104" width="10" height="12" style="--d:8.2s;--r:-1.1s"/><rect class="w" x="272" y="104" width="10" height="12" style="--d:7.9s;--r:-1.5s"/><rect class="w" x="142" y="114" width="16" height="26" style="--d:8s;--r:-1s"/></svg><div class="t l1">明けない夜は、ミッドナイト</div><h1 class="t">つながる介護の夜</h1><div class="t l2">犯人はこの中に、いる。</div><button class="t accuse st" id="st">捜査を始める</button><div class="t note">※ 光の点滅演出があります</div></div>
-<div class="ov" id="ov"><div class="box"><h2 id="oh"></h2><div id="ot"></div><p style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="accuse sub" id="tw">Xにつぶやく</button><button class="accuse sub" id="lgb">捜査ログ</button><button class="accuse" id="rt">タイトルに戻る</button></p></div></div>
+<div class="ov" id="ov"><div class="box"><h2 id="oh"></h2><div id="ot"></div><p style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="accuse sub" id="tw">Xにつぶやく</button><button class="accuse sub" id="lgb">捜査ログ</button><button class="accuse sub" id="nx">次の事件へ</button><button class="accuse" id="rt">タイトルに戻る</button></p></div></div>
 <div class="ov" id="rv"><div class="box" style="max-width:420px;width:100%;max-height:88vh;overflow:auto"><div class="rvh"><h2>捜査ログ</h2><div class="btns"><button class="accuse sub" id="lgt">尋問記録</button><button class="accuse sub on" id="tt">タイムグラフ</button><button class="accuse sub" id="tr">相関図</button><button class="accuse sub" id="rvc">✕ 閉じる</button></div></div><div id="rvb"></div></div></div>
 <script>
 const MAX=16,SH=5,PT=3;
 const S=[["白鳥","👴","理事長/72歳"],["舞","👩‍🦳","ヘルパー/62歳"],["レン","🧑‍🦱","介護士/28歳"],["ひなた","🧹","清掃員/19歳"],["神崎","🧘","ｾﾗﾋﾟｽﾄ/45歳"],["麻里奈","💉","ナース/31歳"],["ソラ","👦","家族/10歳"],["氷室","📋","ケアマネ/37歳"],["源さん","💂","守衛さん/62歳"],["鷹村","🤵","事務長/49歳"],["トメさん","👵","入居者/95歳"],["あかり","🥗","栄養士/31歳"],["ぽち","🐕","セラピー犬/7歳"],["優花","👩‍💼","事務員/35歳"],["みーたん","🐱","猫/3歳"],["胡椒","🤖","介護ロボ/不明"],["シログラス","👨‍🦲","コンサル/50歳"],["アディラ","👩🏾","特定技能/24歳"]];
-const Q=["昨夜22時、あなたはどこにいましたか？","施設長とは、どんな関係ですか？","最近、お金に困っていませんか？","事件の夜、何か物音を聞きましたか？","他の人で、怪しいと思う人はいますか？","顔色が優れないようですが、どうされました？","事件の現場に、普段から出入りしていましたか？","施設長を恨んでいる人に心当たりは？","事件の前、{t}を最後に見たのはいつですか？","正直に答えてください。あなたがやったのですか？","そのとき、何をしていましたか？","何時から何時まで、そこにいましたか？","そこで、誰かと会いましたか？","その間、一度でもそこを離れましたか？","昨夜の行動を、もう一度最初から話してください。","そこにいた証拠はありますか？","この中で、誰が一番怪しいと思いますか？","その人が怪しいと思う理由は何ですか？","他の人のアリバイは信用できますか？","事件のころ、施設内で誰かを見かけませんでしたか？","普段、苦手な人や、よく思っていない人はいますか？","普段、特に仲の良い人はいますか？","それは矛盾していないか？"];
+const Q=["昨夜22時、あなたはどこにいましたか？","何か思い当たることは？","最近、お金に困っていませんか？","事件の夜、何か物音を聞きましたか？","他の人で、怪しいと思う人はいますか？","顔色が優れないようですが、どうされました？","事件の現場に、普段から出入りしていましたか？","施設長を恨んでいる人に心当たりは？","事件の前、{t}を最後に見たのはいつですか？","正直に答えてください。あなたがやったのですか？","そのとき、何をしていましたか？","何時から何時まで、そこにいましたか？","そこで、誰かと会いましたか？","その間、一度でもそこを離れましたか？","昨夜の行動を、もう一度最初から話してください。","そこにいた証拠はありますか？","この中で、誰が一番怪しいと思いますか？","その人が怪しいと思う理由は何ですか？","他の人のアリバイは信用できますか？","事件のころ、施設内で誰かを見かけませんでしたか？","普段、苦手な人や、よく思っていない人はいますか？","普段、特に仲の良い人はいますか？","それは矛盾していないか？"];
 const C=[["真夜中、介護施設「つながる介護」の給湯室から、施設長の秘蔵のカップラーメンが盗まれた。","施設長のカップラーメン"],["真夜中、介護施設「つながる介護」の施設長室で、施設長が殺された。","施設長"],["真夜中、介護施設「つながる介護」で、入居者ウメ子さんの通帳が居室から盗まれた。","ウメ子さんの通帳"],["真夜中、介護施設「つながる介護」の休憩室から、おやつが大量になくなった。","休憩室のおやつ"],["真夜中、介護施設「つながる介護」のリネン室から出火。シーツも備品も灰になった。","リネン室"],["真夜中、介護施設「つながる介護」の介護記録が書き換えられていた。本物の記録は行方不明だ。","本物の介護記録"],["真夜中、介護施設「つながる介護」で、入居者北海五郎さんの入れ歯が盗まれた。","北海五郎さんの入れ歯"],["真夜中、介護施設「つながる介護」で、入居者松子さんの50万円の形見の指輪が消えた。","松子さんの形見の指輪"],["真夜中、介護施設「つながる介護」で、入居者ヨシ子さんの財布が消え、「誰かが盗んだ！」と大騒ぎになった。","ヨシ子さんの財布"],["真夜中、介護施設「つながる介護」で、入居者サブさんが居室から忽然と姿を消した。","サブさん"],["真夜中、介護施設「つながる介護」で、入居者カツ子さんの補聴器が、食事の片付けのあと行方不明になった。","カツ子さんの補聴器"]];
 const T=["アリバイ","施設長との関係","金銭事情","物音","他の容疑者","顔色・様子","現場の知識","恨み","最後の目撃","自白"];
 const A=[
@@ -227,7 +227,7 @@ const tlDraw=()=>{
   if(rel.some(r=>r.t===i&&r.ty==="see"&&r.lb===cp+"の近くで目撃"))s+=`<circle cx="${xc}" cy="${y+19}" r="6" style="fill:var(--acc);stroke:var(--card);stroke-width:2"/><text x="${xc+9}" y="${y+22}" font-size="8.5" style="fill:var(--acc)">現場付近で目撃</text>`});
  return s+'</svg>'};
 const GAME_URL="https://tsunagarukaigo.github.io/kaigodx/midnirht.hyml";
-const tweet=()=>{const r=last,tx=(r.ok?"🔍「つながる介護の夜」推理ゲームで犯人を見破った！":"🔍「つながる介護の夜」推理ゲームで犯人を取り逃がした…")+"\nランク："+r.rk+"\nターン："+r.turn+"\n推理時間："+fm(r.sc)+"\nスコア："+r.pt.toLocaleString()+(r.ok?"\n犯人は"+S[cul][1]+S[cul][0]:"")+"\n#つながる介護の夜";return"https://twitter.com/intent/tweet?text="+encodeURIComponent(tx)+"&url="+encodeURIComponent(GAME_URL)};
+const tweet=()=>{const n=plays,avg=n?Math.round(totPt/n):0,rk2=avg<1000?"ランク外":rank(avg),hd=streak>=3?"🔥"+streak+"連続事件解決中！名探偵、夜を明かす…":streak>=1?"🕵️ 事件解決中！真夜中の介護施設で推理バトル":"🌙 真犯人を取り逃がした…リベンジ捜査中",tx="🔍「つながる介護の夜」\n"+hd+"\n⏱ 推理時間："+fm(totSec)+"　解決事件数："+solved+"/"+n+"\n🏅 探偵ランク："+rk2+" / "+totPt.toLocaleString()+"点\n#つながる介護の夜 #推理ゲーム";return"https://twitter.com/intent/tweet?text="+encodeURIComponent(tx)+"&url="+encodeURIComponent(GAME_URL)};
 const isA=q=>q===0||(q>=10&&q<=15)||q>=20;
 const stm=i=>{const a=al[i];return PRE[i]+a.t+"、ずっと"+a.p+"で"+a.a+"いた"+E[i]+a.w+"と言葉も交わした"+E[i]+dn(lk[i].f)+"とは気が合う"+E[i]+dn(lk[i].g)+"は"+GR[lk[i].r]+E[i]};
 const qt=q=>Q[q].replace("{t}",cs[1]);
@@ -269,7 +269,27 @@ const XM=[
 [["22:10、廊下デ金属音ヲ検知シマシタ。","システム異常ハアリマセン。","私ハ事件ニ関与シテイマセン。"],["ログガ見ツカリマセン。","異常ナシ。異常ナシ。ピ……。","ピ、ピピ……関与、シテ、イマセン。"]],
 [["資料作成中に、廊下で物音が。","納期前なので、少し寝不足でして。","冗談はやめてください。数字で潔白を証明します。"],["資料に集中していて、聞いていません。","ええ、ちょっとした納期のプレッシャーです。","……それは、根拠のない憶測でしょう。"]],
 [["夜に、ドアの音を聞きました。","夜勤で、ねむいです。","私はやっていません。神様に誓います。"],["ごめんなさい、わかりません。","だいじょうぶです。ちょっと、つかれています。","わ、私は、やっていません……。"]]];
-const at=(i,q)=>{const c=i===cul,x=(q===1||q===6||q===7)&&Math.random()<.5?XL[i][q===1?0:q===6?1:2]:((q===3||q===5||q===9)&&Math.random()<.5?XM[i][c?1:0][q===3?0:q===5?1:2]:null),r=x!==null?(i===17&&!unl[17]?kata(x):x):(i===17&&!unl[17]?kata(at0(i,q)):at0(i,q));return i>=10&&(q===0||q>9)&&Math.random()<.6?fv(i)+r:r};
+const Q1=[
+[["A:思い当たることと申せば……{X}の最近の様子が気になっております。","S:私が申せるのは、この四十年、潔白だということでございます。"],["A:さて……強いて言えば、{X}が怪しいのでは。","V:{X}は、信頼のおける職員でございますよ。"]],
+[["A:そういえば{X}、夜に何かコソコソしてたのよぉ。","V:{X}は、いい子よぉ。疑うのは違うわ！"],["A:思い当たること？ {X}じゃないかしらぁ。","S:あたしは何も知らないわよぉ。ずっと働いてたもの！"]],
+[["A:{X}、昨日からちょっと様子が変だった。","S:俺は何もしてない。それだけは言える。"],["A:……{X}じゃないの。知らないけど。","V:{X}はそんなことしないでしょ。多分。"]],
+[["A:{X}が、そこらをうろうろしてたよ！","V:{X}は優しいから、違うと思う！"],["A:え、えっと……{X}が怪しいかも！","S:わ、私はお掃除してただけだよ！"]],
+[["A:論理的には、{X}の行動に不審な点がある。","S:私には動機がない。それが事実だ。"],["A:思い当たる……強いて言えば{X}だ。","V:{X}の行動に、論理的な矛盾はない。"]],
+[["A:そうねぇ、{X}、夜に妙にそわそわしてたわ。","V:{X}を疑うなんて、私は反対よ。"],["A:思い当たること？ {X}かしらね。","S:私はナースよ。人を疑う側じゃなくて、守る側よ。"]],
+[["A:{X}が、ろうかでこそこそしてたよ！","V:{X}は、いいひとだよ！"],["A:えっと……{X}かも！","S:ぼく、なにもしてないよ！"]],
+[["A:記録上、{X}の動きに不自然な点があります。","S:私は事実のみ申し上げます。潔白です。"],["A:思い当たる点としては、{X}でしょうか。","V:{X}に疑う余地はございません。"]],
+[["A:……{X}が、夜ふらふらしとったの。","V:{X}は、悪い人じゃなか。"],["A:わしは見とらんが……{X}かのう。","S:わしは門を守っとっただけじゃ。"]],
+[["A:ええ、{X}は、少々怪しい動きでしたなあ。","S:私は事務長ですからねえ、潔白ですよ。"],["A:思い当たることねえ……{X}じゃないですか？","V:{X}は信頼できる方ですよ、ええ。"]],
+[["A:{X}がのう、夜にうろうろしとったわい。","V:{X}はええ子じゃよ。疑ったらいかん。"],["A:はてさて……{X}かのう。","S:わしゃ、何も知らんよ。"]],
+[["A:{X}、厨房の近くで見かけましたっ。","V:{X}は、そんな人じゃないですっ。"],["A:あ、えっと、{X}が怪しいですっ。","S:私は栄養のことしか考えてませんよっ。"]],
+[["A:{X}がうろうろしてたワン！","V:{X}はいい人だワン！"],["A:ク、クゥン……{X}が怪しいワン。","S:ぼくは何もしてないワン！"]],
+[["A:{X}、書類の近くでウロウロしてたんです。","S:私は書類しか触ってません、本当です。"],["A:え、えっと……{X}じゃないですか？","V:{X}は、そんなことしませんよね……？"]],
+[["S:みゃー","S:みゃー"],["S:みゃー","S:みゃー"]],
+[["A:{X}ノ行動ログニ、不審ナ点ガアリマス。","S:私ノログハ潔白デス。"],["A:{X}ガ最モ怪シイト推定シマス。","V:{X}ノ行動ニ異常ハアリマセン。"]],
+[["A:数字で見ると、{X}の動きが不自然ですね。","S:外部の私に動機はありません。"],["A:思い当たるとすれば、{X}でしょう。","V:{X}は信頼に足る方です。"]],
+[["A:{X}が、夜にあやしいです。","V:{X}は、いい人です。ちがいます。"],["A:{X}、かもしれません……。","S:わたしは、やっていません。"]]];
+function q1(i,c){const o=sus.filter(x=>x!==i),x=o[Math.floor(Math.random()*o.length)],l=Q1[i][c?1:0][Math.random()<.5?0:1],k=l[0];if(k==="A")RF[x]=(RF[x]||0)+2;else if(k==="V")RF[x]=(RF[x]||0)-2;else RF[i]=(RF[i]||0)-1;return l.slice(2).replace("{X}",dn(x))}
+const at=(i,q)=>{const c=i===cul,x=q===1?q1(i,c):(q===6||q===7)&&Math.random()<.5?XL[i][q===6?1:2]:((q===3||q===5||q===9)&&Math.random()<.5?XM[i][c?1:0][q===3?0:q===5?1:2]:null),r=x!==null?(i===17&&!unl[17]?kata(x):x):(i===17&&!unl[17]?kata(at0(i,q)):at0(i,q));return i>=10&&(q===0||q>9)&&Math.random()<.6?fv(i)+r:r};
 const at0=(i,q)=>{if(i===16)return shAt(q);
  const a=al[i],f=fk,e=E[i],c=i===cul,d=tg[i];
  if(q>19){const z=c?lkf:lk[i],t=q===20?z.g:z.f;return PRE[i]+(q===20?dn(t)+"は"+GR[lk[i].r]:dn(t)+"とは気が合う")+e}
@@ -346,8 +366,8 @@ $("acc").onclick=()=>{
  $("oh").textContent=boomF?"💥 爆発END":ok?"事件解決！":"バッドエンド";
  $("ot").innerHTML=boomF?`胡椒は黒煙を噴き上げ、大爆発を起こしてしまった……。<br>真犯人は ${S[cul][1]} ${S[cul][0]} でした。`:ok?`${S[cul][1]} ${S[cul][0]}が犯人でした。動揺を見逃さない、見事な推理です！<br>（${turn}ターンで解決）`:sel===cul?`${S[sel][0]}は確かに犯人だった。だが震えるほどの動揺を引き出せず、証拠不十分のまま取り逃がしてしまった……。`:`${S[sel][0]}は犯人ではなかった……。無実の人を告発してしまった。<br>真犯人は ${S[cul][1]} ${S[cul][0]} でした。`;
  clearInterval(tmr);const ib2=ok?(unl[10]?30000:0)+(unl[12]?30000:0)+(unl[17]?30000:0):0,sc=Math.floor((Date.now()-t0)/1000),b=calc(ok,turn,sc,hits,-MDn*5000-evBad*50000+ib2),pt=ok?b.tot:-(50000+5000+Math.round(Math.max(0,450-sc)*50)+Math.max(0,MAX-turn)*2500),rk=ok?rank(pt):"ランク外",f=n=>n.toLocaleString();
- last={ok,turn,sc,pt,rk};
- $("ot").innerHTML+=`<p>ターン <b>${turn}</b>　推理時間 <b>${fm(sc)}</b><br>${ok?"ランク ":""}<b style="font-size:2rem;color:var(--acc)">${rk}</b></p><hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0">スコア：<b style="font-size:1.5rem">${f(pt)}</b></p>${ok?`<p style="line-height:1.8;margin:0;font-size:.9rem;color:var(--sub)">時間ボーナス：${f(b.sb)}<br>ターンボーナス：${f(b.tb)}<br>推理力：${f(b.hp+b.cl+b.sk)}${ib2?`<br>アイテムボーナス：${f(ib2)}`:""}</p>`:""}`;
+ plays++;if(ok){solved++;streak++}else streak=0;totPt+=pt;totSec+=sc;last={ok,turn,sc,pt,rk};
+ $("ot").innerHTML+=`<p>ターン <b>${turn}</b>　推理時間 <b>${fm(sc)}</b><br>${ok?"ランク ":""}<b style="font-size:2rem;color:var(--acc)">${rk}</b></p><hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0">スコア：<b style="font-size:1.5rem">${f(pt)}</b></p>${ok?`<p style="line-height:1.8;margin:0;font-size:.9rem;color:var(--sub)">時間ボーナス：${f(b.sb)}<br>ターンボーナス：${f(b.tb)}<br>推理力：${f(b.hp+b.cl+b.sk)}${ib2?`<br>アイテムボーナス：${f(ib2)}`:""}</p>`:""}${plays>=2?`<hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><p style="margin:6px 0;font-size:.95rem">解決事件数：<b>${solved} / ${plays}</b>　通算スコア：<b>${f(totPt)}</b></p>`:""}`;
  setTimeout(()=>{$("ov").classList.add("show");SND.end(ok)},endDelay);endDelay=2600;
 };
 const PF=[
@@ -376,7 +396,7 @@ $("tt").onclick=()=>memo(0);$("tr").onclick=()=>memo(1);$("lgt").onclick=()=>mem
 $("relb").onclick=()=>{memo(0);$("rv").classList.add("show")};
 $("rvc").onclick=()=>$("rv").classList.remove("show");
 init();
-const op=$("op"),fl=$("fl");let stk;
+const op=$("op"),fl=$("fl");let stk;var plays=0,solved=0,streak=0,totPt=0,totSec=0;
 const strike=()=>{fl.classList.remove("go");void fl.offsetWidth;fl.classList.add("go");stk=setTimeout(strike,3500+Math.random()*4000)};
 setTimeout(strike,1600);
 const SND=(()=>{let c,m,on=false,iv,nodes=[],muted=true,inGame=false,bi=0,bg,fin=0,fg;
@@ -428,5 +448,6 @@ $("fm").addEventListener("mouseout",e=>{if(e.target.closest(SEL))hideTip()});
 $("fm").addEventListener("click",e=>{const c=e.target.closest(SEL);if(c)showTip(c);else hideTip()});
 $("gdc").onclick=()=>{$("gd").classList.remove("show");t0=Date.now()};
 $("tw").onclick=()=>{window.open(tweet(),"_blank","noopener")};
-$("rt").onclick=()=>{SND.title();$("ov").classList.remove("show");op.style.display="";void op.offsetWidth;op.classList.remove("out");op.querySelectorAll(".t,.fac").forEach(e=>{e.style.animation="none";void e.offsetWidth;e.style.animation=""});clearTimeout(stk);stk=setTimeout(strike,1600)};
+$("nx").onclick=()=>{$("ov").classList.remove("show");SND.go();init()};
+$("rt").onclick=()=>{plays=0;solved=0;streak=0;totPt=0;totSec=0;SND.title();$("ov").classList.remove("show");op.style.display="";void op.offsetWidth;op.classList.remove("out");op.querySelectorAll(".t,.fac").forEach(e=>{e.style.animation="none";void e.offsetWidth;e.style.animation=""});clearTimeout(stk);stk=setTimeout(strike,1600)};
 </script></body></html>
