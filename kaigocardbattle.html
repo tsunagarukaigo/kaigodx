@@ -451,6 +451,156 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
   .bs-card.lunge-p, .bs-card.lunge-e, .bs-fly, .bs-star, .bs-bub, .bs-drawer, .k-rise, .bs-back { animation: none; }
   .bs-card.hit, .bs-tok.hit { animation: hitframe .9s ease-out both; }
 }
+
+/* ===== デッキ画面（案A：上下2段型 440×750） ===== */
+.dc-pill { display: inline-block; background: #fff; color: #000; font-weight: 700; font-size: 12px; line-height: 20px; padding: 0 9px; border-radius: 10px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.dc-pill.warn { background: #ffd37a; }
+.dc-board { position: absolute; left: 12px; top: 48px; width: 416px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; border-radius: 10px; }
+.dc-board.dropok { outline: 2px solid #c9ecd5; outline-offset: 3px; background: rgba(201, 236, 213, .08); }
+.dc-slot { height: 84px; border: 2px solid #6a6a6a; border-radius: 9px; background: linear-gradient(180deg, #1c1c1c, #101010); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; min-width: 0; user-select: none; }
+.dc-slot .ic { font-size: 28px; }
+.dc-slot.empty { border: 2px dashed #333; background: transparent; color: #555; font-size: 12px; cursor: default; }
+.dc-slot.sel { border-color: #c9ecd5; background: linear-gradient(180deg, #1b2520, #111613); box-shadow: 0 0 0 1px #c9ecd5; }
+.dc-slot.pop { animation: dcpop .45s cubic-bezier(.3, 1.5, .5, 1) both; }
+.dc-cp { display: inline-block; background: #fff; color: #000; font-weight: 700; font-size: 10px; line-height: 14px; padding: 0 5px; border-radius: 8px; white-space: nowrap; }
+.dc-cp.s { font-size: 10px; }
+.dc-hp { font-size: 11px; line-height: 1; }
+.dc-bubrow { position: absolute; left: 12px; right: 12px; top: 408px; height: 44px; display: flex; align-items: center; }
+.dc-bub { position: relative; max-width: 100%; border-radius: 16px; padding: 6px 14px; font-weight: 700; font-size: 12.5px; line-height: 1.35; background: #fff; color: #000; border: 2px solid #fff; }
+.dc-bub.bad { color: #b00020; border-color: #ff5c5c; }
+.dc-bub::before { content: ""; position: absolute; left: 30px; top: -7px; width: 12px; height: 12px; background: #fff; transform: rotate(45deg); }
+.dc-bub.bad::before { border-left: 2px solid #ff5c5c; border-top: 2px solid #ff5c5c; }
+.dc-sbub .dc-bub::before { display: none; }
+.dc-sbub { min-height: 38px; display: flex; justify-content: center; align-items: center; }
+.dc-filters { position: absolute; left: 0; right: 0; top: 456px; height: 32px; display: flex; gap: 6px; padding: 0 12px; overflow-x: auto; scrollbar-width: none; }
+.dc-filters::-webkit-scrollbar, .dc-car::-webkit-scrollbar { display: none; }
+.dc-flt { flex: none; height: 30px; padding: 0 13px; border: 1px solid #3b3b3b; border-radius: 15px; background: transparent; color: #f3f3f3; font: inherit; font-size: 13px; cursor: pointer; }
+.dc-flt[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
+.dc-carw { position: absolute; left: 0; right: 0; top: 494px; height: 158px; }
+.dc-carw.dropok { outline: 2px solid #c9ecd5; outline-offset: -2px; background: rgba(201, 236, 213, .08); }
+.dc-car { height: 100%; display: flex; gap: 8px; padding: 0 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.dc-ci { flex: 0 0 112px; height: 150px; scroll-snap-align: start; border: 2px solid #6a6a6a; border-radius: 10px; background: linear-gradient(180deg, #1c1c1c, #0f0f0f); display: flex; flex-direction: column; cursor: grab; }
+.dc-ci.on { border-color: #c9ecd5; background: linear-gradient(180deg, #1b2520, #111613); }
+.dc-art { flex: 1; min-height: 0; padding: 6px 6px 0; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+.dc-top { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+.dc-art .tag { font-size: 9px; line-height: 13px; }
+.dc-art .ic { font-size: 36px; margin-top: 2px; }
+.dc-nm { font-size: 11px; font-weight: 700; line-height: 1.2; text-align: center; min-height: 2.4em; display: flex; align-items: center; }
+.dc-foot { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 6px; gap: 4px; }
+.dc-n { font-size: 11px; font-weight: 700; color: #cfcfcf; }
+.dc-plus { width: 30px; height: 28px; border: 0; border-radius: 7px; background: #fff; color: #000; font: inherit; font-size: 16px; font-weight: 700; line-height: 1; padding: 0; cursor: pointer; }
+.dc-plus.full { opacity: .4; }
+.dc-arr { position: absolute; top: 50%; transform: translateY(-50%); width: 24px; height: 48px; border: 1px solid #3b3b3b; border-radius: 8px; background: rgba(0, 0, 0, .6); color: #fff; font-size: 22px; line-height: 1; padding: 0; cursor: pointer; z-index: 2; }
+.dc-arr.l { left: 2px; }
+.dc-arr.r { right: 2px; }
+.dc-cmd { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; padding: 12px; border-top: 1px solid #2c2c2c; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.dc-cmd button, .dc-cmd label { font: inherit; font-size: 12px; font-weight: 700; line-height: 1.3; border: 1px solid #6a6a6a; border-radius: 10px; background: #151515; color: #fff; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; }
+.dc-cmd button.main { background: #fff; color: #000; border-color: #fff; }
+.dc-back { position: absolute; inset: 0; background: rgba(0, 0, 0, .6); z-index: 20; animation: bsfade .2s ease-out both; }
+.dc-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 21; background: #141414; border-top: 2px solid #f3f3f3; border-radius: 16px 16px 0 0; padding: 10px 14px 16px; display: flex; flex-direction: column; gap: 10px; max-height: 640px; overflow: auto; }
+.dc-sh { position: relative; display: flex; align-items: center; justify-content: flex-end; min-height: 28px; }
+.dc-grip { position: absolute; left: 50%; top: 6px; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: #555; }
+.dc-cnt { display: flex; align-items: center; gap: 8px; }
+.dc-bt { flex: 1; height: 46px; border: 1px solid #6a6a6a; border-radius: 10px; background: #151515; color: #fff; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.dc-bt.main { background: #fff; color: #000; border: 0; }
+.dc-bt.full { opacity: .45; }
+.dc-bt[data-off] { opacity: .4; }
+.k-bub { animation: dcbub .3s cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes dcbub { 0% { opacity: 0; transform: translateY(8px) scale(.6); } 100% { opacity: 1; transform: none; } }
+@keyframes dcpop { 0% { opacity: 0; transform: scale(.3); } 60% { opacity: 1; transform: scale(1.18); } 100% { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .dc-slot.pop, .k-bub, .dc-back { animation: none; } }
+
+/* ===== ？ヘルプ ===== */
+.nav .helpb { margin-left: auto; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: #fff; font: inherit; font-size: 20px; font-weight: 700; cursor: pointer; line-height: 1; }
+.nav .helpb:hover { border-color: #fff; box-shadow: 0 0 12px rgba(255, 255, 255, .25); }
+.hp-back { position: fixed; inset: 0; background: rgba(0, 0, 0, .78); z-index: 60; animation: bsfade .2s ease-out both; }
+.hp-pop { position: fixed; z-index: 61; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(560px, calc(100vw - 20px)); height: min(760px, calc(100vh - 24px)); background: #0e0e0e; border: 2px solid #f3f3f3; border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 0 1px #000, 0 20px 60px rgba(0, 0, 0, .8); animation: hppop .25s cubic-bezier(.3, 1.3, .5, 1) both; }
+@keyframes hppop { from { opacity: 0; transform: translate(-50%, -46%) scale(.94); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.hp-head { display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 12px; background: linear-gradient(180deg, #1d1d1d, #111); border-bottom: 1px solid #2c2c2c; }
+.hp-tabs { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.hp-tab { font: inherit; font-size: 13px; font-weight: 700; min-height: 40px; padding: 0 4px; border: 1px solid #3b3b3b; border-radius: 10px; background: #151515; color: #f3f3f3; cursor: pointer; }
+.hp-tab[aria-selected="true"] { background: #fff; color: #000; border-color: #fff; box-shadow: 0 0 14px rgba(255, 255, 255, .3); }
+.hp-x { flex: none; width: 38px; height: 38px; border-radius: 50%; border: 1px solid #3b3b3b; background: transparent; color: #fff; font-size: 16px; cursor: pointer; }
+.hp-body { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 14px 24px; display: flex; flex-direction: column; gap: 14px; }
+.hp-hero { border: 1px solid #333; border-radius: 14px; padding: 16px 14px; text-align: center; background: radial-gradient(circle at 50% 0, #232323, #101010 70%); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.hp-hero p { margin: 0; font-size: 15px; line-height: 1.5; }
+.hp-sub { font-size: 12px !important; color: #9b9b9b; }
+.hp-vs { display: flex; align-items: center; gap: 12px; }
+.hp-x2 { font-size: 28px; }
+.hp-vs .hp-x { width: auto; height: auto; border: 0; font-size: 30px; cursor: default; }
+.hp-mini { width: 74px; height: 92px; border: 2px solid #c9ecd5; border-radius: 10px; background: linear-gradient(180deg, #1b2520, #111613); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.hp-mini.foe { border-color: #b5b5b5; background: linear-gradient(180deg, #1c1c1c, #0f0f0f); }
+.hp-mini .ic { font-size: 34px; }
+.hp-mini small { font-size: 11px; font-weight: 700; }
+.hp-ko { display: flex; gap: 8px; font-size: 26px; font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif; }
+.hp-sec { border: 1px solid #2c2c2c; border-radius: 14px; padding: 14px; background: #121212; display: flex; flex-direction: column; gap: 10px; }
+.hp-sec h3 { margin: 0; font-size: 15px; display: flex; align-items: center; gap: 10px; letter-spacing: .06em; }
+.hp-no { flex: none; width: 26px; height: 26px; border-radius: 50%; background: #fff; color: #000; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 15px; }
+.hp-t { margin: 0; font-size: 13px; line-height: 1.7; color: #cfcfcf; }
+.hp-t b { color: #fff; }
+.hp-field { display: flex; align-items: flex-end; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.hp-big, .hp-bench { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.hp-bench { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-end; }
+.hp-big em, .hp-bench em { font-style: normal; font-size: 11px; color: #9b9b9b; width: 100%; text-align: center; }
+.hp-bench .hp-mini { width: 58px; height: 70px; border-color: #6a6a6a; background: linear-gradient(180deg, #1c1c1c, #0f0f0f); }
+.hp-bench .hp-mini .ic { font-size: 24px; }
+.hp-cps { display: flex; flex-direction: column; gap: 6px; }
+.hp-cps > div { display: flex; align-items: center; gap: 10px; }
+.hp-cps span:first-child { width: 52px; font-size: 12px; color: #9b9b9b; }
+.hp-cps b { font-size: 13px; min-width: 40px; }
+.hp-pips { display: flex; gap: 4px; flex: 1; }
+.hp-pip { width: 16px; height: 16px; border: 2px solid #fff; border-radius: 50%; }
+.hp-pip.on { background: #fff; box-shadow: 0 0 8px rgba(255, 255, 255, .5); }
+.hp-flow { display: flex; align-items: stretch; justify-content: center; gap: 4px; flex-wrap: wrap; }
+.hp-step { flex: 1 1 90px; max-width: 120px; border: 1px solid #3b3b3b; border-radius: 10px; background: #181818; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
+.hp-step .ic { font-size: 26px; }
+.hp-step b { font-size: 13px; }
+.hp-step small { font-size: 10.5px; color: #9b9b9b; }
+.hp-arr { align-self: center; font-size: 22px; color: #777; }
+.hp-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hp-card { border: 2px solid; border-radius: 12px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.hp-card.g { border-color: #4aa3ff; background: #0d1c2d; }
+.hp-card.w { border-color: #b070ff; background: #1e1229; }
+.hp-card .ic { font-size: 30px; }
+.hp-card small { font-size: 11px; color: #cfcfcf; }
+.hp-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.hp-tiles > div { border: 1px solid #3b3b3b; border-radius: 10px; background: #181818; padding: 10px 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
+.hp-tiles b { font-family: var(--font-display); font-weight: 400; font-size: 28px; line-height: 1.1; }
+.hp-tiles small { font-size: 10px; color: #9b9b9b; line-height: 1.3; }
+.hp-sample { width: 100%; max-width: 380px; border: 2px solid #6a6a6a; border-radius: 12px; background: linear-gradient(180deg, #1c1c1c, #101010); padding: 12px; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.hp-sm, .hp-sm2 { display: flex; align-items: center; gap: 8px; }
+.hp-callno { flex: none; width: 22px; height: 22px; border-radius: 50%; color: #000; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+.hp-callno.a { background: #ffd36e; } .hp-callno.b { background: #8fe27d; } .hp-callno.c { background: #74d0ff; }
+.hp-calls { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; font-size: 12.5px; }
+.hp-calls li { display: flex; align-items: center; gap: 6px; }
+.hp-fx { display: flex; flex-direction: column; gap: 6px; }
+.hp-fxr { display: grid; grid-template-columns: 30px 96px 1fr; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid #262626; border-radius: 10px; background: #161616; }
+.hp-fxr .ic { font-size: 22px; text-align: center; }
+.hp-fd { font-size: 12px; color: #cfcfcf; line-height: 1.4; }
+.hp-calc { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.hp-calc b { font-family: var(--font-display); font-weight: 400; font-size: 34px; color: #ff9393; }
+.hp-op { font-size: 20px; color: #888; }
+.hp-adv { font-size: 16px; font-weight: 700; padding: 2px 10px; border: 2px solid; border-radius: 16px; }
+.hp-adv.up { color: #ff6b6b; border-color: #ff6b6b; }
+.hp-link { font: inherit; font-size: 13px; font-weight: 700; color: #fff; background: transparent; border: 0; border-bottom: 1px solid #fff; padding: 0; margin-left: 6px; cursor: pointer; }
+.hp-ring { width: min(320px, 100%); height: auto; }
+.hp-node { cursor: pointer; outline: none; }
+.hp-node:hover circle:first-child, .hp-node:focus-visible circle:first-child { filter: drop-shadow(0 0 6px currentColor); stroke-width: 4; }
+.hp-node.sel circle:first-child { filter: drop-shadow(0 0 10px rgba(255, 255, 255, .7)); }
+.hp-res { width: 100%; display: flex; flex-direction: column; gap: 6px; font-size: 14px; text-align: left; }
+.hp-res > b { font-size: 16px; }
+.hp-row { display: flex; align-items: center; gap: 10px; border: 1px solid #2c2c2c; border-radius: 10px; padding: 8px 10px; background: #161616; font-size: 13px; }
+.hp-row span:nth-child(2) { flex: 1; }
+.hp-row em { font-style: normal; font-weight: 700; font-size: 12px; }
+.hp-row.up em, .hp-ar.up { color: #ff6b6b; } .hp-row.dn em, .hp-ar.dn { color: #4aa3ff; } .hp-row.eq em, .hp-ar.eq { color: #cfcfcf; }
+.hp-ar { display: inline-flex; width: 22px; height: 22px; border: 2px solid currentColor; border-radius: 50%; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; line-height: 1; margin: 0 4px 0 8px; vertical-align: middle; }
+.hp-row .hp-ar { margin: 0; flex: none; }
+.hp-row.up .hp-ar { color: #ff6b6b; } .hp-row.dn .hp-ar { color: #4aa3ff; } .hp-row.eq .hp-ar { color: #cfcfcf; }
+.hp-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.hp-list > div { display: flex; align-items: center; gap: 6px; border: 1px solid #262626; border-radius: 10px; background: #161616; padding: 6px 8px; font-size: 12px; flex-wrap: wrap; }
+.hp-list .ic { font-size: 18px; }
+@media (max-width: 480px) { .hp-list { grid-template-columns: 1fr; } .hp-fxr { grid-template-columns: 26px 88px 1fr; } }
+@media (prefers-reduced-motion: reduce) { .hp-pop, .hp-back { animation: none; } }
 </style>
 
 <div id="app"></div>
@@ -564,7 +714,7 @@ const opp = s => (s === 'p' ? 'e' : 'p');
 
 /* ---------- 状態 ---------- */
 let G = null;
-let UI = { screen: 'deck', filter: 'all', sel: null, open: {}, cIdx: 0, dsel: -1, drag: null, win: null, anim: null };
+let UI = { screen: 'deck', filter: 'all', sel: null, open: {}, carX: 0, dsel: -1, drag: null, win: null, anim: null, dwin: null, lastAdd: -1, help: null, helpAttr: 0 };
 let DECK = [];
 let OWN = {}, GACHA = { date: '', used: 0 };
 let uidc = 0;
@@ -895,7 +1045,7 @@ function cardAt(z, i) {
 const GACHA_MS = 5000;
 function navHTML(extra) {
   const items = [['gacha', 'ガチャ'], ['deck', 'デッキ'], ['battle', '対戦']];
-  return '<div class="nav">' + items.map(x => '<button class="navb" data-act="nav" data-v="' + x[0] + '"' + (UI.screen === x[0] ? ' aria-current="page"' : '') + '>' + x[1] + '</button>').join('') + (extra || '') + '</div>';
+  return '<div class="nav">' + items.map(x => '<button class="navb" data-act="nav" data-v="' + x[0] + '"' + (UI.screen === x[0] ? ' aria-current="page"' : '') + '>' + x[1] + '</button>').join('') + (extra || '') + '<button class="helpb" data-act="help" aria-label="あそびかた・ヘルプ">？</button></div>';
 }
 function facilitySVG() {
   const win = (x, y, w, h, i) => '<rect class="win" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" style="--d:' + (i * 0.11).toFixed(2) + 's"/>';
@@ -977,62 +1127,88 @@ function fold(k, title, body) {
   return '<div class="panel"><details data-k="' + k + '"' + (UI.open[k] ? ' open' : '') + '><summary>' + title + '</summary>' + body + '</details></div>';
 }
 function carList() { return CARDS.filter(x => OWN[x.id] > 0 && (UI.filter === 'all' || x.attr === UI.filter)); }
-function ciTile(x, i) {
-  const n = DECK.filter(j => j === x.id).length, on = n > 0;
-  return '<div class="card ci' + (on ? ' on' : '') + (i === UI.cIdx ? ' cen' : '') + '" role="button" tabindex="0" draggable="true" data-dk="coll" data-id="' + x.id + '" data-act="cfocus" data-i="' + i + '">' +
-    '<div class="chead">' + costBadge(x.cost) + '<span class="cname">' + x.name + '</span>' + hpBadge(x.hp) + '</div>' +
-    '<div class="art"><span class="tag">' + x.attr + '</span><span class="ic">' + x.ic + '</span></div>' +
-    '<div class="desc">' + x.desc + '</div>' + x.moves.map(moveBox).join('') +
-    '<div class="adopt"><span class="own">所持 ×' + (OWN[x.id] || 0) + '</span>' + (on ? '<span class="adp">採用' + (n > 1 ? ' ' + n : '') + '</span>' : '') + '</div></div>';
+const FAILRE = /できません|を超える|までです|これ以上|が空です|選んでから|キャンセル|読み込めません|所持していない|大きすぎ|ありません/;
+function say(m) {
+  UI.msg = m; clearTimeout(UI.msgTimer);
+  if (m) UI.msgTimer = setTimeout(() => { UI.msg = ''; if (UI.screen === 'deck') render(); }, 3400);
 }
-function slotHTML(i) {
+function canAddCard(id) {
+  const n = DECK.filter(i => i === id).length;
+  return !(n >= Math.min(MAX_COPY, OWN[id] || 0) || DECK.length >= DECK_SIZE || deckCost() + CARDS[id].cost > COST_MAX);
+}
+function dcCard(x, i) {
+  const n = DECK.filter(j => j === x.id).length, max = Math.min(MAX_COPY, OWN[x.id] || 0);
+  return '<div class="dc-ci' + (n ? ' on' : '') + '" draggable="true" data-dk="coll" data-id="' + x.id + '">' +
+    '<div class="dc-art" role="button" tabindex="0" aria-label="' + x.name + 'の詳細" data-act="cfocus" data-i="' + i + '" data-id="' + x.id + '">' +
+    '<span class="dc-top"><span class="dc-cp">CP' + x.cost + '</span><span class="tag">' + x.attr + '</span></span>' +
+    '<span class="ic">' + x.ic + '</span><span class="dc-nm">' + x.name + '</span><b class="dc-hp">HP' + x.hp + '</b></div>' +
+    '<div class="dc-foot"><span class="dc-n">' + (n ? '採用 ' + n + '/' + max : '所持 ' + (OWN[x.id] || 0)) + '</span>' +
+    '<button class="dc-plus' + (canAddCard(x.id) ? '' : ' full') + '" data-act="dadd" data-id="' + x.id + '" aria-label="' + x.name + 'を採用">＋</button></div></div>';
+}
+function dslotHTML(i) {
   const id = DECK[i];
-  if (id === undefined) return '<div class="dslot empty" aria-hidden="true">' + (i + 1) + '</div>';
+  if (id === undefined) return '<div class="dc-slot empty" aria-hidden="true">' + (i + 1) + '</div>';
   const x = CARDS[id];
-  return '<div class="dslot' + (UI.dsel === i ? ' sel' : '') + '" role="button" tabindex="0" draggable="true" title="' + x.name + '" aria-label="' + x.name + ' CP' + x.cost + ' HP' + x.hp + '" data-act="dslot" data-dk="deck" data-idx="' + i + '">' +
-    '<span class="dcp">CP' + x.cost + '</span><span class="ic">' + x.ic + '</span><span class="dhp">HP' + x.hp + '</span></div>';
+  return '<div class="dc-slot' + (UI.dsel === i ? ' sel' : '') + (UI.lastAdd === i ? ' pop' : '') + '" role="button" tabindex="0" draggable="true" title="' + x.name + '" aria-label="' + x.name + ' CP' + x.cost + ' HP' + x.hp + '" data-act="dslot" data-dk="deck" data-idx="' + i + '">' +
+    '<span class="dc-cp s">CP' + x.cost + '</span><span class="ic">' + x.ic + '</span><b class="dc-hp">HP' + x.hp + '</b></div>';
+}
+function bubHTML(cls) {
+  if (!UI.msg) return '';
+  return '<div class="dc-bub k-bub ' + (FAILRE.test(UI.msg) ? 'bad ' : '') + (cls || '') + '" role="status">' + UI.msg + '</div>';
+}
+function dSheet() {
+  if (UI.dwin === null || UI.dwin === undefined) return '';
+  const x = CARDS[UI.dwin];
+  const n = DECK.filter(j => j === x.id).length, max = Math.min(MAX_COPY, OWN[x.id] || 0);
+  return '<div class="dc-back" data-act="dclose"></div><div class="dc-sheet k-rise">' +
+    '<div class="dc-sh"><span class="dc-grip"></span><button class="bs-x" data-act="dclose">閉じる</button></div>' +
+    '<div class="row"><span class="ic" style="font-size:36px">' + x.ic + '</span><span class="col"><b style="font-size:16px">' + x.name + '</b><span class="row"><span class="tag">' + x.attr + '</span><span class="dc-cp">CP' + x.cost + '</span><b class="sm">HP' + x.hp + '</b></span></span></div>' +
+    '<div class="dim sm">' + x.desc + '</div>' + x.moves.map(moveBox).join('') +
+    '<div class="dc-cnt"><button class="dc-bt" data-act="ddec" data-id="' + x.id + '"' + (n ? '' : ' data-off="1"') + '>− 解除</button><b class="sm">採用 ' + n + '/' + max + '（所持 ' + (OWN[x.id] || 0) + '）</b><button class="dc-bt main' + (canAddCard(x.id) ? '' : ' full') + '" data-act="dadd" data-id="' + x.id + '">＋ 採用</button></div>' +
+    '<div class="dc-sbub">' + bubHTML() + '</div></div>';
 }
 function addToDeck(id) {
-  const n = DECK.filter(i => i === id).length;
-  UI.msg = '';
-  if (!OWN[id]) UI.msg = '所持していないカードです。';
-  else if (n >= Math.min(MAX_COPY, OWN[id])) UI.msg = CARDS[id].name + 'は、これ以上入れられません（所持枚数と' + MAX_COPY + '枚の少ない方まで）。';
-  else if (DECK.length >= DECK_SIZE) UI.msg = 'デッキは' + DECK_SIZE + '枚までです。';
-  else if (deckCost() + CARDS[id].cost > COST_MAX) UI.msg = 'CPの合計が' + COST_MAX + 'を超えるため、追加できません。';
-  else DECK.push(id);
+  const n = DECK.filter(i => i === id).length, max = Math.min(MAX_COPY, OWN[id] || 0);
+  let m = '';
+  if (!OWN[id]) m = '所持していないカードです。';
+  else if (n >= max) m = CARDS[id].name + 'は、これ以上入れられません（最大' + max + '枚）。';
+  else if (DECK.length >= DECK_SIZE) m = 'デッキは' + DECK_SIZE + '枚までです。';
+  else if (deckCost() + CARDS[id].cost > COST_MAX) m = 'CPの合計が' + COST_MAX + 'を超えるため、追加できません。';
+  if (m) say(m);
+  else { DECK.push(id); UI.lastAdd = DECK.length - 1; say(CARDS[id].name + 'を採用！（' + (n + 1) + '/' + max + '枚）'); }
   saveDeck(); render();
 }
 function removeFromDeck(idx) {
-  if (!(idx >= 0 && idx < DECK.length)) UI.msg = 'デッキ内のカードを選んでから「カード削除」を押してください。';
-  else { UI.msg = ''; DECK.splice(idx, 1); UI.dsel = -1; }
+  if (!(idx >= 0 && idx < DECK.length)) say('デッキ内のカードを選んでから「カード削除」を押してください。');
+  else { const nm = CARDS[DECK[idx]].name; DECK.splice(idx, 1); UI.dsel = -1; say(nm + 'を外しました。'); }
   saveDeck(); render();
 }
 function deckFileText() {
   return JSON.stringify({ app: 'kaigo-card-battle', version: 1, savedAt: new Date().toISOString(), deck: DECK.map(i => ({ id: i, name: CARDS[i].name })) }, null, 1);
 }
 async function saveDeckFile() {
-  if (!DECK.length) { UI.msg = 'デッキが空です。カードを入れてから保存してください。'; render(); return; }
+  if (!DECK.length) { say('デッキが空です。カードを入れてから保存してください。'); render(); return; }
   let dl = null;
   try { dl = typeof window !== 'undefined' && window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
-  if (!dl) { UI.msg = 'この画面ではファイルを保存できません。'; render(); return; }
+  if (!dl) { say('この画面ではファイルを保存できません。'); render(); return; }
   const data = deckFileText();
   try {
     await dl.save({ filename: 'kaigo-deck.dat', data });
-    UI.msg = 'デッキを保存しました（kaigo-deck.dat）。';
+    say('デッキを保存しました（kaigo-deck.dat）。');
   } catch (e) {
     if (e && e.code === 'rejected_extension') {
       try {
         await dl.save({ filename: 'kaigo-deck.dat.txt', data });
-        UI.msg = 'この環境では.datで保存できないため、kaigo-deck.dat.txtで保存しました。名前を変えなくても、.datに直しても「復元」で読み込めます。';
-      } catch (e2) { UI.msg = e2 && e2.code === 'declined' ? '保存をキャンセルしました。' : 'デッキを保存できませんでした。'; }
-    } else UI.msg = e && e.code === 'declined' ? '保存をキャンセルしました。' : 'デッキを保存できませんでした。';
+        say('kaigo-deck.dat.txtで保存しました（.datに直しても復元できます）。');
+      } catch (e2) { say(e2 && e2.code === 'declined' ? '保存をキャンセルしました。' : 'デッキを保存できませんでした。'); }
+    } else say(e && e.code === 'declined' ? '保存をキャンセルしました。' : 'デッキを保存できませんでした。');
   }
   render();
 }
 function restoreFromText(text) {
   let v = null;
   try { v = JSON.parse(text); } catch (e) { v = null; }
-  if (!v || !Array.isArray(v.deck)) { UI.msg = 'デッキファイルを読み込めませんでした。'; render(); return; }
+  if (!v || !Array.isArray(v.deck)) { say('デッキファイルを読み込めませんでした。'); render(); return; }
   const byName = {};
   CARDS.forEach(x => { byName[x.name] = x.id; });
   const ids = v.deck.map(d => (d && byName[d.name] !== undefined) ? byName[d.name] : (d && CARDS[d.id] ? d.id : -1)).filter(i => i >= 0);
@@ -1044,72 +1220,39 @@ function restoreFromText(text) {
     cnt[id] = (cnt[id] || 0) + 1; cost += CARDS[id].cost; nd.push(id);
   });
   DECK = nd; UI.dsel = -1; saveDeck();
-  UI.msg = 'デッキを復元しました（' + nd.length + '枚）。' + (noOwn ? noOwn + '枚は未所持のため入れられませんでした。' : '') + (over ? over + '枚は枚数・CPの上限で入れられませんでした。' : '');
+  say('デッキを復元しました（' + nd.length + '枚）。' + (noOwn ? noOwn + '枚は未所持のため入れられませんでした。' : '') + (over ? over + '枚は枚数・CPの上限で入れられませんでした。' : ''));
   render();
 }
 function syncCar() {
   const car = document.getElementById('car');
-  if (!car || !car.querySelectorAll) return;
-  const items = car.querySelectorAll('.ci');
-  if (!items.length) return;
-  if (UI.cIdx >= items.length) UI.cIdx = items.length - 1;
-  if (UI.cIdx < 0) UI.cIdx = 0;
-  car.scrollLeft = UI.cIdx * (items[0].offsetWidth + 12);
+  if (car) car.scrollLeft = UI.carX || 0;
 }
-function scrollCar(i) {
+function scrollCar(dir) {
   const car = document.getElementById('car');
-  if (!car || !car.querySelectorAll) return;
-  const items = car.querySelectorAll('.ci');
-  if (!items.length) return;
-  i = Math.max(0, Math.min(items.length - 1, i));
-  const left = i * (items[0].offsetWidth + 12);
-  if (car.scrollTo) car.scrollTo({ left, behavior: 'smooth' }); else car.scrollLeft = left;
+  if (!car) return;
+  const it = car.querySelector('.dc-ci'), w = (it ? it.offsetWidth : 112) + 8;
+  if (car.scrollBy) car.scrollBy({ left: dir * w * 2, behavior: 'smooth' }); else car.scrollLeft += dir * w * 2;
 }
 function renderDeck() {
   const list = carList();
-  if (UI.cIdx >= list.length) UI.cIdx = Math.max(0, list.length - 1);
-  const counts = ATTRS.map(a => a + ' ' + DECK.filter(i => CARDS[i].attr === a).length).join(' · ');
-  const attrBody = '<div class="chart">' +
-    ATTRS.map(a => '<div><span class="tag">' + a + '</span><span>→ ' + RULE_LINES[a].join('・') + ' に強い</span></div>').join('') +
-    '</div><p class="dim sm">強い相手には1.5倍、弱い相手には0.5倍のダメージ。</p>';
-  const moveBody = '<div class="legend">' +
-    [['d', '攻撃 25', '前衛にダメージ'], ['s', '全体 10', '相手ベンチ全体にダメージ'], ['h', '回復 15', '自分や味方のHPを回復'], ['g', '盾 10', '次の相手ターンまでダメージを吸収'],
-      ['b', '強化 +10', '味方の次のダメージが増える'], ['w', '弱体 -10', '相手前衛の次のダメージが減る'], ['u', 'CP +1', 'CPやドローの追加']]
-      .map(x => '<span class="item"><span class="chip2 c-' + x[0] + '">' + x[1] + '</span><span class="dim">' + x[2] + '</span></span>').join('') +
-    '</div>';
-  const ruleBody = '<ul>' +
-    '<li>先に相手の職員を' + WIN_PTS + '体、戦闘不能にした方の勝ちです。</li>' +
-    '<li>場は前衛1枚とベンチ3枚。手札は「場に出す」でCPを使って配置します。</li>' +
-    '<li>CPは毎ターン全回復し、3、4、5…と増えます（最大9）。</li>' +
-    '<li>わざは前衛だけが1ターンに1回。交代はCP1で1ターンに1回です。</li>' +
-    '<li>シールドは次の相手ターンまでダメージを吸収します。「弱体」は相手の次のわざを弱めます。</li>' +
-    '<li>先攻（あなた）は最初のターン、わざを使えません。</li>' +
-    '<li>ガチャは1日' + GACHA_MAX + '回まで。1回で' + GACHA_PULL + '枚をランダムで獲得し、手に入れたカードだけがデッキに入れられます。</li>' +
-    '<li>デッキは手持ちカードをドラッグ＆ドロップかダブルクリックで入れます。同じカードは所持枚数か' + MAX_COPY + '枚の少ない方まで、CP合計は' + COST_MAX + '以内です。</li>' +
-    '</ul>';
   const slots = [];
-  for (let i = 0; i < DECK_SIZE; i++) slots.push(slotHTML(i));
-  return '<div class="wrap">' + navHTML() +
-    '<div class="toolbar"><span class="count">デッキ ' + DECK.length + '/' + DECK_SIZE + '</span><span class="count' + (deckCost() >= COST_MAX ? ' full' : '') + '">CP ' + deckCost() + '/' + COST_MAX + '</span><span class="dim sm">' + counts + '</span><span class="spacer"></span>' +
-    '<button class="btn ghost" data-act="random">ランダム編成</button>' +
-    '<button class="btn ghost" data-act="reset">リセット</button>' +
-    '<button class="btn ghost" data-act="del" data-dz="trash">カード削除</button>' +
-    '<button class="btn ghost" data-act="save">デッキ保存</button>' +
-    '<label class="btn ghost filebtn">復元<input class="vh" type="file" id="dfile" accept=".dat,.txt,.json,text/plain"></label></div>' +
-    (UI.msg ? '<p class="sm warn">' + UI.msg + '</p>' : '') +
-    '<div class="board" data-dz="board"><div class="bh"><b>デッキ構成</b><span class="dim sm">手持ちカードをここにドラッグ／ダブルクリックで追加。カードを選んで「カード削除」か、下の手持ち欄にドラッグで削除。</span></div>' +
-    '<div class="slots">' + slots.join('') + '</div></div>' +
-    '<p class="dim sm cen-t">所持カード ' + ownTotal() + '枚（' + Object.keys(OWN).length + '/' + CARDS.length + '種）</p>' +
-    '<div class="filters cen-f">' +
-    ['all'].concat(ATTRS).map(a => '<button class="chip" data-act="filter" data-v="' + a + '" aria-pressed="' + (UI.filter === a) + '">' + (a === 'all' ? 'すべて' : a) + '</button>').join('') +
-    '</div>' +
-    (list.length ?
-      '<div class="carw" data-dz="trash"><button class="carb l" data-act="cmove" data-dir="-1" aria-label="前のカード">‹</button><div class="car" id="car" tabindex="0" aria-label="手持ちのカード">' + list.map(ciTile).join('') + '</div><button class="carb r" data-act="cmove" data-dir="1" aria-label="次のカード">›</button></div>' +
-      '<div class="cadd"><button class="btn" data-act="cadd">このカードをデッキに入れる</button><span class="dim sm">ダブルクリックやドラッグでも入れられます</span></div>'
-      : '<p class="dim cen-t">この属性のカードはまだありません。ガチャで手に入れましょう。</p>') +
-    fold('attr', '属性の相性', attrBody) +
-    fold('move', 'わざの見かた', moveBody) +
-    fold('rule', 'あそびかた', ruleBody) +
+  for (let i = 0; i < DECK_SIZE; i++) slots.push(dslotHTML(i));
+  const full = deckCost() >= COST_MAX - 5;
+  const stage = '<div class="bs-wrap"><div class="bs" id="dcs">' +
+    '<div class="bs-status"><b>デッキ</b><span class="dc-pill">' + DECK.length + '/' + DECK_SIZE + '</span><span class="dc-pill' + (full ? ' warn' : '') + '">CP ' + deckCost() + '/' + COST_MAX + '</span><span class="grow"></span><span class="dim sm">所持 ' + ownTotal() + '枚（' + Object.keys(OWN).length + '/' + CARDS.length + '種）</span></div>' +
+    '<div class="dc-board" data-dz="board">' + slots.join('') + '</div>' +
+    '<div class="dc-bubrow">' + (UI.dwin === null || UI.dwin === undefined ? bubHTML() : '') + (UI.msg ? '' : '<span class="dim sm">カードをタップで詳細、＋で採用。デッキのカードを選んで「カード削除」</span>') + '</div>' +
+    '<div class="dc-filters">' + ['all'].concat(ATTRS).map(a => '<button class="dc-flt" data-act="filter" data-v="' + a + '" aria-pressed="' + (UI.filter === a) + '">' + (a === 'all' ? 'すべて' : a) + '</button>').join('') + '</div>' +
+    '<div class="dc-carw" data-dz="trash">' +
+    (list.length ? '<div class="dc-car" id="car" tabindex="0" aria-label="手持ちのカード（左右にスライド）">' + list.map(dcCard).join('') + '</div>' +
+      '<button class="dc-arr l" data-act="cmove" data-dir="-1" aria-label="左へ">‹</button><button class="dc-arr r" data-act="cmove" data-dir="1" aria-label="右へ">›</button>'
+      : '<p class="dim cen-t" style="padding-top:50px">この属性のカードはまだありません。ガチャで手に入れましょう。</p>') + '</div>' +
+    '<div class="dc-cmd">' +
+    '<button data-act="random">ランダム<br>編成</button><button data-act="reset">リセット</button><button class="main" data-act="save">デッキ<br>保存</button>' +
+    '<label class="filebtn">復元<input class="vh" type="file" id="dfile" accept=".dat,.txt,.json,text/plain"></label>' +
+    '<button data-act="del" data-dz="trash" style="opacity:' + (UI.dsel >= 0 ? 1 : .55) + '">カード<br>削除</button></div>' +
+    dSheet() + '</div></div>';
+  return '<div class="wrap">' + navHTML() + stage +
     '<p class="dim sm foot">HP・属性・わざの数値と相性は、ゲーム用のフィクションです。</p>' +
     '</div>';
 }
@@ -1369,24 +1512,112 @@ async function animMove(s, mi) {
   UI.anim = null;
   return true;
 }
+/* ---------- ヘルプ（？ボタンのポップアップ） ---------- */
+const ATTR_IC = { '介護': '🤝', '医療': '💉', '相談': '💬', '栄養': '🥗', '訓練': '🦵', '環境': '🧹' };
+const ATTR_COL = { '介護': '#ff8f8f', '医療': '#74d0ff', '相談': '#ffd36e', '栄養': '#8fe27d', '訓練': '#c69bff', '環境': '#5fe0c4' };
+function hpMini(ic, label, cls) {
+  return '<span class="hp-mini ' + (cls || '') + '"><span class="ic">' + ic + '</span>' + (label ? '<small>' + label + '</small>' : '') + '</span>';
+}
+function hpPips(n, max) {
+  let s = '';
+  for (let i = 0; i < max; i++) s += '<i class="hp-pip' + (i < n ? ' on' : '') + '"></i>';
+  return '<span class="hp-pips">' + s + '</span>';
+}
+function hpSec(no, title, body) {
+  return '<section class="hp-sec"><h3><span class="hp-no">' + no + '</span>' + title + '</h3>' + body + '</section>';
+}
+function helpRule() {
+  const flow = [['🃏', '場に出す', 'CPを使う'], ['🔁', '交代', 'CP1・1回'], ['⚔️', 'わざ', '前衛・1回'], ['⏭️', 'ターン終了', '相手の番へ']];
+  return '<div class="hp-hero"><div class="hp-vs">' + hpMini('🤝', 'あなた') + '<span class="hp-x">⚔️</span>' + hpMini('💉', '相手', 'foe') + '</div>' +
+      '<p><b>先に相手の職員を' + WIN_PTS + '体、戦闘不能にしたら勝ち！</b></p>' +
+      '<div class="hp-ko"><span>💥</span><span>💥</span><span>💥</span></div></div>' +
+    hpSec(1, '場のしくみ', '<div class="hp-field"><div class="hp-big">' + hpMini('🤝', '前衛') + '<em>わざを使える</em></div><div class="hp-bench">' + hpMini('🌱', 'ベンチ') + hpMini('🍱', 'ベンチ') + hpMini('🧹', 'ベンチ') + '<em>控え（最大3枚）</em></div></div>' +
+      '<p class="hp-t">場は<b>前衛1枚</b>と<b>ベンチ3枚</b>。手札のカードは「場に出す」でCPを使って置きます。</p>') +
+    hpSec(2, 'CPと手番', '<div class="hp-cps"><div><span>ターン1</span>' + hpPips(3, 9) + '<b>3</b></div><div><span>ターン2</span>' + hpPips(4, 9) + '<b>4</b></div><div><span>ターン3</span>' + hpPips(5, 9) + '<b>5</b></div><div><span>…</span>' + hpPips(9, 9) + '<b>最大9</b></div></div>' +
+      '<p class="hp-t">CPは毎ターン<b>全回復</b>して、1ずつ増えていきます。</p>') +
+    hpSec(3, 'ターンの流れ', '<div class="hp-flow">' + flow.map((f, i) => (i ? '<span class="hp-arr">›</span>' : '') + '<div class="hp-step"><span class="ic">' + f[0] + '</span><b>' + f[1] + '</b><small>' + f[2] + '</small></div>').join('') + '</div>' +
+      '<p class="hp-t">わざは<b>前衛だけ</b>が1ターンに1回。交代はCP1で1ターンに1回です。<b>先攻（あなた）は最初のターン、わざを使えません。</b></p>') +
+    hpSec(4, 'シールドと弱体', '<div class="hp-two"><div class="hp-card g"><span class="ic">🛡️</span><b>シールド</b><small>次の相手ターンまで、ダメージを吸収</small></div><div class="hp-card w"><span class="ic">⬇️</span><b>弱体</b><small>相手の次のわざのダメージを減らす</small></div></div>') +
+    hpSec(5, 'デッキとガチャ', '<div class="hp-tiles"><div><b>' + DECK_SIZE + '</b><small>枚で1デッキ</small></div><div><b>' + MAX_COPY + '</b><small>同じカードは最大</small></div><div><b>' + COST_MAX + '</b><small>CP合計の上限</small></div><div><b>' + GACHA_MAX + '</b><small>ガチャは1日 / 回</small></div></div>' +
+      '<p class="hp-t">ガチャは1回で<b>' + GACHA_PULL + '枚</b>。手に入れたカードだけがデッキに入れられます。デッキ画面で、手持ちカードの「＋」やドラッグ＆ドロップ、ダブルクリックで入れましょう。</p>');
+}
+function helpMove() {
+  const fxs = [['d', '⚔️', '攻撃 25', '前衛にダメージ'], ['s', '💥', '全体 10', '相手のベンチ全体にダメージ'], ['h', '💚', '回復 15', '自分や味方のHPを回復'], ['g', '🛡️', '盾 10', '次の相手ターンまでダメージを吸収'],
+    ['b', '⬆️', '強化 +10', '味方の次のダメージが増える'], ['w', '⬇️', '弱体 -10', '相手前衛の次のダメージが減る'], ['u', '⚡', 'CP +1', 'CPが増える／カードを引く']];
+  return '<div class="hp-hero"><p><b>わざは「名前・必要CP・色つきの効果」で読みます</b></p>' +
+    '<div class="hp-sample"><div class="hp-sm"><span class="hp-callno a">1</span><span class="mvn">身体介護</span><span class="hp-callno b">2</span><span class="cpb">CP 1</span></div><div class="hp-sm2"><span class="hp-callno c">3</span><span class="chips"><span class="chip2 c-d">攻撃 15</span><span class="chip2 c-h">回復 10</span></span></div></div>' +
+    '<ol class="hp-calls"><li><span class="hp-callno a">1</span>わざの名前</li><li><span class="hp-callno b">2</span>使うのに必要なCP</li><li><span class="hp-callno c">3</span>効果（色で種類がわかる）</li></ol></div>' +
+    hpSec('★', '効果の色とアイコン', '<div class="hp-fx">' + fxs.map(f => '<div class="hp-fxr"><span class="ic">' + f[1] + '</span><span class="chip2 c-' + f[0] + '">' + f[2] + '</span><span class="hp-fd">' + f[3] + '</span></div>').join('') + '</div>') +
+    hpSec('☆', 'ダメージの決まり方', '<div class="hp-calc"><span class="chip2 c-d">攻撃 30</span><span class="hp-op">×</span><span class="hp-adv up">↑ 1.5</span><span class="hp-op">＝</span><b>45</b></div><p class="hp-t">基本の攻撃値に、<b>属性の相性</b>（↑1.5倍 / ↓0.5倍）がかかります。強化・弱体・シールドも計算に入ります。<button class="hp-link" data-act="htab" data-v="attr">属性の相性を見る ›</button></p>');
+}
+function hpSeg(i, j, shrink) {
+  const P = k => ({ x: 150 + 105 * Math.cos((-90 + 60 * k) * Math.PI / 180), y: 150 + 105 * Math.sin((-90 + 60 * k) * Math.PI / 180) });
+  const a = P(i), b = P(j), dx = b.x - a.x, dy = b.y - a.y, L = Math.sqrt(dx * dx + dy * dy), u = shrink / L;
+  return 'x1="' + (a.x + dx * u).toFixed(1) + '" y1="' + (a.y + dy * u).toFixed(1) + '" x2="' + (b.x - dx * u).toFixed(1) + '" y2="' + (b.y - dy * u).toFixed(1) + '"';
+}
+function helpAttr() {
+  const s = UI.helpAttr || 0, n = ATTRS.length, mod = k => ((k % n) + n) % n;
+  const strong = [mod(s + 1), mod(s + 2)], weak = [mod(s - 1), mod(s - 2)], even = mod(s + 3);
+  let svg = '<svg class="hp-ring" viewBox="0 0 300 300" role="group" aria-label="属性の相性図">' +
+    '<defs><marker id="mr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ff6b6b"/></marker><marker id="mb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4aa3ff"/></marker><marker id="mw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker></defs>' +
+    '<circle cx="150" cy="150" r="42" fill="none" stroke="#222" stroke-dasharray="3 5"/><text x="150" y="146" text-anchor="middle" fill="#9b9b9b" font-size="10">強い向き</text><text x="150" y="162" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">→→</text>';
+  for (let i = 0; i < n; i++) svg += '<line ' + hpSeg(i, mod(i + 1), 30) + ' stroke="#444" stroke-width="2" marker-end="url(#mw)"/>';
+  strong.forEach(k => { svg += '<line ' + hpSeg(s, k, 30) + ' stroke="#ff6b6b" stroke-width="3.5" marker-end="url(#mr)"/>'; });
+  weak.forEach(k => { svg += '<line ' + hpSeg(k, s, 30) + ' stroke="#4aa3ff" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#mb)"/>'; });
+  ATTRS.forEach((a, i) => {
+    const x = 150 + 105 * Math.cos((-90 + 60 * i) * Math.PI / 180), y = 150 + 105 * Math.sin((-90 + 60 * i) * Math.PI / 180);
+    const sel = i === s, bd = strong.includes(i) ? ['↑', '#ff6b6b'] : weak.includes(i) ? ['↓', '#4aa3ff'] : i === even ? ['→', '#cfcfcf'] : null;
+    svg += '<g role="button" tabindex="0" data-act="hattr" data-i="' + i + '" class="hp-node' + (sel ? ' sel' : '') + '" aria-label="' + a + 'を選ぶ">' +
+      '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="30" fill="#131313" stroke="' + ATTR_COL[a] + '" stroke-width="' + (sel ? 5 : 2.5) + '"/>' +
+      '<text x="' + x.toFixed(1) + '" y="' + (y - 3).toFixed(1) + '" text-anchor="middle" font-size="20" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,sans-serif">' + ATTR_IC[a] + '</text>' +
+      '<text x="' + x.toFixed(1) + '" y="' + (y + 16).toFixed(1) + '" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">' + a + '</text>' +
+      (bd ? '<circle cx="' + (x + 22).toFixed(1) + '" cy="' + (y - 22).toFixed(1) + '" r="10" fill="#0a0a0a" stroke="' + bd[1] + '" stroke-width="2"/><text x="' + (x + 22).toFixed(1) + '" y="' + (y - 17.5).toFixed(1) + '" text-anchor="middle" fill="' + bd[1] + '" font-size="13" font-weight="700">' + bd[0] + '</text>' : '') + '</g>';
+  });
+  svg += '</svg>';
+  const A = ATTRS[s];
+  return '<div class="hp-hero"><p><b>属性は6すくみの輪。矢印の先の2つに強い！</b></p><p class="hp-sub">輪の属性をタップすると、強い・弱い相手が見られます</p>' + svg +
+    '<div class="hp-res"><b style="color:' + ATTR_COL[A] + '">' + ATTR_IC[A] + ' ' + A + '</b>から見ると<div class="hp-row up"><span class="hp-ar">↑</span><span>' + strong.map(k => ATTRS[k]).join('・') + ' に強い</span><em>ダメージ ×1.5</em></div>' +
+    '<div class="hp-row dn"><span class="hp-ar">↓</span><span>' + weak.map(k => ATTRS[k]).join('・') + ' に弱い</span><em>ダメージ ×0.5</em></div>' +
+    '<div class="hp-row eq"><span class="hp-ar">→</span><span>' + ATTRS[even] + ' や同じ属性は等倍</span><em>ダメージ ×1</em></div></div></div>' +
+    hpSec('★', '対戦画面のマーク', '<p class="hp-t">名前の横の丸いマークは、<b>相手の前衛との相性</b>です。<span class="hp-ar up">↑</span>有利（赤）<span class="hp-ar dn">↓</span>不利（青）<span class="hp-ar eq">→</span>等倍</p>') +
+    hpSec('☆', '属性の一覧', '<div class="hp-list">' + ATTRS.map(a => '<div><span class="ic">' + ATTR_IC[a] + '</span><b style="color:' + ATTR_COL[a] + '">' + a + '</b><span>→ ' + RULE_LINES[a].join('・') + ' に強い</span></div>').join('') + '</div>');
+}
+function helpHTML() {
+  if (!UI.help) return '';
+  const tabs = [['rule', 'あそびかた'], ['move', 'わざの見かた'], ['attr', '属性の相性']];
+  const body = UI.help === 'move' ? helpMove() : UI.help === 'attr' ? helpAttr() : helpRule();
+  return '<div class="hp-back" data-act="helpclose"></div><div class="hp-pop" role="dialog" aria-modal="true" aria-label="ヘルプ">' +
+    '<div class="hp-head"><div class="hp-tabs" role="tablist">' + tabs.map(x => '<button role="tab" class="hp-tab" data-act="htab" data-v="' + x[0] + '" aria-selected="' + (UI.help === x[0]) + '">' + x[1] + '</button>').join('') + '</div>' +
+    '<button class="hp-x" data-act="helpclose" aria-label="閉じる">✕</button></div>' +
+    '<div class="hp-body" id="hbody">' + body + '</div></div>';
+}
 function render() {
   const app = document.getElementById('app');
   if (!app) return;
   const hand = document.getElementById('bsl');
   const hx = hand ? hand.scrollTop : 0;
+  const hb = document.getElementById('hbody');
+  const hbx = hb ? hb.scrollTop : 0;
   const sy = typeof window !== 'undefined' ? window.scrollY : 0;
-  app.innerHTML = renderScreen();
+  app.innerHTML = renderScreen() + helpHTML();
   if (G) G.fx = { dmg: {}, heal: {}, ghost: {} };
+  UI.lastAdd = -1;
   hideTip();
   if (UI.screen === 'deck') syncCar();
   const h2 = document.getElementById('bsl');
   if (h2) h2.scrollTop = hx;
-  if (UI.screen === 'battle') applyScale();
-  if (typeof window !== 'undefined' && window.scrollTo && UI.screen === 'battle') window.scrollTo(0, sy);
+  const hb2 = document.getElementById('hbody');
+  if (hb2) hb2.scrollTop = hbx;
+  if (UI.screen === 'battle' || UI.screen === 'deck') applyScale();
+  if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, sy);
 }
 
 /* ---------- 操作 ---------- */
 function act(a, d) {
+  if (a === 'help') { UI.help = UI.help ? null : 'rule'; render(); return; }
+  if (a === 'helpclose') { UI.help = null; render(); return; }
+  if (a === 'htab') { UI.help = d.v; render(); const b = document.getElementById('hbody'); if (b) b.scrollTop = 0; return; }
+  if (a === 'hattr') { UI.helpAttr = +d.i; render(); return; }
   if (a === 'toggle' || a === 'dec') {
     const id = +d.id, n = DECK.filter(i => i === id).length;
     UI.msg = '';
@@ -1399,7 +1630,7 @@ function act(a, d) {
   }
   if (a === 'nav') {
     if (G && G.over) G.dismissed = true;
-    UI.screen = d.v; UI.msg = ''; render();
+    UI.screen = d.v; UI.msg = ''; UI.dwin = null; render();
     if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
     return;
   }
@@ -1417,19 +1648,17 @@ function act(a, d) {
     setTimeout(() => { if (UI.gAnim === A && !A.done) { A.done = true; render(); } }, GACHA_MS);
     render(); return;
   }
-  if (a === 'filter') { UI.filter = d.v; UI.cIdx = 0; render(); return; }
-  if (a === 'cfocus') {
-    clearTimeout(UI.cfTimer);
-    if (+d.i !== UI.cIdx) { const i = +d.i; UI.cfTimer = setTimeout(() => scrollCar(i), 320); }
-    return;
-  }
-  if (a === 'cmove') { scrollCar(UI.cIdx + (+d.dir)); return; }
-  if (a === 'cadd') { const x = carList()[UI.cIdx]; if (x) addToDeck(x.id); return; }
+  if (a === 'filter') { UI.filter = d.v; UI.carX = 0; render(); return; }
+  if (a === 'cfocus') { clearTimeout(UI.cfTimer); const id = +d.id; UI.cfTimer = setTimeout(() => { UI.dwin = id; render(); }, 280); return; }
+  if (a === 'cmove') { scrollCar(+d.dir); return; }
+  if (a === 'dclose') { UI.dwin = null; render(); return; }
+  if (a === 'dadd') { addToDeck(+d.id); return; }
+  if (a === 'ddec') { const i = DECK.lastIndexOf(+d.id); if (i < 0) { say('このカードは採用されていません。'); render(); } else removeFromDeck(i); return; }
   if (a === 'dslot') { UI.dsel = UI.dsel === +d.idx ? -1 : +d.idx; UI.msg = ''; render(); return; }
   if (a === 'del') { removeFromDeck(UI.dsel); return; }
   if (a === 'save') { saveDeckFile(); return; }
-  if (a === 'reset') { DECK = []; UI.dsel = -1; UI.msg = ''; saveDeck(); render(); return; }
-  if (a === 'random') { DECK = randomDeck(ownedPool()); UI.dsel = -1; UI.msg = ''; saveDeck(); render(); return; }
+  if (a === 'reset') { DECK = []; UI.dsel = -1; say('すべて解除しました。'); saveDeck(); render(); return; }
+  if (a === 'random') { DECK = randomDeck(ownedPool()); UI.dsel = -1; say('ランダムに' + DECK.length + '枚を編成しました。'); saveDeck(); render(); return; }
   if (a === 'start' || a === 'retry') {
     if (DECK.length !== DECK_SIZE) return;
     newGame(DECK.slice()); UI.screen = 'battle'; startTurn('p');
@@ -1587,23 +1816,15 @@ function init() {
       if (t.dataset.dk === 'coll') addToDeck(+t.dataset.id);
       else if (t.dataset.dk === 'deck') removeFromDeck(+t.dataset.idx);
     });
-    app.addEventListener('scroll', e => {
-      const car = e.target;
-      if (!car || car.id !== 'car' || !car.querySelectorAll) return;
-      const items = car.querySelectorAll('.ci');
-      if (!items.length) return;
-      const idx = Math.max(0, Math.min(items.length - 1, Math.round(car.scrollLeft / (items[0].offsetWidth + 12))));
-      UI.cIdx = idx;
-      items.forEach((n, i) => n.classList.toggle('cen', i === idx));
-    }, true);
+    app.addEventListener('scroll', e => { const car = e.target; if (car && car.id === 'car') UI.carX = car.scrollLeft; }, true);
     app.addEventListener('change', e => {
       const f = e.target;
       if (!f || f.id !== 'dfile' || !f.files || !f.files[0]) return;
       const file = f.files[0];
-      if (file.size > 200000) { UI.msg = 'ファイルが大きすぎます。デッキファイルを選んでください。'; render(); return; }
+      if (file.size > 200000) { say('ファイルが大きすぎます。デッキファイルを選んでください。'); render(); return; }
       const r = new FileReader();
       r.onload = () => restoreFromText(String(r.result));
-      r.onerror = () => { UI.msg = 'ファイルを読み込めませんでした。'; render(); };
+      r.onerror = () => { say('ファイルを読み込めませんでした。'); render(); };
       r.readAsText(file);
       f.value = '';
     });
@@ -1612,12 +1833,14 @@ function init() {
       if (k) UI.open[k] = e.target.open;
     }, true);
     app.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && UI.help) { UI.help = null; render(); return; }
       if (e.key !== 'Enter' && e.key !== ' ') return;
       const t = e.target.closest('[data-act]');
       if (t && t.getAttribute('role') === 'button') { e.preventDefault(); act(t.dataset.act, t.dataset); }
     });
   }
   if (typeof window !== 'undefined' && window.addEventListener) window.addEventListener('resize', applyScale);
+  if (typeof document !== 'undefined') document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.help) { UI.help = null; render(); } });
   render();
 }
 init();
