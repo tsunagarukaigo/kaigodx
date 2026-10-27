@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>つながる介護の夜 ─ 10回くらいは遊べる推理ゲーム</title>
+<title>つながる介護の夜 ─ 推理ゲーム</title>
 <style>
 :root{--bg:#f4efe6;--card:#fffaf0;--ink:#2a2118;--sub:#7a6a58;--acc:#a3262a;--line:#d8cbb6;--bub:#ece2cf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#16120e;--card:#221c15;--ink:#f0e6d4;--sub:#a8987f;--acc:#e0555a;--line:#3a3023;--bub:#2d251b}}
@@ -141,7 +141,7 @@ const adv=()=>{if(swc>0)swc--;else turn++};
 function swFind(){if(swGot||turn>=MAX||$("evp").classList.contains("show")||Math.random()>=.01)return;swGot=1;swc=3;$("evh").textContent="アイテムを発見！";$("evi").textContent="⏱️";$("evt").textContent="「ストップウォッチ」を手に入れた！ 3回まで、時間（ターン）の進行を止められる……！";$("evp").classList.add("show")}
 const bar=()=>{const a=[];
 if(evOn&&!evUsed)a.push(["ev",ev[1],"証拠品「"+ev[0]+"」："+(ev[1]==="📄"?"現場に残されていた。示された人物だと思う人を選んでつきつけよう":"現場に落ちていた。持ち主だと思う人を選んでつきつけよう")+"（人違いだと証拠は消える）"]);
-if(IT.med)a.push(["med","💊","？？？"]);if(IT.sen)a.push(["sen","🛏","？？？"]);
+if(IT.med)a.push(["med","💊","くすり：誰のくすりだろうか・・・"]);if(IT.sen)a.push(["sen","🛏","見守りセンサー：利用者の安否確認ができるハイテクマシン"]);
 if(IT.dent&&!unl[10])a.push(["dent","🦷","入れ歯：トメさんに差し上げると、ちゃんと話してくれる"]);
 if(IT.bau&&((sus.includes(12)&&!unl[12])||(sus.includes(17)&&!unl[17])))a.push(["bau","📟","バウリンガル（翻訳機）：ぽち／アディラに向けると、言葉が正しく分かる"]);
 if(IT.cake)a.push(["cake","🍰","ショートケーキ：女性にあげると喜ぶ"]);if(IT.cash)a.push(["cash","💴","札束：みんなだいすき"]);
@@ -153,7 +153,7 @@ var CT=false,medT={},senT={},medGot=0,senGot=0,TP={},SWT={},cakeGot=0,cashGot=0;
 function rollSW(){sus.forEach(i=>{const l=lv(i);SWT[i]=l==="H"?Math.random()<.4:l==="M"?Math.random()<.3:false})}
 const FEM=[1,3,5,7,10,11,13,17];
 function nwFind(){if(turn>=MAX||$("evp").classList.contains("show"))return;const k=!IT.cake&&!cakeGot&&Math.random()<.05?"cake":!IT.cash&&!cashGot&&Math.random()<.01?"cash":null;if(!k)return;if(k==="cake"){cakeGot=1;IT.cake=1}else{cashGot=1;IT.cash=1}$("evh").textContent="アイテムを発見！";$("evi").textContent=k==="cake"?"🍰":"💴";$("evt").textContent=k==="cake"?"「ショートケーキ」を手に入れた！ 女性にあげると喜ぶかもしれない……。（アイテム欄から使える）":"「札束」を手に入れた！ みんなだいすき……。（アイテム欄から使える）";$("evp").classList.add("show")}
-function nw2(){if(turn>=MAX||$("evp").classList.contains("show"))return;const a=!medGot&&Math.random()<.03,b=!senGot&&Math.random()<.03,k=a?"med":b?"sen":null;if(!k)return;if(k==="med"){medGot=1;IT.med=1}else{senGot=1;IT.sen=1}$("evh").textContent="アイテムを発見！";$("evi").textContent=k==="med"?"💊":"🛏";$("evt").textContent="謎のアイテム「？？？」を手に入れた！ 使い道は分からない……。（アイテム欄から使える）";$("evp").classList.add("show")}
+function nw2(){if(turn>=MAX||$("evp").classList.contains("show"))return;const a=!medGot&&Math.random()<.03,b=!senGot&&Math.random()<.03,k=a?"med":b?"sen":null;if(!k)return;if(k==="med"){medGot=1;IT.med=1}else{senGot=1;IT.sen=1}$("evh").textContent="アイテムを発見！";$("evi").textContent=k==="med"?"💊":"🛏";$("evt").textContent=k==="med"?"「くすり」を手に入れた！ 誰かに使ってみようか……。（アイテム欄から使える）":"「見守りセンサー」を手に入れた！ 誰かに突きつけてみようか……。（アイテム欄から使える）";$("evp").classList.add("show")}
 const STF=[0,9,7,5,4,11,2,1,17,13,3,8],SEN={0:"ご入居者様の身に何かあったやもしれません！ 失礼いたします！",9:"利用者様のお部屋で反応が！ ちょっと失礼しますよ！",7:"センサーに反応あり。利用者様が危険です、確認に向かいます！",5:"大変！ 入居者さんがベッドから落ちそうよ！ 行ってくるわ！",4:"転倒の恐れがある。直ちに向かう！",11:"入居者さんが大変ですっ！ ちょっと見てきますっ！",2:"やべ、入居者さんが！ 行ってくる！",1:"あらやだ、入居者さんが大変よぉ！ 飛んでいくわぁ！",17:"入居者さんが大変です！ 行ってきます！",13:"入居者さんが大変です！ 書類置いてすぐ行きます！",3:"入居者さんが大変だよ！ モップ置いて行ってくる！",8:"入居者さんが大変じゃ！ 見回りに行ってくるわい！"};
 function useMed(k){const i=sel,L=$("log"),say=h=>{L.insertAdjacentHTML("beforeend",h);const c=$("scr");c.scrollTo({top:c.scrollHeight,behavior:"smooth"})};
  if(!(k==="med"?STF.includes(i)||i===10:STF.includes(i))){say(`<div class="b me"><small>探偵</small>${k==="med"?"💊":"🛏"} ……この人には、使えなさそうだ。</div>`);return}
