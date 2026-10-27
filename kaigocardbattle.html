@@ -343,6 +343,114 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
   .tile.ghost { animation: hitframe .9s ease-out both, ghostfade .5s ease-in .6s forwards; }
   .burst { animation: burstfade .85s ease-out both; }
 }
+
+/* ===== 対戦画面（案B：440×750 ステージ） ===== */
+.bs-wrap { position: relative; width: calc(440px * var(--bsc, 1)); height: calc(750px * var(--bsc, 1)); margin: 0 auto; }
+.bs { position: absolute; left: 0; top: 0; width: 440px; height: 750px; overflow: hidden; transform: scale(var(--bsc, 1)); transform-origin: 0 0; background: #0a0a0a; border: 1px solid #2c2c2c; border-radius: 14px; font-size: 14px; line-height: 1.4; }
+.bs .grow { flex: 1; min-width: 0; }
+.bs .col { display: flex; flex-direction: column; gap: 2px; }
+.bs-status { position: absolute; left: 0; top: 0; right: 0; height: 40px; display: flex; align-items: center; gap: 14px; padding: 0 14px; border-bottom: 1px solid #2c2c2c; font-size: 12px; color: #cfcfcf; }
+.bs-status b { color: #fff; }
+.bs-pill { display: inline-block; background: #fff; color: #000; font-weight: 700; font-size: 11px; line-height: 16px; padding: 0 7px; border-radius: 9px; white-space: nowrap; }
+.bs-pill.s { font-size: 10px; line-height: 14px; padding: 0 5px; }
+.bs-bench { position: absolute; display: flex; gap: 7px; }
+.bs-bench.foe { left: 14px; top: 52px; width: 260px; }
+.bs-bench.mine { left: 178px; bottom: 220px; width: 248px; }
+.bs-tok { position: relative; flex: 1; min-width: 0; height: 64px; border: 2px solid #6a6a6a; border-radius: 10px; background: linear-gradient(180deg, #1c1c1c, #101010); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; }
+.bs-tok.foe { border-color: #4a4a4a; }
+.bs-tok .ic { font-size: 24px; }
+.bs-tok b { font-size: 11px; line-height: 1; }
+.bs-tok.empty { border-style: dashed; background: transparent; color: #9b9b9b; font-size: 11px; cursor: default; }
+.bs-tok.sel { border-color: #c9ecd5; box-shadow: 0 0 0 1px #c9ecd5; }
+.bs-tok .burst .bi { font-size: 22px; }
+.bs-tok .burst .bn { font-size: 16px; }
+.bs-card { position: absolute; border: 2px solid #b5b5b5; border-radius: 12px; background: linear-gradient(180deg, #1c1c1c, #0f0f0f); padding: 8px; display: flex; flex-direction: column; gap: 6px; cursor: pointer; }
+.bs-card.foe { left: 290px; top: 52px; width: 136px; height: 176px; }
+.bs-card.mine { left: 14px; top: 330px; width: 152px; height: 200px; z-index: 3; border-color: #c9ecd5; background: linear-gradient(180deg, #1b2520, #111613); }
+.bs-card.empty { border-style: dashed; background: transparent; align-items: center; justify-content: center; cursor: default; }
+.bs-top { display: flex; justify-content: space-between; align-items: center; }
+.bs-art { position: relative; flex: 1; min-height: 0; border-radius: 8px; background: radial-gradient(circle at 50% 40%, #2e2e2e, #0c0c0c); display: flex; align-items: center; justify-content: center; }
+.bs-card.foe .ic { font-size: 50px; }
+.bs-card.mine .ic { font-size: 58px; }
+.bs-art .sts { position: absolute; left: 2px; right: 2px; bottom: 2px; display: flex; gap: 2px; justify-content: center; flex-wrap: wrap; }
+.bs-nm { min-height: 2.4em; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px; font-weight: 700; line-height: 1.2; }
+.bs-plate { position: absolute; border: 2px solid #b5b5b5; background: #141414; padding: 8px 12px; display: flex; flex-direction: column; gap: 5px; }
+.bs-plate.foe { left: 14px; bottom: 522px; width: 260px; border-radius: 10px 10px 10px 28px; }
+.bs-plate.mine { left: 178px; top: 330px; width: 248px; border-color: #c9ecd5; background: #141c18; border-radius: 10px 28px 10px 10px; }
+.bs-hpr { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
+.bs-n { font-size: 15px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bs-ar { flex: none; width: 20px; height: 20px; border: 2px solid; border-radius: 50%; font-size: 12px; font-weight: 700; line-height: 16px; text-align: center; }
+.bs-lb { font-size: 11px; font-weight: 700; color: #9b9b9b; }
+.bs-bar { flex: 1; min-width: 40px; height: 8px; background: #2a2a2a; border-radius: 4px; overflow: hidden; }
+.bs-bar i { display: block; height: 100%; transition: width .3s; }
+.bs-hpn { font-size: 16px; font-variant-numeric: tabular-nums; }
+.bs-hpn small { font-size: 11px; color: #9b9b9b; }
+.bs-pips { display: flex; gap: 3px; flex: 1; }
+.bs-pip { width: 12px; height: 12px; border: 2px solid #fff; border-radius: 50%; }
+.bs-pip.on { background: #fff; }
+.bs-cpn { font-size: 13px; }
+.bs-msg { position: absolute; left: 12px; right: 12px; top: 558px; height: 48px; border: 2px solid #f3f3f3; border-radius: 6px; background: #0d0d0d; padding: 4px 14px; font-size: 13px; line-height: 1.4; display: flex; align-items: center; outline: 2px solid #3b3b3b; outline-offset: 2px; cursor: pointer; overflow: hidden; }
+.bs-cmd { position: absolute; left: 0; right: 0; bottom: 0; height: 136px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; background: #0a0a0a; border-top: 1px solid #2c2c2c; }
+.bs-cmd button { font: inherit; font-weight: 700; font-size: 17px; border: 1px solid #6a6a6a; border-radius: 10px; background: #151515; color: #fff; cursor: pointer; }
+.bs-cmd button.main { background: #fff; color: #000; border-color: #fff; font-size: 18px; }
+.bs-cmd button:disabled { opacity: .4; cursor: not-allowed; }
+.bs-back { position: absolute; inset: 0; background: rgba(0, 0, 0, .58); z-index: 20; animation: bsfade .2s ease-out both; }
+.bs-pop { position: absolute; left: 12px; right: 12px; bottom: 146px; z-index: 21; background: #141414; border: 2px solid #f3f3f3; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 560px; overflow: auto; }
+.bs-pop.infow { bottom: auto; top: 60px; max-height: 620px; }
+.bs-wh { display: flex; align-items: center; gap: 8px; }
+.bs-wh b { font-size: 15px; }
+.bs-x { font: inherit; height: 28px; padding: 0 12px; border: 1px solid #3b3b3b; border-radius: 14px; background: transparent; color: #cfcfcf; font-size: 12px; cursor: pointer; }
+.bs-mv { font: inherit; display: flex; flex-direction: column; gap: 6px; text-align: left; width: 100%; padding: 9px 12px; border: 2px solid #6a6a6a; border-radius: 10px; background: linear-gradient(180deg, #1c1c1c, #101010); color: #f3f3f3; cursor: pointer; }
+.bs-mv:disabled { opacity: .5; cursor: not-allowed; }
+.bs-note { font-size: 12px; color: #c9ecd5; }
+.bs-row { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 10px; border: 2px solid #6a6a6a; border-radius: 10px; background: linear-gradient(180deg, #1c1c1c, #0f0f0f); cursor: default; }
+.bs-row[data-act] { cursor: pointer; }
+.bs-row .ic { font-size: 24px; }
+.bs-row .rn { font-size: 13px; font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bs-row .rh { font-size: 12px; min-width: 40px; text-align: right; }
+.bs-row.sel { border-color: #c9ecd5; box-shadow: 0 0 0 1px #c9ecd5; }
+.bs-row.dim { opacity: .55; }
+.bs-go, .bs-play { font: inherit; font-weight: 700; border: 0; border-radius: 10px; background: #fff; color: #000; cursor: pointer; }
+.bs-go { height: 40px; padding: 0 14px; font-size: 13px; }
+.bs-go:disabled, .bs-play:disabled { opacity: .4; cursor: not-allowed; }
+.bs-drawer { position: absolute; right: 0; top: 40px; bottom: 0; width: 316px; z-index: 21; background: #141414; border-left: 2px solid #f3f3f3; padding: 10px 12px 14px; display: flex; flex-direction: column; gap: 8px; animation: bsdrawer .26s ease-out both; }
+.bs-list { display: flex; flex-direction: column; gap: 6px; flex: 0 1 auto; max-height: 250px; overflow: auto; }
+.bs-det { display: flex; flex-direction: column; gap: 6px; padding: 9px 10px; border: 1px solid #3b3b3b; border-radius: 10px; background: #101010; overflow: auto; flex: 1; min-height: 0; }
+.bs-hint { margin-top: auto; }
+.bs-play { flex: none; height: 48px; font-size: 15px; }
+.bs-log { display: flex; flex-direction: column; gap: 3px; font-size: 13px; color: #cfcfcf; }
+.bs-log div:last-child { color: #fff; font-weight: 500; }
+.bs-bub { position: absolute; background: #fff; color: #000; border-radius: 16px; padding: 7px 12px; font-weight: 700; font-size: 14px; line-height: 1.3; text-align: center; z-index: 9; animation: bspop .28s ease-out both; pointer-events: none; }
+.bs-bub.big { font-size: 18px; padding: 9px 14px; }
+.bs-bub.still { animation: none; }
+.bs-bub i { position: absolute; width: 14px; height: 14px; background: #fff; transform: rotate(45deg); }
+.bs-fly { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif; font-size: 26px; line-height: 1; z-index: 8; pointer-events: none; box-shadow: 0 0 18px 6px rgba(255, 255, 255, .55); animation: bsfly .46s cubic-bezier(.5, 0, .8, .6) .1s both; }
+.bs-star { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; z-index: 5; pointer-events: none; animation: bsstar .6s ease-out both; }
+.bs-card.lunge-p { animation: bslp .56s ease-in-out both; }
+.bs-card.lunge-e { animation: bsle .56s ease-in-out both; }
+.bs-card.hit, .bs-tok.hit { animation: shake .55s cubic-bezier(.36, .07, .19, .97) both, hitframe .9s ease-out both; }
+.bs-card.ghost, .bs-tok.ghost { position: absolute; animation: shake .55s cubic-bezier(.36, .07, .19, .97) both, hitframe .9s ease-out both, ghostfade .5s ease-in .6s forwards; cursor: default; }
+.bs-tok.ghost { position: relative; }
+.bs-card.hit::before, .bs-card.ghost::before, .bs-tok.hit::before, .bs-tok.ghost::before { content: ""; position: absolute; inset: 0; border-radius: 9px; background: rgba(255, 48, 48, .5); pointer-events: none; z-index: 2; animation: redflash .6s ease-out both; }
+.bs-card.heal, .bs-tok.heal { animation: healframe .9s ease-out both; }
+.bs-card .burst, .bs-tok .burst { z-index: 6; }
+.drag-on .bs-card[data-drop], .drag-on .bs-tok[data-drop] { outline: 2px dashed #c9ecd5; outline-offset: 2px; }
+.bs-card.dropok, .bs-tok.dropok { box-shadow: 0 0 0 3px #c9ecd5; }
+.bs-dragging .bs-drawer { opacity: 0; pointer-events: none; }
+.bs-dragging .bs-back { background: transparent; pointer-events: none; }
+@keyframes bslp { 0%, 100% { transform: none; } 30%, 60% { transform: translate(26px, -34px) scale(1.07); } }
+@keyframes bsle { 0%, 100% { transform: none; } 30%, 60% { transform: translate(-26px, 34px) scale(1.07); } }
+@keyframes bsfly { 0% { opacity: 0; transform: translate(0, 0) scale(.6) rotate(0); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.5) rotate(360deg); } }
+@keyframes bsstar { 0% { opacity: 0; transform: scale(.2) rotate(0); } 25% { opacity: 1; transform: scale(1.1) rotate(20deg); } 100% { opacity: 0; transform: scale(1.7) rotate(50deg); } }
+@keyframes bspop { 0% { opacity: 0; transform: scale(.4); } 65% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes bsfade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bsdrawer { from { transform: translateX(100%); } to { transform: none; } }
+.k-rise { animation: bsrise .2s ease-out both; }
+@keyframes bsrise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .bs-card.lunge-p, .bs-card.lunge-e, .bs-fly, .bs-star, .bs-bub, .bs-drawer, .k-rise, .bs-back { animation: none; }
+  .bs-card.hit, .bs-tok.hit { animation: hitframe .9s ease-out both; }
+}
 </style>
 
 <div id="app"></div>
@@ -456,7 +564,7 @@ const opp = s => (s === 'p' ? 'e' : 'p');
 
 /* ---------- 状態 ---------- */
 let G = null;
-let UI = { screen: 'deck', filter: 'all', sel: null, open: {}, cIdx: 0, dsel: -1, drag: null };
+let UI = { screen: 'deck', filter: 'all', sel: null, open: {}, cIdx: 0, dsel: -1, drag: null, win: null, anim: null };
 let DECK = [];
 let OWN = {}, GACHA = { date: '', used: 0 };
 let uidc = 0;
@@ -742,7 +850,7 @@ async function cpuTurn(s) {
   if (S.active && !G.attacked && canAttack(s)) {
     const opts = S.active.moves.map((m, i) => ({ i, m, sc: aiScore(s, m) })).filter(o => S.cp >= o.m.c).sort((a, b) => b.sc - a.sc);
     if (opts.length && opts[0].sc > 0) {
-      useMove(s, opts[0].i); render(); await sleep(800);
+      await animMove(s, opts[0].i); render(); await sleep(250);
       await waitPromotion();
       if (G.over) return;
     }
@@ -914,8 +1022,8 @@ async function saveDeckFile() {
   } catch (e) {
     if (e && e.code === 'rejected_extension') {
       try {
-        await dl.save({ filename: 'kaigo-deck.txt', data });
-        UI.msg = 'この環境では.datで保存できないため、kaigo-deck.txtで保存しました。拡張子を.datに変えても「復元」で読み込めます。';
+        await dl.save({ filename: 'kaigo-deck.dat.txt', data });
+        UI.msg = 'この環境では.datで保存できないため、kaigo-deck.dat.txtで保存しました。名前を変えなくても、.datに直しても「復元」で読み込めます。';
       } catch (e2) { UI.msg = e2 && e2.code === 'declined' ? '保存をキャンセルしました。' : 'デッキを保存できませんでした。'; }
     } else UI.msg = e && e.code === 'declined' ? '保存をキャンセルしました。' : 'デッキを保存できませんでした。';
   }
@@ -1054,60 +1162,226 @@ function infoHTML() {
   if (!x) return '<div class="info"><span class="dim">カードをタップすると、業務内容とわざが表示されます。PCではカードにマウスを重ねても表示され、手札は場にドラッグして出せます。</span></div>';
   return '<div class="info">' + detailHTML(x) + '</div>';
 }
+/* ---------- 対戦画面（案B：スマホ 440×750 のステージ） ---------- */
+function arrowOf(m) { return m > 1 ? ['↑', '#ff5c5c', '有利'] : m < 1 ? ['↓', '#4aa3ff', '不利'] : ['→', '#cfcfcf', '等倍']; }
+function arBadge(a, b) {
+  if (!a || !b) return '';
+  const r = arrowOf(mult(a.attr, b.attr));
+  return '<span class="bs-ar" style="color:' + r[1] + ';border-color:' + r[1] + '" role="img" aria-label="' + r[2] + '">' + r[0] + '</span>';
+}
+function bsPill(n, s) { return '<span class="bs-pill' + (s ? ' s' : '') + '">CP' + n + '</span>'; }
+function stTags(x) { return (x.sh ? '<span class="st">盾' + x.sh + '</span>' : '') + (x.db ? '<span class="st">弱-' + x.db + '</span>' : ''); }
+function fxCls(x) {
+  const d = G.fx.dmg[x.uid], h = G.fx.heal[x.uid];
+  return d !== undefined ? ' hit' : (h !== undefined ? ' heal' : '');
+}
+function fxBurst(x) {
+  const d = G.fx.dmg[x.uid], h = G.fx.heal[x.uid];
+  return d !== undefined ? burst(d, false) : (h !== undefined ? burst(h, true) : '');
+}
+function fxStar(x) {
+  return G.fx.dmg[x.uid] !== undefined && G.fx.dmg[x.uid] > 0
+    ? '<svg class="bs-star" viewBox="-50 -50 100 100" aria-hidden="true"><polygon points="0,-46 10,-14 44,-24 20,2 46,24 12,18 0,46 -12,18 -46,24 -20,2 -44,-24 -10,-14" fill="#fff" stroke="#ff5a5a" stroke-width="3" stroke-linejoin="round"></polygon></svg>' : '';
+}
+function cardInner(x) {
+  return '<div class="bs-top">' + bsPill(x.cost) + '<span class="tag">' + x.attr + '</span></div>' +
+    '<div class="bs-art"><span class="ic">' + x.ic + '</span>' + (stTags(x) ? '<span class="sts">' + stTags(x) + '</span>' : '') + '</div>' +
+    '<div class="bs-nm">' + x.name + '</div>';
+}
+function bsCard(x, zone) {
+  const mine = zone === 'pa', side = mine ? 'mine' : 'foe';
+  if (!x) {
+    const g = G.fx.ghost[zone + '0'];
+    if (g) return '<div class="bs-card ' + side + ' ghost">' + cardInner(g) + fxStar(g) + burst(G.fx.dmg[g.uid], false) + '</div>';
+    return '<div class="bs-card ' + side + ' empty"' + dropAttr(zone, 0) + '><span class="dim sm">前衛なし</span></div>';
+  }
+  const an = UI.anim;
+  const lunge = an && an.ph === 'wind' && an.s === (mine ? 'p' : 'e') ? ' lunge-' + an.s : '';
+  return '<div class="bs-card ' + side + fxCls(x) + lunge + '" role="button" tabindex="0" data-act="info" data-zone="' + zone + '" data-idx="0"' + dropAttr(zone, 0) + '>' +
+    cardInner(x) + fxStar(x) + fxBurst(x) + '</div>';
+}
+function bsTok(x, zone, idx) {
+  const mine = zone === 'pb', side = mine ? 'mine' : 'foe';
+  if (!x) {
+    const g = G.fx.ghost[zone + idx];
+    if (g) return '<div class="bs-tok ' + side + ' ghost"><span class="ic">' + g.ic + '</span>' + burst(G.fx.dmg[g.uid], false) + '</div>';
+    return '<div class="bs-tok ' + side + ' empty"' + dropAttr(zone, idx) + '>空き</div>';
+  }
+  const sel = mine && UI.sel && UI.sel.zone === 'pb' && UI.sel.idx === idx;
+  return '<div class="bs-tok ' + side + fxCls(x) + (sel ? ' sel' : '') + '" role="button" tabindex="0" data-act="' + (mine ? 'swapopen' : 'info') + '" data-zone="' + zone + '" data-idx="' + idx + '"' +
+    dropAttr(zone, idx) + (mine ? ' draggable="true"' : '') + ' aria-label="' + x.name + '">' +
+    '<span class="ic">' + x.ic + '</span>' + bsPill(x.cost, true) + '<b>HP' + x.hp + '</b>' + fxBurst(x) + '</div>';
+}
+function bsPlate(x, side, other) {
+  const mine = side === 'p', S = G[side];
+  const pips = mine ? '<div class="bs-hpr"><span class="bs-lb">CP</span><span class="bs-pips">' +
+    Array.from({ length: S.max }, (_, i) => '<i class="bs-pip' + (i < S.cp ? ' on' : '') + '"></i>').join('') + '</span><b class="bs-cpn">' + S.cp + '/' + S.max + '</b></div>' : '';
+  if (!x) return '<div class="bs-plate ' + (mine ? 'mine' : 'foe') + '"><b class="dim">前衛なし</b>' + pips + '</div>';
+  const pct = Math.round(x.hp / x.max * 100);
+  return '<div class="bs-plate ' + (mine ? 'mine' : 'foe') + '">' +
+    '<div class="bs-hpr"><b class="bs-n">' + x.name + '</b>' + arBadge(x, other) + '<span class="grow"></span><span class="tag">' + x.attr + '</span></div>' +
+    '<div class="bs-hpr"><span class="bs-lb">HP</span><span class="bs-bar"><i style="width:' + pct + '%;background:' + (pct <= 30 ? '#ff6b6b' : '#fff') + '"></i></span><b class="bs-hpn">' + x.hp + '<small>/' + x.max + '</small></b></div>' +
+    (stTags(x) ? '<div class="bs-hpr">' + stTags(x) + '</div>' : '') + pips + '</div>';
+}
+function bubble(cls, pos, tail, html) {
+  return '<div class="bs-bub ' + cls + '" style="' + pos + '">' + html + '<i style="' + tail + '"></i></div>';
+}
+function animLayer() {
+  const an = UI.anim;
+  if (!an) return '';
+  const p = an.s === 'p';
+  const still = an.ph === 'hit' ? ' still' : '';
+  let h = '';
+  if (an.ph === 'wind') {
+    const from = p ? 'left:68px;top:408px' : 'left:336px;top:118px';
+    const to = p ? '--dx:268px;--dy:-290px' : '--dx:-268px;--dy:290px';
+    h += '<div class="bs-fly" style="' + from + ';' + to + '">' + an.ic + '</div>';
+  }
+  h += p ? bubble('big' + still, 'left:178px;top:334px;width:236px', 'left:-7px;bottom:12px', an.bp)
+    : bubble('big' + still, 'left:20px;top:238px;width:236px', 'right:50px;top:-7px', an.bp);
+  if (an.ph === 'hit' && an.be) {
+    h += p ? bubble('', 'left:244px;top:236px;width:182px', 'right:36px;top:-7px', an.be)
+      : bubble('', 'left:14px;top:286px;width:236px', 'left:60px;bottom:-7px', an.be);
+  }
+  return h;
+}
+function msgText(can) {
+  if (G.mustPromote) return '前衛が倒れました。ベンチから出す職員を選んでください。';
+  if (UI.anim) return UI.anim.msg;
+  if (can && !canAttack('p') && !G.attacked) return '先攻の最初のターンは、わざを使えません。出す・交代はできます。';
+  return G.log[G.log.length - 1] || '';
+}
+function winHead(title, sub, closable) {
+  return '<div class="bs-wh"><b>' + title + '</b><span class="dim sm">' + sub + '</span><span class="grow"></span>' +
+    (closable ? '<button class="bs-x" data-act="closewin" aria-label="閉じる">閉じる</button>' : '') + '</div>';
+}
+function movesWin(can) {
+  const P = G.p, a = P.active, ea = G.e.active;
+  if (!a) return '<div class="bs-pop">' + winHead('わざ', '', true) + '<p class="dim">前衛がいません。</p></div>';
+  const blocked = !canAttack('p');
+  const k = ea ? mult(a.attr, ea.attr) : 1;
+  const rows = a.moves.map((m, i) => {
+    const dmg = m.e.d && ea ? Math.max(0, Math.round(((m.e.d + P.buff) * k - a.db) / 5) * 5) : 0;
+    const why = !can ? '' : blocked ? '先攻の最初のターンは使えません' : G.attacked ? 'このターンは攻撃済み' : P.cp < m.c ? 'CPが足りません' : '';
+    const note = why || (dmg ? (k > 1 ? '相性◎ ' : k < 1 ? '相性△ ' : '') + dmg + 'ダメージ' : '');
+    const dis = !can || !!why;
+    return '<button class="bs-mv" data-act="move" data-i="' + i + '"' + (dis ? ' disabled' : '') + '><span class="row"><span class="mvn">' + m.n + '</span><span class="bs-pill">CP ' + m.c + '</span><span class="grow"></span><b class="bs-note">' + note + '</b></span>' + chips(m.e) + '</button>';
+  }).join('');
+  return '<div class="bs-pop k-rise">' + winHead('わざをえらぶ', a.name + ' · CP ' + P.cp + '/' + P.max, true) + rows + '</div>';
+}
+function swapWin(can) {
+  const P = G.p, mp = G.mustPromote;
+  const rows = P.bench.map((x, i) => {
+    if (!x) return '';
+    const off = !mp && (!can || G.swapped || (P.active && P.cp < 1));
+    const sel = UI.sel && UI.sel.zone === 'pb' && UI.sel.idx === i;
+    return '<div class="bs-row' + (sel ? ' sel' : '') + '"><span class="ic">' + x.ic + '</span><span class="grow col"><b class="rn">' + x.name + '</b><span class="row">' + bsPill(x.cost, true) + '<b class="sm">HP' + x.hp + '/' + x.max + '</b><span class="tag">' + x.attr + '</span></span></span>' +
+      '<button class="bs-go" data-act="' + (mp ? 'pick' : 'swapto') + '" data-zone="pb" data-idx="' + i + '"' + (off ? ' disabled' : '') + '>' + (mp ? '前衛に出す' : '交代 CP1') + '</button></div>';
+  }).join('');
+  const empty = P.bench.some(Boolean) ? '' : '<p class="dim">ベンチに職員がいません。</p>';
+  const note = !mp && can && G.swapped ? '<p class="dim sm">交代は1ターンに1回です。</p>' : '';
+  return '<div class="bs-pop k-rise">' + winHead(mp ? '前衛が倒れた！出す職員を選ぼう' : 'だれと交代する？', mp ? '' : 'CP1・1ターン1回', !mp) + rows + empty + note + '</div>';
+}
+function handWin(can) {
+  const P = G.p;
+  const sel = UI.sel && UI.sel.zone === 'hand' ? P.hand[UI.sel.idx] : null;
+  const rows = P.hand.map((x, i) => {
+    const s = UI.sel && UI.sel.zone === 'hand' && UI.sel.idx === i, ok = P.cp >= x.cost;
+    return '<div class="bs-row' + (s ? ' sel' : '') + (ok ? '' : ' dim') + '" role="button" tabindex="0" data-act="pick" data-zone="hand" data-idx="' + i + '" draggable="true">' +
+      '<span class="ic">' + x.ic + '</span><span class="grow rn">' + x.name + '</span><span class="tag">' + x.attr + '</span>' + bsPill(x.cost, true) + '<b class="rh">HP' + x.hp + '</b></div>';
+  }).join('') || '<p class="dim">手札はありません。</p>';
+  const room = !P.active || P.bench.includes(null);
+  let label = '手札をえらんでください', dis = true;
+  if (sel) {
+    if (!can) label = '自分の番のみ出せます';
+    else if (!room) label = 'ベンチがいっぱいです';
+    else if (P.cp < sel.cost) label = 'CPが足りません（必要 ' + sel.cost + '）';
+    else { label = '場に出す（CP ' + sel.cost + '）'; dis = false; }
+  }
+  const det = sel ? '<div class="bs-det"><div class="row"><b>' + sel.name + '</b><span class="tag">' + sel.attr + '</span></div><div class="dim sm">' + sel.desc + '</div>' + sel.moves.map(moveBox).join('') + '</div>' : '';
+  return '<div class="bs-drawer">' + winHead('手札', P.hand.length + '枚 · CP ' + P.cp + '/' + P.max, true) +
+    '<div class="bs-list" id="bsl">' + rows + '</div>' + det +
+    '<div class="bs-hint dim sm">PCは手札を場にドラッグしても出せます。</div>' +
+    '<button class="bs-play" data-act="summon"' + (dis ? ' disabled' : '') + '>' + label + '</button></div>';
+}
+function infoWin() {
+  const x = selCard();
+  if (!x) return '';
+  return '<div class="bs-pop infow k-rise">' + winHead('カードの詳細', '', true) + detailHTML(x) + '</div>';
+}
+function logWin() {
+  return '<div class="bs-pop k-rise">' + winHead('ログ', '', true) + '<div class="bs-log">' + G.log.slice(-14).map(l => '<div>' + l + '</div>').join('') + '</div></div>';
+}
 function renderBattle() {
   const P = G.p, E = G.e;
   const can = G.turn === 'p' && !G.busy && !G.over && !G.mustPromote;
-  const a = P.active;
-  const blocked = !canAttack('p');
-  const mvBtn = i => {
-    const m = a ? a.moves[i] : null;
-    const dis = !can || !a || G.attacked || blocked || P.cp < m.c;
-    return '<button class="btn ghost mvb" data-act="move" data-i="' + i + '"' + (dis ? ' disabled' : '') + '>' +
-      (m ? '<span class="row"><span class="mvn">' + m.n + '</span><span class="cpb">CP ' + m.c + '</span></span>' + chips(m.e) : '<span>前衛なし</span>') + '</button>';
-  };
-  const sel = UI.sel;
-  let ctx = '<button class="btn ghost" disabled>カードを選択</button>';
-  if (sel && sel.zone === 'hand' && P.hand[sel.idx]) {
-    const x = P.hand[sel.idx];
-    const room = !P.active || P.bench.includes(null);
-    ctx = '<button class="btn" data-act="summon"' + (can && P.cp >= x.cost && room ? '' : ' disabled') + '>場に出す（CP' + x.cost + '）</button>';
-  } else if (sel && sel.zone === 'pb' && P.bench[sel.idx]) {
-    ctx = '<button class="btn" data-act="swap"' + (can && !G.swapped && (!P.active || P.cp >= 1) ? '' : ' disabled') + '>前衛と交代（CP1）</button>';
-  }
-  const lines = G.log.slice(-5);
-  const logHTML = lines.map((l, i) => '<div class="' + (i === lines.length - 1 ? 'new' : '') + '">' + l + '</div>').join('');
+  const a = P.active, ea = E.active;
+  const win = G.mustPromote ? 'swap' : UI.win;
   const over = G.over ? '<div class="overlay"><div class="box"><h2>' + (G.over.winner === 'p' ? '勝利' : '敗北') + '</h2><p>' + G.over.reason + '</p>' +
     '<div class="row"><button class="btn" data-act="retry">もう一度</button><button class="btn ghost" data-act="toDeck">デッキ編成へ</button></div></div></div>' : '';
+  let pop = '';
+  if (win === 'hand') pop = '<div class="bs-back" data-act="closewin"></div>' + handWin(can);
+  else if (win) {
+    const body = win === 'moves' ? movesWin(can) : win === 'swap' ? swapWin(can) : win === 'log' ? logWin() : win === 'info' ? infoWin() : '';
+    if (body) pop = '<div class="bs-back"' + (G.mustPromote ? '' : ' data-act="closewin"') + '></div>' + body;
+  }
+  const stage = '<div class="bs-wrap"><div class="bs" id="bs">' +
+    '<div class="bs-status"><span>撃破 <b>' + P.pts + '</b>-<b>' + E.pts + '</b>/' + WIN_PTS + '</span><span>山札 <b>' + P.deck.length + '</b></span><span>相手の手札 <b>' + E.hand.length + '</b></span></div>' +
+    '<div class="bs-bench foe">' + E.bench.map((x, i) => bsTok(x, 'eb', i)).join('') + '</div>' +
+    bsPlate(ea, 'e', a) + bsCard(ea, 'ea') +
+    bsCard(a, 'pa') + bsPlate(a, 'p', ea) +
+    '<div class="bs-bench mine">' + P.bench.map((x, i) => bsTok(x, 'pb', i)).join('') + '</div>' +
+    animLayer() +
+    '<div class="bs-msg" data-act="win" data-v="log" role="button" tabindex="0" aria-label="ログを開く">' + msgText(can) + '</div>' +
+    '<div class="bs-cmd">' +
+    '<button class="main" data-act="win" data-v="moves"' + (can && a ? '' : ' disabled') + '>わざ</button>' +
+    '<button data-act="win" data-v="hand"' + (G.mustPromote ? ' disabled' : '') + '>手札 <span class="bs-pill">' + P.hand.length + '</span></button>' +
+    '<button data-act="win" data-v="swap"' + (can ? '' : ' disabled') + '>交代</button>' +
+    '<button data-act="end"' + (can ? '' : ' disabled') + '>ターン終了</button></div>' +
+    pop + '</div></div>';
   return '<div class="wrap">' +
     navHTML('<span class="dim turn">ターン' + G[G.turn].t + ' · ' + (G.turn === 'p' ? 'あなたの番' : '相手の番') + '</span>') +
-    '<div class="arena">' + statusHTML('e') +
-    '<div class="bench">' + E.bench.map((x, i) => tile(x, 'eb', i)).join('') + '</div>' +
-    '<div class="active">' + tile(E.active, 'ea', 0, 'big') + '</div>' +
-    '<div class="log">' + logHTML + '</div>' +
-    '<div class="active" data-drop="pfield:0">' + tile(P.active, 'pa', 0, 'big') + '</div>' +
-    '<div class="bench" data-drop="pfield:0">' + P.bench.map((x, i) => tile(x, 'pb', i)).join('') + '</div>' +
-    statusHTML('p') + '</div>' +
-    (G.mustPromote ? '<div class="banner">前衛が倒れました。ベンチから出すカードを選んでください。</div>' : '') +
-    '<div class="actions">' + mvBtn(0) + mvBtn(1) +
-    '<div class="wide">' + ctx + '<button class="btn" data-act="end"' + (can ? '' : ' disabled') + '>ターン終了</button></div></div>' +
-    (blocked && G.turn === 'p' ? '<p class="dim sm" style="text-align:center">先攻の最初のターンは、わざを使えません。</p>' : '') +
-    infoHTML() +
-    '<div class="handlabel dim">手札 ' + P.hand.length + '枚（横にスクロール）</div>' +
-    '<div class="hand" id="hand">' + P.hand.map(handTile).join('') + '</div>' +
-    over + '</div>';
+    stage + over + '</div>';
+}
+function applyScale() {
+  const w = document.documentElement.clientWidth || 440;
+  const s = Math.max(0.5, Math.min(1, (w - 32) / 440));
+  const el = document.querySelector('.bs-wrap');
+  if (el) el.style.setProperty('--bsc', s);
+}
+async function animMove(s, mi) {
+  const S = G[s], a = S.active, m = a ? a.moves[mi] : null;
+  if (!m || G.attacked || !canAttack(s) || S.cp < m.c) return false;
+  const tgt = G[opp(s)].active, k = tgt ? mult(a.attr, tgt.attr) : 1, ic = a.ic;
+  UI.anim = { s, ph: 'wind', bp: m.n + '！', ic, msg: LBL[s] + 'の' + a.name + '「' + m.n + '」！' };
+  render(); await sleep(560);
+  const ok = useMove(s, mi);
+  if (!ok) { UI.anim = null; return false; }
+  const dm = tgt ? G.fx.dmg[tgt.uid] : undefined;
+  const lines = [];
+  if (dm !== undefined) {
+    lines.push(dm > 0 ? dm + 'ダメージ！' : 'ダメージなし');
+    if (k > 1) lines.push('相性ばつぐん！');
+    if (k < 1) lines.push('相性いまひとつ…');
+  }
+  UI.anim = { s, ph: 'hit', bp: m.n + '！', ic, be: lines.join('<br>'), msg: dm !== undefined ? tgt.name + 'に' + dm + 'ダメージ！' : fx(m.e) };
+  render(); await sleep(1100);
+  UI.anim = null;
+  return true;
 }
 function render() {
   const app = document.getElementById('app');
   if (!app) return;
-  const hand = document.getElementById('hand');
-  const hx = hand ? hand.scrollLeft : 0;
+  const hand = document.getElementById('bsl');
+  const hx = hand ? hand.scrollTop : 0;
   const sy = typeof window !== 'undefined' ? window.scrollY : 0;
   app.innerHTML = renderScreen();
   if (G) G.fx = { dmg: {}, heal: {}, ghost: {} };
   hideTip();
   if (UI.screen === 'deck') syncCar();
-  const h2 = document.getElementById('hand');
-  if (h2) h2.scrollLeft = hx;
+  const h2 = document.getElementById('bsl');
+  if (h2) h2.scrollTop = hx;
+  if (UI.screen === 'battle') applyScale();
   if (typeof window !== 'undefined' && window.scrollTo && UI.screen === 'battle') window.scrollTo(0, sy);
 }
 
@@ -1144,7 +1418,11 @@ function act(a, d) {
     render(); return;
   }
   if (a === 'filter') { UI.filter = d.v; UI.cIdx = 0; render(); return; }
-  if (a === 'cfocus') { if (+d.i !== UI.cIdx) scrollCar(+d.i); return; }
+  if (a === 'cfocus') {
+    clearTimeout(UI.cfTimer);
+    if (+d.i !== UI.cIdx) { const i = +d.i; UI.cfTimer = setTimeout(() => scrollCar(i), 320); }
+    return;
+  }
   if (a === 'cmove') { scrollCar(UI.cIdx + (+d.dir)); return; }
   if (a === 'cadd') { const x = carList()[UI.cIdx]; if (x) addToDeck(x.id); return; }
   if (a === 'dslot') { UI.dsel = UI.dsel === +d.idx ? -1 : +d.idx; UI.msg = ''; render(); return; }
@@ -1160,23 +1438,33 @@ function act(a, d) {
   }
   if (a === 'toDeck') { if (G && G.over) G.dismissed = true; UI.screen = 'deck'; render(); return; }
   if (!G || G.over) return;
+  if (a === 'closewin') { if (!G.mustPromote) { UI.win = null; render(); } return; }
+  if (a === 'win') {
+    if (G.mustPromote) return;
+    UI.win = UI.win === d.v ? null : d.v;
+    if (UI.win === 'hand' && !(UI.sel && UI.sel.zone === 'hand' && G.p.hand[UI.sel.idx])) UI.sel = G.p.hand.length ? { zone: 'hand', idx: 0 } : null;
+    render(); return;
+  }
+  if (a === 'info') { UI.sel = { zone: d.zone, idx: +d.idx }; UI.win = 'info'; render(); return; }
   if (G.busy && !(G.mustPromote && a === 'pick')) return;
   if (a === 'pick') {
     const z = d.zone, i = +d.idx;
     if (G.mustPromote && z === 'pb' && G.p.bench[i]) {
       const S = G.p; S.active = S.bench[i]; S.bench[i] = null; G.mustPromote = false;
       log('あなたは' + S.active.name + 'を前衛に出した。');
-      UI.sel = null;
+      UI.sel = null; UI.win = null;
       const r = G.pr; G.pr = null;
       render(); if (r) r(); return;
     }
     UI.sel = { zone: z, idx: i }; render(); return;
   }
   if (G.turn !== 'p' || G.mustPromote) return;
-  if (a === 'summon' && UI.sel && UI.sel.zone === 'hand') { summon('p', UI.sel.idx); UI.sel = null; after(); render(); return; }
+  if (a === 'swapopen') { UI.sel = { zone: 'pb', idx: +d.idx }; UI.win = 'swap'; render(); return; }
+  if (a === 'swapto') { swap('p', +d.idx); UI.sel = null; UI.win = null; render(); return; }
+  if (a === 'summon' && UI.sel && UI.sel.zone === 'hand') { summon('p', UI.sel.idx); UI.sel = null; UI.win = null; after(); render(); return; }
   if (a === 'swap' && UI.sel && UI.sel.zone === 'pb') { swap('p', UI.sel.idx); UI.sel = null; render(); return; }
-  if (a === 'move') { useMove('p', +d.i); UI.sel = null; render(); return; }
-  if (a === 'end') { endTurn('p'); UI.sel = null; enemyTurn(); return; }
+  if (a === 'move') { UI.sel = null; UI.win = null; G.busy = true; animMove('p', +d.i).then(() => { G.busy = false; render(); }); return; }
+  if (a === 'end') { endTurn('p'); UI.sel = null; UI.win = null; enemyTurn(); return; }
 }
 
 let tipEl = null, dragging = false;
@@ -1207,7 +1495,7 @@ function doDrop(kind, idx, target) {
     else if (P.active && P.cp < 1) log('CPが足りません（交代はCP1）。');
     else swap('p', idx);
   } else return;
-  UI.sel = null; render();
+  UI.sel = null; UI.win = null; render();
 }
 function init() {
   loadOwn();
@@ -1223,7 +1511,7 @@ function init() {
       document.body.appendChild(tipEl);
     }
     app.addEventListener('mouseover', e => {
-      if (!tipEl || !G || UI.screen !== 'battle' || dragging || !canHover()) return;
+      if (!tipEl || !G || UI.screen !== 'battle' || UI.win || G.mustPromote || dragging || !canHover()) return;
       const t = e.target.closest('[data-zone]');
       const x = t ? cardAt(t.dataset.zone, +t.dataset.idx) : null;
       if (x) showTip(x, e); else hideTip();
@@ -1251,9 +1539,10 @@ function init() {
       e.dataTransfer.setData('text/plain', z + ':' + t.dataset.idx);
       e.dataTransfer.effectAllowed = 'move';
       app.classList.add('drag-on');
+      setTimeout(() => { if (dragging) app.classList.add('bs-dragging'); }, 0);
     });
     const endDrag = () => {
-      dragging = false; UI.drag = null; app.classList.remove('drag-on');
+      dragging = false; UI.drag = null; app.classList.remove('drag-on', 'bs-dragging');
       app.querySelectorAll('.dropok').forEach(el => el.classList.remove('dropok'));
     };
     app.addEventListener('dragend', endDrag);
@@ -1291,6 +1580,7 @@ function init() {
       doDrop(v[0], +v[1], t.dataset.drop);
     });
     app.addEventListener('dblclick', e => {
+      clearTimeout(UI.cfTimer);
       if (UI.screen !== 'deck') return;
       const t = e.target.closest ? e.target.closest('[data-dk]') : null;
       if (!t) return;
@@ -1327,6 +1617,7 @@ function init() {
       if (t && t.getAttribute('role') === 'button') { e.preventDefault(); act(t.dataset.act, t.dataset); }
     });
   }
+  if (typeof window !== 'undefined' && window.addEventListener) window.addEventListener('resize', applyScale);
   render();
 }
 init();
