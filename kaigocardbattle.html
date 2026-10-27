@@ -196,7 +196,7 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 .scene svg { display: block; width: 100%; height: auto; }
 .gctl { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
 .gprog { width: min(420px, 100%); height: 6px; background: #2a2a2a; border-radius: 3px; overflow: hidden; }
-.gprog i { display: block; height: 100%; background: var(--hi); width: 0; animation: gprog 5s linear calc(0s - var(--el)) both; }
+.gprog i { display: block; height: 100%; background: var(--hi); width: 0; animation: gprog var(--dur, 5s) linear calc(0s - var(--el)) both; }
 @keyframes gprog { from { width: 0; } to { width: 100%; } }
 .win { fill: #262626; stroke: #f3f3f3; stroke-width: 2; }
 .cap, .ring { opacity: 0; }
@@ -394,7 +394,7 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 .bs-cmd button { font: inherit; font-weight: 700; font-size: 17px; border: 1px solid #6a6a6a; border-radius: 10px; background: #151515; color: #fff; cursor: pointer; }
 .bs-cmd button.main { background: #fff; color: #000; border-color: #fff; font-size: 18px; }
 .bs-cmd button:disabled { opacity: .4; cursor: not-allowed; }
-.bs-back { position: absolute; inset: 0; background: rgba(0, 0, 0, .58); z-index: 20; animation: bsfade .2s ease-out both; }
+.bs-back { position: absolute; inset: 0; background: rgba(0, 0, 0, .58); z-index: 20; }
 .bs-pop { position: absolute; left: 12px; right: 12px; bottom: 146px; z-index: 21; background: #141414; border: 2px solid #f3f3f3; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 560px; overflow: auto; }
 .bs-pop.infow { bottom: auto; top: 60px; max-height: 620px; }
 .bs-wh { display: flex; align-items: center; gap: 8px; }
@@ -413,8 +413,13 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 .bs-go, .bs-play { font: inherit; font-weight: 700; border: 0; border-radius: 10px; background: #fff; color: #000; cursor: pointer; }
 .bs-go { height: 40px; padding: 0 14px; font-size: 13px; }
 .bs-go:disabled, .bs-play:disabled { opacity: .4; cursor: not-allowed; }
-.bs-drawer { position: absolute; right: 0; top: 40px; bottom: 0; width: 316px; z-index: 21; background: #141414; border-left: 2px solid #f3f3f3; padding: 10px 12px 14px; display: flex; flex-direction: column; gap: 8px; animation: bsdrawer .26s ease-out both; }
-.bs-list { display: flex; flex-direction: column; gap: 6px; flex: 0 1 auto; max-height: 250px; overflow: auto; }
+.bs-drawer { position: absolute; right: 0; top: 40px; bottom: 0; width: 316px; z-index: 21; background: #141414; border-left: 2px solid #f3f3f3; padding: 10px 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.bs-list { display: flex; flex-direction: column; gap: 6px; flex: 0 1 auto; max-height: 196px; overflow: auto; }
+.bs-cardface { flex: 1; min-height: 0; overflow: auto; border: 2px solid #c9ecd5; border-radius: 12px; background: linear-gradient(180deg, #1b2520, #111613); padding: 10px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 0 14px rgba(201, 236, 213, .15); }
+.bs-cardface .art { height: 78px; flex: none; }
+.bs-cardface .art .ic { font-size: 44px; }
+.bs-cardface .costb, .bs-cardface .hpb { min-width: 42px; }
+.bs-cardface .costb b, .bs-cardface .hpb b { font-size: 20px; }
 .bs-det { display: flex; flex-direction: column; gap: 6px; padding: 9px 10px; border: 1px solid #3b3b3b; border-radius: 10px; background: #101010; overflow: auto; flex: 1; min-height: 0; }
 .bs-hint { margin-top: auto; }
 .bs-play { flex: none; height: 48px; font-size: 15px; }
@@ -445,10 +450,12 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 @keyframes bspop { 0% { opacity: 0; transform: scale(.4); } 65% { opacity: 1; transform: scale(1.08); } 100% { opacity: 1; transform: scale(1); } }
 @keyframes bsfade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes bsdrawer { from { transform: translateX(100%); } to { transform: none; } }
-.k-rise { animation: bsrise .2s ease-out both; }
+.bs-back.fresh, .dc-back.fresh { animation: bsfade .2s ease-out both; }
+.bs-drawer.fresh { animation: bsdrawer .26s ease-out both; }
+.bs-pop.fresh, .dc-sheet.fresh { animation: bsrise .2s ease-out both; }
 @keyframes bsrise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .bs-card.lunge-p, .bs-card.lunge-e, .bs-fly, .bs-star, .bs-bub, .bs-drawer, .k-rise, .bs-back { animation: none; }
+  .bs-card.lunge-p, .bs-card.lunge-e, .bs-fly, .bs-star, .bs-bub, .bs-drawer.fresh, .bs-pop.fresh, .bs-back.fresh { animation: none; }
   .bs-card.hit, .bs-tok.hit { animation: hitframe .9s ease-out both; }
 }
 
@@ -496,7 +503,7 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 .dc-cmd { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; padding: 12px; border-top: 1px solid #2c2c2c; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .dc-cmd button, .dc-cmd label { font: inherit; font-size: 12px; font-weight: 700; line-height: 1.3; border: 1px solid #6a6a6a; border-radius: 10px; background: #151515; color: #fff; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; text-align: center; }
 .dc-cmd button.main { background: #fff; color: #000; border-color: #fff; }
-.dc-back { position: absolute; inset: 0; background: rgba(0, 0, 0, .6); z-index: 20; animation: bsfade .2s ease-out both; }
+.dc-back { position: absolute; inset: 0; background: rgba(0, 0, 0, .6); z-index: 20; }
 .dc-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 21; background: #141414; border-top: 2px solid #f3f3f3; border-radius: 16px 16px 0 0; padding: 10px 14px 16px; display: flex; flex-direction: column; gap: 10px; max-height: 640px; overflow: auto; }
 .dc-sh { position: relative; display: flex; align-items: center; justify-content: flex-end; min-height: 28px; }
 .dc-grip { position: absolute; left: 50%; top: 6px; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: #555; }
@@ -508,13 +515,13 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 .k-bub { animation: dcbub .3s cubic-bezier(.3, 1.4, .5, 1) both; }
 @keyframes dcbub { 0% { opacity: 0; transform: translateY(8px) scale(.6); } 100% { opacity: 1; transform: none; } }
 @keyframes dcpop { 0% { opacity: 0; transform: scale(.3); } 60% { opacity: 1; transform: scale(1.18); } 100% { opacity: 1; transform: scale(1); } }
-@media (prefers-reduced-motion: reduce) { .dc-slot.pop, .k-bub, .dc-back { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .dc-slot.pop, .k-bub, .dc-back.fresh, .dc-sheet.fresh { animation: none; } }
 
 /* ===== ？ヘルプ ===== */
 .nav .helpb { margin-left: auto; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: #fff; font: inherit; font-size: 20px; font-weight: 700; cursor: pointer; line-height: 1; }
 .nav .helpb:hover { border-color: #fff; box-shadow: 0 0 12px rgba(255, 255, 255, .25); }
 .hp-back { position: fixed; inset: 0; background: rgba(0, 0, 0, .78); z-index: 60; animation: bsfade .2s ease-out both; }
-.hp-pop { position: fixed; z-index: 61; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(560px, calc(100vw - 20px)); height: min(760px, calc(100vh - 24px)); background: #0e0e0e; border: 2px solid #f3f3f3; border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 0 1px #000, 0 20px 60px rgba(0, 0, 0, .8); animation: hppop .25s cubic-bezier(.3, 1.3, .5, 1) both; }
+.hp-pop { position: fixed; z-index: 61; left: 50%; top: 50%; transform: translate(-50%, -50%); zoom: .84; width: min(480px, calc((100vw - 24px) / .84)); height: min(700px, calc((100vh - 28px) / .84)); background: #0e0e0e; border: 2px solid #f3f3f3; border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 0 1px #000, 0 20px 60px rgba(0, 0, 0, .8); animation: hppop .25s cubic-bezier(.3, 1.3, .5, 1) both; }
 @keyframes hppop { from { opacity: 0; transform: translate(-50%, -46%) scale(.94); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 .hp-head { display: flex; align-items: center; gap: 8px; padding: 10px 10px 10px 12px; background: linear-gradient(180deg, #1d1d1d, #111); border-bottom: 1px solid #2c2c2c; }
 .hp-tabs { flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
@@ -601,6 +608,82 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 .hp-list .ic { font-size: 18px; }
 @media (max-width: 480px) { .hp-list { grid-template-columns: 1fr; } .hp-fxr { grid-template-columns: 26px 88px 1fr; } }
 @media (prefers-reduced-motion: reduce) { .hp-pop, .hp-back { animation: none; } }
+
+/* 属性バランス・スクロールバー */
+.dc-bubrow { align-items: stretch; }
+.dc-balw { width: 100%; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+.dc-bt1 { font-size: 10px; color: #9b9b9b; letter-spacing: .08em; line-height: 1; }
+.dc-bal { display: flex; height: 16px; border-radius: 8px; overflow: hidden; gap: 2px; background: #1c1c1c; }
+.dc-bal span { display: flex; align-items: center; justify-content: center; color: #000; font-size: 10px; font-weight: 700; line-height: 1; min-width: 0; transition: flex .3s; }
+.dc-bal.empty { align-items: center; justify-content: center; color: #666; font-size: 10px; border: 1px dashed #333; background: transparent; }
+.dc-leg { display: flex; justify-content: space-between; gap: 4px; font-size: 10.5px; color: #e6e6e6; line-height: 1.2; white-space: nowrap; }
+.dc-leg span { display: inline-flex; align-items: center; gap: 3px; }
+.dc-leg span.z { color: #666; }
+.dc-leg i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+* { scrollbar-width: thin; scrollbar-color: #4a4a4a transparent; }
+::-webkit-scrollbar { width: 6px; height: 6px; background: transparent; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; border: 0; }
+::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 3px; border: 0; }
+::-webkit-scrollbar-thumb:hover { background: #7a7a7a; }
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+.dc-filters, .dc-car, .car { scrollbar-width: none; }
+
+/* レア・相性表示 */
+.rareb { position: absolute; top: -8px; left: -6px; z-index: 3; background: linear-gradient(90deg, #ffe08a, #ffb347); color: #000; font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 0 7px; border-radius: 4px; line-height: 16px; }
+.rareb.s { top: -7px; left: 50%; transform: translateX(-50%); font-size: 9px; line-height: 14px; padding: 0 6px; }
+.dc-ci { position: relative; }
+.dc-ci.rare { border-color: #ffd37a; box-shadow: 0 0 10px rgba(255, 211, 122, .3); }
+.dc-ci.rare.on { border-color: #c9ecd5; box-shadow: 0 0 10px rgba(255, 211, 122, .45); }
+.dc-slot.rare { border-color: #ffd37a; box-shadow: 0 0 8px rgba(255, 211, 122, .3); }
+.dc-slot.rare.sel { border-color: #c9ecd5; }
+.gc.mc.rare { border-color: #ffd37a; box-shadow: 0 0 16px rgba(255, 211, 122, .55); }
+.bs-card.rare, .bs-tok.rare { border-color: #ffd37a; }
+.bs-card.rare { box-shadow: 0 0 12px rgba(255, 211, 122, .3); }
+.bs-match { display: flex; align-items: center; gap: 8px; border: 1px solid #333; border-radius: 8px; padding: 5px 8px; font-size: 12px; font-weight: 700; background: #101010; }
+.bs-match.up { color: #ff8a8a; border-color: #ff6b6b; } .bs-match.dn { color: #7fbcff; border-color: #4aa3ff; } .bs-match.eq { color: #cfcfcf; }
+.bs-match .hp-ar { margin: 0; flex: none; }
+
+/* ===== レア演出（ガチャ） ===== */
+.aura, .rays, .robot, .spk { opacity: 0; pointer-events: none; }
+.rays { transform-box: view-box; transform-origin: 360px 250px; }
+.spk { transform-box: fill-box; transform-origin: center; }
+.go.rr .bld { animation: bshake .22s linear calc(.2s - var(--el)) 8, bldout 1s ease-in calc(2.2s - var(--el)) both; }
+.go.rr .robot { animation: robin 1s cubic-bezier(.2, 1.4, .4, 1) calc(2.9s - var(--el)) both, rbob 1.2s ease-in-out calc(3.9s - var(--el)) infinite; transform-box: view-box; transform-origin: 360px 400px; }
+.go.rr .aura { animation: auin 1.4s ease-out calc(2.9s - var(--el)) both; }
+.go.rr .rays { animation: raysin 1s ease-out calc(3s - var(--el)) both, spin 9s linear calc(3s - var(--el)) infinite; }
+.go.rr .spk { animation: twk 1s ease-in-out calc(var(--sd) - var(--el)) infinite; }
+.go.rr .eye { animation: eyeg .5s ease-in-out calc(3.9s - var(--el)) infinite alternate; }
+.go.rr .flash { animation: flashg .9s ease-out calc(2.7s - var(--el)) both, flashk .7s ease-in calc(6.3s - var(--el)) both; fill: #ffe9b0; }
+.go.rr .cap .pop circle { stroke: #b8860b; }
+@keyframes bldout { 0% { opacity: 1; transform: none; filter: none; } 55% { opacity: 1; transform: scale(1.04, .94); filter: brightness(3); } 100% { opacity: 0; transform: scale(.4, 1.1); filter: brightness(6); } }
+.bld { transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes robin { 0% { opacity: 0; transform: scale(.25, .1); } 50% { opacity: 1; transform: scale(.9, 1.15); } 100% { opacity: 1; transform: none; } }
+@keyframes rbob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes auin { from { opacity: 0; transform: scale(.3); } to { opacity: 1; transform: none; } }
+.aura { transform-box: fill-box; transform-origin: center; }
+@keyframes raysin { from { opacity: 0; } to { opacity: .8; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes twk { 0%, 100% { opacity: 0; transform: scale(.3); } 50% { opacity: 1; transform: scale(1.3) rotate(25deg); } }
+@keyframes eyeg { from { filter: brightness(1); } to { filter: brightness(1.8) drop-shadow(0 0 6px #ffd37a); } }
+@keyframes flashg { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0; } }
+.scene.rr { border-color: #ffd37a; box-shadow: 0 0 24px rgba(255, 211, 122, .35); }
+
+/* ===== レアカードの模様 ===== */
+.dc-ci.rare .dc-art, .dc-slot.rare, .gc.mc.rare, .bs-card.rare, .bs-tok.rare, .bs-row.rare, .bs-cardface.rare {
+  background-image:
+    linear-gradient(115deg, transparent 38%, rgba(255, 244, 205, .32) 50%, transparent 62%),
+    repeating-linear-gradient(45deg, rgba(255, 211, 122, .16) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(-45deg, rgba(255, 211, 122, .16) 0 1px, transparent 1px 8px),
+    radial-gradient(circle at 50% 38%, rgba(255, 211, 122, .22), transparent 62%);
+  background-size: 260% 100%, auto, auto, auto;
+  background-position: 130% 0, 0 0, 0 0, 0 0;
+  animation: holo 3.6s linear infinite;
+}
+.bs-cardface.rare { border-color: #ffd37a; }
+.bs-row.rare { border-color: #ffd37a; }
+@keyframes holo { 0% { background-position: 130% 0, 0 0, 0 0, 0 0; } 60%, 100% { background-position: -30% 0, 0 0, 0 0, 0 0; } }
+.dc-slot.rare .ic, .gc.rare .ic, .dc-ci.rare .ic { filter: drop-shadow(0 0 6px rgba(255, 211, 122, .75)); }
+@media (prefers-reduced-motion: reduce) { .dc-ci.rare .dc-art, .dc-slot.rare, .gc.mc.rare, .bs-card.rare, .bs-tok.rare, .bs-row.rare, .bs-cardface.rare, .go.rr .robot, .go.rr .rays { animation: none; } }
 </style>
 
 <div id="app"></div>
@@ -637,7 +720,8 @@ const ICONS = {
   '施設長': '🏢', '生活相談員': '💬', '支援相談員': '🏠', '介護支援専門員': '📝', 'サービス提供責任者': '📞', '社会福祉士': '⚖️', '公認心理師': '🧠', '認知症ケア専門士': '💭',
   '管理栄養士': '🥗', '栄養士': '🍎', '給食調理員': '🍲', '調理師': '👨‍🍳', '配膳スタッフ': '🍱',
   '機能訓練指導員': '🏃', '理学療法士': '🦵', '作業療法士': '✋', '言語聴覚士': '👂', '柔道整復師': '🦴', 'あん摩マッサージ指圧師': '💆', 'レクリエーション担当': '🎵',
-  '介護事務員': '🧾', '送迎ドライバー': '🚐', '清掃スタッフ': '🧹', 'リネン・洗濯スタッフ': '🛏️', '福祉用具専門相談員': '♿', '施設管理担当': '🔧', 'ボランティア': '🌼'
+  '介護事務員': '🧾', '送迎ドライバー': '🚐', '清掃スタッフ': '🧹', 'リネン・洗濯スタッフ': '🛏️', '福祉用具専門相談員': '♿', '施設管理担当': '🔧', 'ボランティア': '🌼',
+  '理事長': '👑', 'コンサルタント': '📊', 'ケアマネ協会': '🗂️', '医師会': '🏥'
 };
 function chips(e) {
   const t = [];
@@ -707,6 +791,12 @@ c('リネン・洗濯スタッフ', '環境', 50, 1, 'シーツや衣類を清�
 c('福祉用具専門相談員', '環境', 60, 2, '車いすやベッドなど、合う用具を選ぶ相談役。', ['用具選定', 1, { d: 10, b: 5 }], ['住環境整備の提案', 3, { d: 30, g: 20 }]);
 c('施設管理担当', '環境', 65, 2, '建物と設備の点検・修繕で、安全を守る。', ['設備点検', 1, { d: 10 }], ['修繕対応', 2, { d: 25, g: 15 }]);
 c('ボランティア', '環境', 45, 1, 'お話し相手や行事のお手伝いで施設を支える。', ['傾聴', 1, { d: 5, ha: 10 }], ['行事のお手伝い', 2, { d: 15, b: 10 }]);
+/* レア（CP5・ガチャ限定） */
+function cr(name, attr, hp, desc, m1, m2) { c(name, attr, hp, 5, desc, m1, m2); CARDS[CARDS.length - 1].rare = true; }
+cr('理事長', '介護', 105, '法人の最高責任者。介護の質と施設の進む道を、最後に決める。', ['経営方針の徹底', 2, { d: 30, b: 20 }], ['理事長決裁', 5, { d: 90, g: 20, cp: 1 }]);
+cr('コンサルタント', '環境', 95, '外部の専門家として、施設の運営や環境を診断して改善案を示す。', ['運営診断', 2, { d: 25, w: 20 }], ['業務改善プラン', 5, { d: 85, ha: 25, dr: 1 }]);
+cr('ケアマネ協会', '相談', 100, '全国のケアマネジャーが集う団体。ケアプランの知恵と人脈で支える。', ['ケアプラン研修', 2, { d: 30, ha: 15, dr: 1 }], ['全国ネットワーク', 5, { d: 80, b: 25, dr: 2 }]);
+cr('医師会', '医療', 100, '地域の医師が集う団体。医療と介護の連携を強力に後押しする。', ['地域連携会議', 2, { d: 30, ha: 25 }], ['地域医療総力戦', 5, { d: 90, s: 15 }]);
 
 const DECK_SIZE = 20, WIN_PTS = 3, BENCH = 3, COST_MAX = 60, MAX_COPY = 4, GACHA_MAX = 2, GACHA_PULL = 5;
 const LBL = { p: 'あなた', e: '相手' };
@@ -732,7 +822,7 @@ function deckCost(ids) { return (ids || DECK).reduce((t, i) => t + CARDS[i].cost
 function saveDeck() { try { localStorage.setItem('kaigo-card-deck', JSON.stringify(DECK)); } catch (e) { /* ignore */ } }
 
 function randomDeck(pool) {
-  const src = pool || CARDS.map(x => x.id);
+  const src = pool || CARDS.filter(x => !x.rare).map(x => x.id);
   for (let k = 0; k < 200; k++) {
     const sh = shuffle(src), d = [], cnt = {};
     let cost = 0;
@@ -753,7 +843,15 @@ function ownedPool() {
 }
 function ownTotal() { return Object.keys(OWN).reduce((t, k) => t + OWN[k], 0); }
 function gachaLeft() { return GACHA.date === today() ? Math.max(0, GACHA_MAX - GACHA.used) : GACHA_MAX; }
-function pullIds(n) { const r = []; for (let i = 0; i < n; i++) r.push(Math.floor(Math.random() * CARDS.length)); return r; }
+const RARE_RATE = 0.03;
+function pullIds(n, noRare) {
+  const rare = CARDS.filter(x => x.rare), norm = CARDS.filter(x => !x.rare), r = [];
+  for (let i = 0; i < n; i++) {
+    const pool = !noRare && Math.random() < RARE_RATE ? rare : norm;
+    r.push(pool[Math.floor(Math.random() * pool.length)].id);
+  }
+  return r;
+}
 function saveOwn() { try { localStorage.setItem('kaigo-card-own', JSON.stringify({ own: OWN, gacha: GACHA })); } catch (e) { /* ignore */ } }
 function loadOwn() {
   try {
@@ -765,7 +863,7 @@ function loadOwn() {
     }
   } catch (e) { /* ignore */ }
   for (let k = 0; k < 300; k++) {
-    const ids = pullIds(DECK_SIZE), cnt = {};
+    const ids = pullIds(DECK_SIZE, true), cnt = {};
     ids.forEach(i => { cnt[i] = (cnt[i] || 0) + 1; });
     if (Object.keys(cnt).every(i => cnt[i] <= MAX_COPY) && deckCost(ids) <= COST_MAX) { OWN = cnt; saveOwn(); return; }
   }
@@ -781,7 +879,7 @@ function loadDeck() {
 }
 function inst(id) {
   const d = CARDS[id];
-  return { uid: ++uidc, id: d.id, ic: d.ic, name: d.name, attr: d.attr, cost: d.cost, desc: d.desc, moves: d.moves, hp: d.hp, max: d.hp, sh: 0, db: 0 };
+  return { uid: ++uidc, id: d.id, ic: d.ic, name: d.name, attr: d.attr, cost: d.cost, desc: d.desc, moves: d.moves, hp: d.hp, max: d.hp, sh: 0, db: 0, rare: !!d.rare };
 }
 function newSide(ids) {
   let deck, hand;
@@ -1042,12 +1140,12 @@ function cardAt(z, i) {
   if (z === 'eb') return G.e.bench[i];
   return null;
 }
-const GACHA_MS = 5000;
+const GACHA_MS = 5000, GACHA_MS_RARE = 7000;
 function navHTML(extra) {
   const items = [['gacha', 'ガチャ'], ['deck', 'デッキ'], ['battle', '対戦']];
   return '<div class="nav">' + items.map(x => '<button class="navb" data-act="nav" data-v="' + x[0] + '"' + (UI.screen === x[0] ? ' aria-current="page"' : '') + '>' + x[1] + '</button>').join('') + (extra || '') + '<button class="helpb" data-act="help" aria-label="あそびかた・ヘルプ">？</button></div>';
 }
-function facilitySVG() {
+function facilitySVG(rr) {
   const win = (x, y, w, h, i) => '<rect class="win" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" style="--d:' + (i * 0.11).toFixed(2) + 's"/>';
   let i = 0, w = '';
   [[222, 250], [268, 250], [418, 250], [464, 250], [222, 298], [268, 298], [418, 298], [464, 298]].forEach(p => { w += win(p[0], p[1], 34, 34, i++); });
@@ -1055,7 +1153,7 @@ function facilitySVG() {
   const tx = [-180, -90, 0, 90, 180], cf = ['#c9ecd5', '#ffd0d0', '#cfe2ff', '#fff0a8', '#e4d2ff'];
   let caps = '', rings = '';
   tx.forEach((t, k) => {
-    const d = (2.2 + k * 0.25).toFixed(2), pd = (4.1 + k * 0.06).toFixed(2);
+    const d = ((rr ? 4.4 : 2.2) + k * 0.25).toFixed(2), pd = ((rr ? 6.1 : 4.1) + k * 0.06).toFixed(2);
     caps += '<g class="cap" style="--tx:' + t + 'px;--d:' + d + 's"><g class="pop" style="--pd:' + pd + 's">' +
       '<circle r="17" fill="#f3f3f3" stroke="#000" stroke-width="2"/><path d="M-17 0A17 17 0 0 0 17 0Z" fill="' + cf[k] + '" stroke="#000" stroke-width="2"/>' +
       '<line x1="-17" y1="0" x2="17" y2="0" stroke="#000" stroke-width="2"/></g></g>';
@@ -1082,13 +1180,42 @@ function facilitySVG() {
     '<text x="585" y="345" text-anchor="middle" font-size="20" font-weight="700" fill="#f3f3f3" font-family="\'Noto Sans JP\',sans-serif">ガチャ</text>' +
     '<text x="585" y="372" text-anchor="middle" font-size="15" fill="#9b9b9b" font-family="\'Noto Sans JP\',sans-serif">1日2回</text>' +
     '</g>' +
+    (rr ? robotSVG() : '') +
     '<g transform="translate(360 372)">' + rings + caps + '</g>' +
     '<rect class="flash" x="0" y="0" width="720" height="470" fill="#fff"/>' +
     '</svg>';
 }
+function robotSVG() {
+  const L = '#f3f3f3', G = '#ffd37a';
+  let rays = '', sp = '';
+  for (let i = 0; i < 16; i++) rays += '<line x1="360" y1="250" x2="' + (360 + 420 * Math.cos(i * Math.PI / 8)).toFixed(1) + '" y2="' + (250 + 420 * Math.sin(i * Math.PI / 8)).toFixed(1) + '" stroke="' + G + '" stroke-width="' + (i % 2 ? 6 : 14) + '" opacity=".5"/>';
+  [[150, 120], [570, 110], [110, 260], [610, 250], [230, 60], [490, 50], [180, 360], [540, 370]].forEach((q, i) => {
+    sp += '<path class="spk" style="--sd:' + (3.2 + i * 0.25).toFixed(2) + 's" transform="translate(' + q[0] + ' ' + q[1] + ')" d="M0-14L3-3L14 0L3 3L0 14L-3 3L-14 0L-3-3Z" fill="' + G + '"/>';
+  });
+  return '<defs><radialGradient id="aura"><stop offset="0" stop-color="#ffe9b0" stop-opacity=".95"/><stop offset=".5" stop-color="#ffd37a" stop-opacity=".35"/><stop offset="1" stop-color="#ffd37a" stop-opacity="0"/></radialGradient></defs>' +
+    '<circle class="aura" cx="360" cy="250" r="270" fill="url(#aura)"/>' +
+    '<g class="rays">' + rays + '</g>' + sp +
+    '<g class="robot">' +
+    '<rect x="318" y="320" width="30" height="80" fill="#1a1a1a" stroke="' + L + '" stroke-width="3"/><rect x="372" y="320" width="30" height="80" fill="#1a1a1a" stroke="' + L + '" stroke-width="3"/>' +
+    '<rect x="302" y="388" width="52" height="14" rx="4" fill="' + G + '" stroke="#000" stroke-width="2"/><rect x="366" y="388" width="52" height="14" rx="4" fill="' + G + '" stroke="#000" stroke-width="2"/>' +
+    '<rect x="248" y="206" width="48" height="112" rx="10" fill="#1a1a1a" stroke="' + L + '" stroke-width="3"/><rect x="424" y="206" width="48" height="112" rx="10" fill="#1a1a1a" stroke="' + L + '" stroke-width="3"/>' +
+    '<circle cx="272" cy="330" r="22" fill="' + G + '" stroke="#000" stroke-width="3"/><circle cx="448" cy="330" r="22" fill="' + G + '" stroke="#000" stroke-width="3"/>' +
+    '<circle cx="272" cy="204" r="26" fill="#2a2a2a" stroke="' + L + '" stroke-width="3"/><circle cx="448" cy="204" r="26" fill="#2a2a2a" stroke="' + L + '" stroke-width="3"/>' +
+    '<rect x="296" y="190" width="128" height="140" rx="14" fill="#202020" stroke="' + L + '" stroke-width="4"/>' +
+    '<path d="M296 244H424M296 290H424" stroke="' + G + '" stroke-width="3" opacity=".7"/>' +
+    '<circle cx="360" cy="262" r="30" fill="#000" stroke="' + G + '" stroke-width="4"/>' +
+    '<rect x="354" y="246" width="12" height="32" fill="' + G + '"/><rect x="344" y="256" width="32" height="12" fill="' + G + '"/>' +
+    '<rect x="346" y="168" width="28" height="26" fill="#2a2a2a" stroke="' + L + '" stroke-width="3"/>' +
+    '<rect x="318" y="96" width="84" height="76" rx="14" fill="#202020" stroke="' + L + '" stroke-width="4"/>' +
+    '<line x1="360" y1="96" x2="360" y2="68" stroke="' + L + '" stroke-width="4"/><circle class="eye" cx="360" cy="62" r="9" fill="' + G + '" stroke="#000" stroke-width="2"/>' +
+    '<rect x="330" y="116" width="60" height="22" rx="8" fill="#000"/>' +
+    '<rect class="eye" x="336" y="121" width="20" height="12" rx="4" fill="' + G + '"/><rect class="eye" x="364" y="121" width="20" height="12" rx="4" fill="' + G + '"/>' +
+    '<rect x="338" y="150" width="44" height="8" rx="3" fill="#000" stroke="' + L + '" stroke-width="2"/>' +
+    '</g>';
+}
 function renderGacha() {
   const A = UI.gAnim;
-  if (A && !A.done && Date.now() - A.t0 >= GACHA_MS) A.done = true;
+  if (A && !A.done && Date.now() - A.t0 >= A.ms) A.done = true;
   const running = !!A && !A.done;
   const el = running ? ((Date.now() - A.t0) / 1000).toFixed(3) : '0';
   const left = gachaLeft();
@@ -1101,14 +1228,14 @@ function renderGacha() {
     res = '<div class="panel"><h2>ゲットしたカード</h2><div class="gcards">' + A.ids.map((id, k) => {
       const c = CARDS[id];
       const x = { cost: c.cost, attr: c.attr, ic: c.ic, name: c.name, hp: c.hp, max: c.hp, sh: 0, db: 0 };
-      return '<div class="gcol" style="animation-delay:' + (k * 0.12).toFixed(2) + 's"><div class="gc mc">' + (A.fresh.includes(id) ? '<span class="newb">NEW</span>' : '') + miniBody(x, { bar: false }) + '</div><span class="dim sm">所持 ×' + (OWN[id] || 0) + '</span></div>';
+      return '<div class="gcol" style="animation-delay:' + (k * 0.12).toFixed(2) + 's"><div class="gc mc' + (c.rare ? ' rare' : '') + '">' + (c.rare ? '<span class="rareb">RARE</span>' : '') + (A.fresh.includes(id) ? '<span class="newb">NEW</span>' : '') + miniBody(x, { bar: false }) + '</div><span class="dim sm">所持 ×' + (OWN[id] || 0) + '</span></div>';
     }).join('') + '</div></div>';
   }
   return '<div class="wrap">' + navHTML() +
-    '<div class="scene' + (running ? ' go' : '') + '" style="--el:' + el + 's">' + facilitySVG() + '</div>' +
+    '<div class="scene' + (running ? ' go' : '') + (running && A.hasRare ? ' rr' : '') + '" style="--el:' + el + 's">' + facilitySVG(running && A.hasRare) + '</div>' +
     '<div class="gctl">' + btn +
-    (running ? '<div class="gprog"><i style="--el:' + el + 's"></i></div>' : '') +
-    '<p class="dim sm">1日' + GACHA_MAX + '回まで。1回で' + GACHA_PULL + '枚のカードをランダムで獲得します（日付が変わるとリセット）。</p>' +
+    (running ? '<div class="gprog"><i style="--el:' + el + 's;--dur:' + A.ms / 1000 + 's"></i></div>' : '') +
+    '<p class="dim sm">1日' + GACHA_MAX + '回まで。1回で' + GACHA_PULL + '枚のカードをランダムで獲得します（日付が変わるとリセット）。レアカード（CP5）は約' + Math.round(RARE_RATE * 100) + '%の確率で出ます。</p>' +
     (UI.msg ? '<p class="sm warn">' + UI.msg + '</p>' : '') + '</div>' + res + '</div>';
 }
 function renderBattleStart() {
@@ -1138,9 +1265,9 @@ function canAddCard(id) {
 }
 function dcCard(x, i) {
   const n = DECK.filter(j => j === x.id).length, max = Math.min(MAX_COPY, OWN[x.id] || 0);
-  return '<div class="dc-ci' + (n ? ' on' : '') + '" draggable="true" data-dk="coll" data-id="' + x.id + '">' +
+  return '<div class="dc-ci' + (n ? ' on' : '') + (x.rare ? ' rare' : '') + '" draggable="true" data-dk="coll" data-id="' + x.id + '">' +
     '<div class="dc-art" role="button" tabindex="0" aria-label="' + x.name + 'の詳細" data-act="cfocus" data-i="' + i + '" data-id="' + x.id + '">' +
-    '<span class="dc-top"><span class="dc-cp">CP' + x.cost + '</span><span class="tag">' + x.attr + '</span></span>' +
+    '<span class="dc-top"><span class="dc-cp">CP' + x.cost + '</span><span class="tag">' + x.attr + '</span></span>' + (x.rare ? '<span class="rareb s">RARE</span>' : '') +
     '<span class="ic">' + x.ic + '</span><span class="dc-nm">' + x.name + '</span><b class="dc-hp">HP' + x.hp + '</b></div>' +
     '<div class="dc-foot"><span class="dc-n">' + (n ? '採用 ' + n + '/' + max : '所持 ' + (OWN[x.id] || 0)) + '</span>' +
     '<button class="dc-plus' + (canAddCard(x.id) ? '' : ' full') + '" data-act="dadd" data-id="' + x.id + '" aria-label="' + x.name + 'を採用">＋</button></div></div>';
@@ -1149,8 +1276,17 @@ function dslotHTML(i) {
   const id = DECK[i];
   if (id === undefined) return '<div class="dc-slot empty" aria-hidden="true">' + (i + 1) + '</div>';
   const x = CARDS[id];
-  return '<div class="dc-slot' + (UI.dsel === i ? ' sel' : '') + (UI.lastAdd === i ? ' pop' : '') + '" role="button" tabindex="0" draggable="true" title="' + x.name + '" aria-label="' + x.name + ' CP' + x.cost + ' HP' + x.hp + '" data-act="dslot" data-dk="deck" data-idx="' + i + '">' +
+  return '<div class="dc-slot' + (UI.dsel === i ? ' sel' : '') + (x.rare ? ' rare' : '') + (UI.lastAdd === i ? ' pop' : '') + '" role="button" tabindex="0" draggable="true" title="' + x.name + '" aria-label="' + x.name + ' CP' + x.cost + ' HP' + x.hp + '" data-act="dslot" data-dk="deck" data-idx="' + i + '">' +
     '<span class="dc-cp s">CP' + x.cost + '</span><span class="ic">' + x.ic + '</span><b class="dc-hp">HP' + x.hp + '</b></div>';
+}
+function balanceHTML() {
+  const n = DECK.length;
+  const cnt = ATTRS.map(a => DECK.filter(i => CARDS[i].attr === a).length);
+  const bar = n
+    ? '<div class="dc-bal" role="img" aria-label="属性のバランス">' + ATTRS.map((a, i) => cnt[i] ? '<span style="flex:' + cnt[i] + ';background:' + ATTR_COL[a] + '">' + cnt[i] + '</span>' : '').join('') + '</div>'
+    : '<div class="dc-bal empty">デッキが空です</div>';
+  const leg = '<div class="dc-leg">' + ATTRS.map((a, i) => '<span' + (cnt[i] ? '' : ' class="z"') + '><i style="background:' + ATTR_COL[a] + '"></i>' + a + ' ' + cnt[i] + '</span>').join('') + '</div>';
+  return '<div class="dc-balw"><b class="dc-bt1">属性のバランス</b>' + bar + leg + '</div>';
 }
 function bubHTML(cls) {
   if (!UI.msg) return '';
@@ -1160,7 +1296,7 @@ function dSheet() {
   if (UI.dwin === null || UI.dwin === undefined) return '';
   const x = CARDS[UI.dwin];
   const n = DECK.filter(j => j === x.id).length, max = Math.min(MAX_COPY, OWN[x.id] || 0);
-  return '<div class="dc-back" data-act="dclose"></div><div class="dc-sheet k-rise">' +
+  return '<div class="dc-back' + fr() + '" data-act="dclose"></div><div class="dc-sheet' + fr() + '">' +
     '<div class="dc-sh"><span class="dc-grip"></span><button class="bs-x" data-act="dclose">閉じる</button></div>' +
     '<div class="row"><span class="ic" style="font-size:36px">' + x.ic + '</span><span class="col"><b style="font-size:16px">' + x.name + '</b><span class="row"><span class="tag">' + x.attr + '</span><span class="dc-cp">CP' + x.cost + '</span><b class="sm">HP' + x.hp + '</b></span></span></div>' +
     '<div class="dim sm">' + x.desc + '</div>' + x.moves.map(moveBox).join('') +
@@ -1179,7 +1315,7 @@ function addToDeck(id) {
   saveDeck(); render();
 }
 function removeFromDeck(idx) {
-  if (!(idx >= 0 && idx < DECK.length)) say('デッキ内のカードを選んでから「カード削除」を押してください。');
+  if (!(idx >= 0 && idx < DECK.length)) say('デッキ内のカードを選んでから「外す」を押すか、ダブルクリックしてください。');
   else { const nm = CARDS[DECK[idx]].name; DECK.splice(idx, 1); UI.dsel = -1; say(nm + 'を外しました。'); }
   saveDeck(); render();
 }
@@ -1241,7 +1377,7 @@ function renderDeck() {
   const stage = '<div class="bs-wrap"><div class="bs" id="dcs">' +
     '<div class="bs-status"><b>デッキ</b><span class="dc-pill">' + DECK.length + '/' + DECK_SIZE + '</span><span class="dc-pill' + (full ? ' warn' : '') + '">CP ' + deckCost() + '/' + COST_MAX + '</span><span class="grow"></span><span class="dim sm">所持 ' + ownTotal() + '枚（' + Object.keys(OWN).length + '/' + CARDS.length + '種）</span></div>' +
     '<div class="dc-board" data-dz="board">' + slots.join('') + '</div>' +
-    '<div class="dc-bubrow">' + (UI.dwin === null || UI.dwin === undefined ? bubHTML() : '') + (UI.msg ? '' : '<span class="dim sm">カードをタップで詳細、＋で採用。デッキのカードを選んで「カード削除」</span>') + '</div>' +
+    '<div class="dc-bubrow">' + (UI.dwin === null || UI.dwin === undefined ? bubHTML() : '') + (UI.msg ? '' : balanceHTML()) + '</div>' +
     '<div class="dc-filters">' + ['all'].concat(ATTRS).map(a => '<button class="dc-flt" data-act="filter" data-v="' + a + '" aria-pressed="' + (UI.filter === a) + '">' + (a === 'all' ? 'すべて' : a) + '</button>').join('') + '</div>' +
     '<div class="dc-carw" data-dz="trash">' +
     (list.length ? '<div class="dc-car" id="car" tabindex="0" aria-label="手持ちのカード（左右にスライド）">' + list.map(dcCard).join('') + '</div>' +
@@ -1250,7 +1386,7 @@ function renderDeck() {
     '<div class="dc-cmd">' +
     '<button data-act="random">ランダム<br>編成</button><button data-act="reset">リセット</button><button class="main" data-act="save">デッキ<br>保存</button>' +
     '<label class="filebtn">復元<input class="vh" type="file" id="dfile" accept=".dat,.txt,.json,text/plain"></label>' +
-    '<button data-act="del" data-dz="trash" style="opacity:' + (UI.dsel >= 0 ? 1 : .55) + '">カード<br>削除</button></div>' +
+    '<button data-act="del" data-dz="trash" style="opacity:' + (UI.dsel >= 0 ? 1 : .55) + '">外す</button></div>' +
     dSheet() + '</div></div>';
   return '<div class="wrap">' + navHTML() + stage +
     '<p class="dim sm foot">HP・属性・わざの数値と相性は、ゲーム用のフィクションです。</p>' +
@@ -1340,7 +1476,7 @@ function bsCard(x, zone) {
   }
   const an = UI.anim;
   const lunge = an && an.ph === 'wind' && an.s === (mine ? 'p' : 'e') ? ' lunge-' + an.s : '';
-  return '<div class="bs-card ' + side + fxCls(x) + lunge + '" role="button" tabindex="0" data-act="info" data-zone="' + zone + '" data-idx="0"' + dropAttr(zone, 0) + '>' +
+  return '<div class="bs-card ' + side + (x.rare ? ' rare' : '') + fxCls(x) + lunge + '" role="button" tabindex="0" data-act="info" data-zone="' + zone + '" data-idx="0"' + dropAttr(zone, 0) + '>' +
     cardInner(x) + fxStar(x) + fxBurst(x) + '</div>';
 }
 function bsTok(x, zone, idx) {
@@ -1351,7 +1487,7 @@ function bsTok(x, zone, idx) {
     return '<div class="bs-tok ' + side + ' empty"' + dropAttr(zone, idx) + '>空き</div>';
   }
   const sel = mine && UI.sel && UI.sel.zone === 'pb' && UI.sel.idx === idx;
-  return '<div class="bs-tok ' + side + fxCls(x) + (sel ? ' sel' : '') + '" role="button" tabindex="0" data-act="' + (mine ? 'swapopen' : 'info') + '" data-zone="' + zone + '" data-idx="' + idx + '"' +
+  return '<div class="bs-tok ' + side + (x.rare ? ' rare' : '') + fxCls(x) + (sel ? ' sel' : '') + '" role="button" tabindex="0" data-act="' + (mine ? 'swapopen' : 'info') + '" data-zone="' + zone + '" data-idx="' + idx + '"' +
     dropAttr(zone, idx) + (mine ? ' draggable="true"' : '') + ' aria-label="' + x.name + '">' +
     '<span class="ic">' + x.ic + '</span>' + bsPill(x.cost, true) + '<b>HP' + x.hp + '</b>' + fxBurst(x) + '</div>';
 }
@@ -1366,6 +1502,7 @@ function bsPlate(x, side, other) {
     '<div class="bs-hpr"><span class="bs-lb">HP</span><span class="bs-bar"><i style="width:' + pct + '%;background:' + (pct <= 30 ? '#ff6b6b' : '#fff') + '"></i></span><b class="bs-hpn">' + x.hp + '<small>/' + x.max + '</small></b></div>' +
     (stTags(x) ? '<div class="bs-hpr">' + stTags(x) + '</div>' : '') + pips + '</div>';
 }
+function fr() { return UI.fresh ? ' fresh' : ''; }
 function bubble(cls, pos, tail, html) {
   return '<div class="bs-bub ' + cls + '" style="' + pos + '">' + html + '<i style="' + tail + '"></i></div>';
 }
@@ -1410,7 +1547,7 @@ function movesWin(can) {
     const dis = !can || !!why;
     return '<button class="bs-mv" data-act="move" data-i="' + i + '"' + (dis ? ' disabled' : '') + '><span class="row"><span class="mvn">' + m.n + '</span><span class="bs-pill">CP ' + m.c + '</span><span class="grow"></span><b class="bs-note">' + note + '</b></span>' + chips(m.e) + '</button>';
   }).join('');
-  return '<div class="bs-pop k-rise">' + winHead('わざをえらぶ', a.name + ' · CP ' + P.cp + '/' + P.max, true) + rows + '</div>';
+  return '<div class="bs-pop' + fr() + '">' + winHead('わざをえらぶ', a.name + ' · CP ' + P.cp + '/' + P.max, true) + rows + '</div>';
 }
 function swapWin(can) {
   const P = G.p, mp = G.mustPromote;
@@ -1418,20 +1555,27 @@ function swapWin(can) {
     if (!x) return '';
     const off = !mp && (!can || G.swapped || (P.active && P.cp < 1));
     const sel = UI.sel && UI.sel.zone === 'pb' && UI.sel.idx === i;
-    return '<div class="bs-row' + (sel ? ' sel' : '') + '"><span class="ic">' + x.ic + '</span><span class="grow col"><b class="rn">' + x.name + '</b><span class="row">' + bsPill(x.cost, true) + '<b class="sm">HP' + x.hp + '/' + x.max + '</b><span class="tag">' + x.attr + '</span></span></span>' +
+    return '<div class="bs-row' + (sel ? ' sel' : '') + (x.rare ? ' rare' : '') + '"><span class="ic">' + x.ic + '</span><span class="grow col"><b class="rn">' + x.name + '</b><span class="row">' + bsPill(x.cost, true) + '<b class="sm">HP' + x.hp + '/' + x.max + '</b><span class="tag">' + x.attr + '</span>' + arBadge(x, G.e.active) + '</span></span>' +
       '<button class="bs-go" data-act="' + (mp ? 'pick' : 'swapto') + '" data-zone="pb" data-idx="' + i + '"' + (off ? ' disabled' : '') + '>' + (mp ? '前衛に出す' : '交代 CP1') + '</button></div>';
   }).join('');
   const empty = P.bench.some(Boolean) ? '' : '<p class="dim">ベンチに職員がいません。</p>';
   const note = !mp && can && G.swapped ? '<p class="dim sm">交代は1ターンに1回です。</p>' : '';
-  return '<div class="bs-pop k-rise">' + winHead(mp ? '前衛が倒れた！出す職員を選ぼう' : 'だれと交代する？', mp ? '' : 'CP1・1ターン1回', !mp) + rows + empty + note + '</div>';
+  return '<div class="bs-pop' + fr() + '">' + winHead(mp ? '前衛が倒れた！出す職員を選ぼう' : 'だれと交代する？', mp ? (G.e.active ? '相手の前衛：' + G.e.active.name + '（' + G.e.active.attr + '）' : '') : 'CP1・1ターン1回' + (G.e.active ? '・相手：' + G.e.active.name + '（' + G.e.active.attr + '）' : ''), !mp) + rows + empty + note + '</div>';
+}
+function matchChip(x) {
+  const e = G.e.active;
+  if (!e) return '';
+  const r = arrowOf(mult(x.attr, e.attr)), cls = r[0] === '↑' ? 'up' : r[0] === '↓' ? 'dn' : 'eq';
+  const k = mult(x.attr, e.attr);
+  return '<div class="bs-match ' + cls + '"><span class="hp-ar ' + cls + '">' + r[0] + '</span><span>相手の前衛（' + e.name + '・' + e.attr + '）に' + r[2] + '　ダメージ ×' + k + '</span></div>';
 }
 function handWin(can) {
   const P = G.p;
   const sel = UI.sel && UI.sel.zone === 'hand' ? P.hand[UI.sel.idx] : null;
   const rows = P.hand.map((x, i) => {
     const s = UI.sel && UI.sel.zone === 'hand' && UI.sel.idx === i, ok = P.cp >= x.cost;
-    return '<div class="bs-row' + (s ? ' sel' : '') + (ok ? '' : ' dim') + '" role="button" tabindex="0" data-act="pick" data-zone="hand" data-idx="' + i + '" draggable="true">' +
-      '<span class="ic">' + x.ic + '</span><span class="grow rn">' + x.name + '</span><span class="tag">' + x.attr + '</span>' + bsPill(x.cost, true) + '<b class="rh">HP' + x.hp + '</b></div>';
+    return '<div class="bs-row' + (s ? ' sel' : '') + (x.rare ? ' rare' : '') + (ok ? '' : ' dim') + '" role="button" tabindex="0" data-act="pick" data-zone="hand" data-idx="' + i + '">' +
+      '<span class="ic">' + x.ic + '</span><span class="grow rn">' + x.name + '</span>' + arBadge(x, G.e.active) + '<span class="tag">' + x.attr + '</span>' + bsPill(x.cost, true) + '<b class="rh">HP' + x.hp + '</b></div>';
   }).join('') || '<p class="dim">手札はありません。</p>';
   const room = !P.active || P.bench.includes(null);
   let label = '手札をえらんでください', dis = true;
@@ -1441,19 +1585,20 @@ function handWin(can) {
     else if (P.cp < sel.cost) label = 'CPが足りません（必要 ' + sel.cost + '）';
     else { label = '場に出す（CP ' + sel.cost + '）'; dis = false; }
   }
-  const det = sel ? '<div class="bs-det"><div class="row"><b>' + sel.name + '</b><span class="tag">' + sel.attr + '</span></div><div class="dim sm">' + sel.desc + '</div>' + sel.moves.map(moveBox).join('') + '</div>' : '';
-  return '<div class="bs-drawer">' + winHead('手札', P.hand.length + '枚 · CP ' + P.cp + '/' + P.max, true) +
+  const det = sel ? '<div class="bs-cardface' + (sel.rare ? ' rare' : '') + '"><div class="chead">' + costBadge(sel.cost) + '<span class="cname">' + sel.name + '</span>' + hpBadge(sel.hp) + '</div>' +
+    '<div class="art"><span class="tag">' + sel.attr + '</span><span class="ic">' + sel.ic + '</span></div>' + matchChip(sel) +
+    '<div class="dim sm">' + sel.desc + '</div>' + sel.moves.map(moveBox).join('') + '</div>' : '';
+  return '<div class="bs-drawer' + fr() + '">' + winHead('手札', P.hand.length + '枚 · CP ' + P.cp + '/' + P.max, true) +
     '<div class="bs-list" id="bsl">' + rows + '</div>' + det +
-    '<div class="bs-hint dim sm">PCは手札を場にドラッグしても出せます。</div>' +
     '<button class="bs-play" data-act="summon"' + (dis ? ' disabled' : '') + '>' + label + '</button></div>';
 }
 function infoWin() {
   const x = selCard();
   if (!x) return '';
-  return '<div class="bs-pop infow k-rise">' + winHead('カードの詳細', '', true) + detailHTML(x) + '</div>';
+  return '<div class="bs-pop infow' + fr() + '">' + winHead('カードの詳細', '', true) + detailHTML(x) + '</div>';
 }
 function logWin() {
-  return '<div class="bs-pop k-rise">' + winHead('ログ', '', true) + '<div class="bs-log">' + G.log.slice(-14).map(l => '<div>' + l + '</div>').join('') + '</div></div>';
+  return '<div class="bs-pop' + fr() + '">' + winHead('ログ', '', true) + '<div class="bs-log">' + G.log.slice(-14).map(l => '<div>' + l + '</div>').join('') + '</div></div>';
 }
 function renderBattle() {
   const P = G.p, E = G.e;
@@ -1463,10 +1608,10 @@ function renderBattle() {
   const over = G.over ? '<div class="overlay"><div class="box"><h2>' + (G.over.winner === 'p' ? '勝利' : '敗北') + '</h2><p>' + G.over.reason + '</p>' +
     '<div class="row"><button class="btn" data-act="retry">もう一度</button><button class="btn ghost" data-act="toDeck">デッキ編成へ</button></div></div></div>' : '';
   let pop = '';
-  if (win === 'hand') pop = '<div class="bs-back" data-act="closewin"></div>' + handWin(can);
+  if (win === 'hand') pop = '<div class="bs-back' + fr() + '" data-act="closewin"></div>' + handWin(can);
   else if (win) {
     const body = win === 'moves' ? movesWin(can) : win === 'swap' ? swapWin(can) : win === 'log' ? logWin() : win === 'info' ? infoWin() : '';
-    if (body) pop = '<div class="bs-back"' + (G.mustPromote ? '' : ' data-act="closewin"') + '></div>' + body;
+    if (body) pop = '<div class="bs-back' + fr() + '"' + (G.mustPromote ? '' : ' data-act="closewin"') + '></div>' + body;
   }
   const stage = '<div class="bs-wrap"><div class="bs" id="bs">' +
     '<div class="bs-status"><span>撃破 <b>' + P.pts + '</b>-<b>' + E.pts + '</b>/' + WIN_PTS + '</span><span>山札 <b>' + P.deck.length + '</b></span><span>相手の手札 <b>' + E.hand.length + '</b></span></div>' +
@@ -1539,7 +1684,7 @@ function helpRule() {
       '<p class="hp-t">わざは<b>前衛だけ</b>が1ターンに1回。交代はCP1で1ターンに1回です。<b>先攻（あなた）は最初のターン、わざを使えません。</b></p>') +
     hpSec(4, 'シールドと弱体', '<div class="hp-two"><div class="hp-card g"><span class="ic">🛡️</span><b>シールド</b><small>次の相手ターンまで、ダメージを吸収</small></div><div class="hp-card w"><span class="ic">⬇️</span><b>弱体</b><small>相手の次のわざのダメージを減らす</small></div></div>') +
     hpSec(5, 'デッキとガチャ', '<div class="hp-tiles"><div><b>' + DECK_SIZE + '</b><small>枚で1デッキ</small></div><div><b>' + MAX_COPY + '</b><small>同じカードは最大</small></div><div><b>' + COST_MAX + '</b><small>CP合計の上限</small></div><div><b>' + GACHA_MAX + '</b><small>ガチャは1日 / 回</small></div></div>' +
-      '<p class="hp-t">ガチャは1回で<b>' + GACHA_PULL + '枚</b>。手に入れたカードだけがデッキに入れられます。デッキ画面で、手持ちカードの「＋」やドラッグ＆ドロップ、ダブルクリックで入れましょう。</p>');
+      '<p class="hp-t">ガチャは1回で<b>' + GACHA_PULL + '枚</b>。手に入れたカードだけがデッキに入れられます。<b>レアカード</b>（CP5・強力なわざ）はガチャでだけ手に入り、出る確率は約' + Math.round(RARE_RATE * 100) + '%です。デッキ画面で、手持ちカードの「＋」やドラッグ＆ドロップ、ダブルクリックで入れましょう。</p>');
 }
 function helpMove() {
   const fxs = [['d', '⚔️', '攻撃 25', '前衛にダメージ'], ['s', '💥', '全体 10', '相手のベンチ全体にダメージ'], ['h', '💚', '回復 15', '自分や味方のHPを回復'], ['g', '🛡️', '盾 10', '次の相手ターンまでダメージを吸収'],
@@ -1602,6 +1747,7 @@ function render() {
   app.innerHTML = renderScreen() + helpHTML();
   if (G) G.fx = { dmg: {}, heal: {}, ghost: {} };
   UI.lastAdd = -1;
+  UI.fresh = false;
   hideTip();
   if (UI.screen === 'deck') syncCar();
   const h2 = document.getElementById('bsl');
@@ -1630,7 +1776,15 @@ function act(a, d) {
   }
   if (a === 'nav') {
     if (G && G.over) G.dismissed = true;
-    UI.screen = d.v; UI.msg = ''; UI.dwin = null; render();
+    UI.msg = ''; UI.dwin = null;
+    if (d.v === 'battle' && (!G || G.dismissed)) {
+      if (DECK.length === DECK_SIZE && deckCost() <= COST_MAX) { act('start', {}); return; }
+      UI.screen = 'deck';
+      say('対戦するには、デッキを' + DECK_SIZE + '枚（CP合計' + COST_MAX + '以内）にそろえてください。');
+      render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
+      return;
+    }
+    UI.screen = d.v; render();
     if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
     return;
   }
@@ -1643,18 +1797,23 @@ function act(a, d) {
     GACHA.used++;
     saveOwn();
     UI.msg = '';
-    const A = { ids, fresh, t0: Date.now(), done: false };
+    const hasRare = ids.some(id => CARDS[id].rare), A = { ids, fresh, hasRare, ms: hasRare ? GACHA_MS_RARE : GACHA_MS, t0: Date.now(), done: false };
     UI.gAnim = A;
-    setTimeout(() => { if (UI.gAnim === A && !A.done) { A.done = true; render(); } }, GACHA_MS);
+    setTimeout(() => { if (UI.gAnim === A && !A.done) { A.done = true; render(); } }, A.ms);
     render(); return;
   }
   if (a === 'filter') { UI.filter = d.v; UI.carX = 0; render(); return; }
-  if (a === 'cfocus') { clearTimeout(UI.cfTimer); const id = +d.id; UI.cfTimer = setTimeout(() => { UI.dwin = id; render(); }, 280); return; }
+  if (a === 'cfocus') { clearTimeout(UI.cfTimer); const id = +d.id; UI.cfTimer = setTimeout(() => { UI.dwin = id; UI.fresh = true; render(); }, 280); return; }
   if (a === 'cmove') { scrollCar(+d.dir); return; }
   if (a === 'dclose') { UI.dwin = null; render(); return; }
   if (a === 'dadd') { addToDeck(+d.id); return; }
   if (a === 'ddec') { const i = DECK.lastIndexOf(+d.id); if (i < 0) { say('このカードは採用されていません。'); render(); } else removeFromDeck(i); return; }
-  if (a === 'dslot') { UI.dsel = UI.dsel === +d.idx ? -1 : +d.idx; UI.msg = ''; render(); return; }
+  if (a === 'dslot') {
+    const now = Date.now(), i = +d.idx;
+    if (UI.lastSlot === i && now - (UI.lastSlotT || 0) < 400) { UI.lastSlot = -1; removeFromDeck(i); return; }
+    UI.lastSlot = i; UI.lastSlotT = now;
+    UI.dsel = UI.dsel === i ? -1 : i; UI.msg = ''; render(); return;
+  }
   if (a === 'del') { removeFromDeck(UI.dsel); return; }
   if (a === 'save') { saveDeckFile(); return; }
   if (a === 'reset') { DECK = []; UI.dsel = -1; say('すべて解除しました。'); saveDeck(); render(); return; }
@@ -1670,11 +1829,11 @@ function act(a, d) {
   if (a === 'closewin') { if (!G.mustPromote) { UI.win = null; render(); } return; }
   if (a === 'win') {
     if (G.mustPromote) return;
-    UI.win = UI.win === d.v ? null : d.v;
+    UI.win = UI.win === d.v ? null : d.v; UI.fresh = true;
     if (UI.win === 'hand' && !(UI.sel && UI.sel.zone === 'hand' && G.p.hand[UI.sel.idx])) UI.sel = G.p.hand.length ? { zone: 'hand', idx: 0 } : null;
     render(); return;
   }
-  if (a === 'info') { UI.sel = { zone: d.zone, idx: +d.idx }; UI.win = 'info'; render(); return; }
+  if (a === 'info') { UI.sel = { zone: d.zone, idx: +d.idx }; UI.win = 'info'; UI.fresh = true; render(); return; }
   if (G.busy && !(G.mustPromote && a === 'pick')) return;
   if (a === 'pick') {
     const z = d.zone, i = +d.idx;
@@ -1688,7 +1847,7 @@ function act(a, d) {
     UI.sel = { zone: z, idx: i }; render(); return;
   }
   if (G.turn !== 'p' || G.mustPromote) return;
-  if (a === 'swapopen') { UI.sel = { zone: 'pb', idx: +d.idx }; UI.win = 'swap'; render(); return; }
+  if (a === 'swapopen') { UI.sel = { zone: 'pb', idx: +d.idx }; UI.win = 'swap'; UI.fresh = true; render(); return; }
   if (a === 'swapto') { swap('p', +d.idx); UI.sel = null; UI.win = null; render(); return; }
   if (a === 'summon' && UI.sel && UI.sel.zone === 'hand') { summon('p', UI.sel.idx); UI.sel = null; UI.win = null; after(); render(); return; }
   if (a === 'swap' && UI.sel && UI.sel.zone === 'pb') { swap('p', UI.sel.idx); UI.sel = null; render(); return; }
@@ -1814,7 +1973,6 @@ function init() {
       const t = e.target.closest ? e.target.closest('[data-dk]') : null;
       if (!t) return;
       if (t.dataset.dk === 'coll') addToDeck(+t.dataset.id);
-      else if (t.dataset.dk === 'deck') removeFromDeck(+t.dataset.idx);
     });
     app.addEventListener('scroll', e => { const car = e.target; if (car && car.id === 'car') UI.carX = car.scrollLeft; }, true);
     app.addEventListener('change', e => {
