@@ -904,6 +904,63 @@ ci('evi', 'エビデンス', '🦐', '次の自分のターンまで、属性の
 ci('bcp', 'BCP', '⚡', '次の自分のターンまで、だれもアイテムを使えない。', 7, true);
 ci('yakin', '夜勤明け', '🌅', '相手のカード1体を選ぶ。HP0になるまで、そのカードの攻撃-10。', 7, true);
 ci('tsuru', '鶴の一声', '💬', '次の自分のターンまで、だれもダメージを受けない。', 7, true);
+
+/* レア版（各キャラクターカードの強化版：CP+1・HP増・わざ強化／変更。ガチャ限定、出現率13％） */
+const VAR_RATE = 0.13;
+function rv(base, hpAdd, m1, m2, desc) {
+  const b = CARDS.find(x => x.name === base && !x.rare && !x.item);
+  if (!b) throw new Error('rare variant base not found: ' + base);
+  CARDS.push({
+    id: CARDS.length, name: base + '★', attr: b.attr, hp: b.hp + hpAdd, cost: b.cost + 1,
+    desc: desc || ('【レア版】' + b.desc), ic: b.ic, rare: true, variant: true, base: b.id,
+    moves: [m1, m2].map(m => ({ n: m[0], c: m[1], e: m[2] }))
+  });
+}
+/* 介護 */
+rv('介護福祉士', 10, ['身体介護・熟練', 1, { d: 20, h: 5 }], ['計画的ケアの実践', 3, { d: 45, ha: 20 }]);
+rv('介護職員(初任者研修)', 10, ['移乗介助・改', 1, { d: 15 }], ['見守り強化・改', 2, { d: 20, g: 15 }]);
+rv('介護職員(実務者研修)', 10, ['入浴介助・改', 1, { d: 20 }], ['食事介助・改', 2, { d: 30, h: 15 }]);
+rv('ユニットリーダー', 10, ['申し送り・徹底', 1, { d: 10, b: 15 }], ['ユニット運営・改', 3, { d: 40, b: 20 }]);
+rv('夜勤専従介護職員', 10, ['夜間巡視・改', 1, { d: 15, w: 10 }], ['夜勤のふんばり・改', 3, { d: 50, g: 15 }]);
+rv('介護助手', 10, ['声かけ・改', 1, { d: 10, h: 5 }], ['配膳補助・改', 2, { ha: 20, cp: 1, dr: 1 }]);
+/* 医療 */
+rv('看護師', 10, ['バイタル精密測定', 1, { d: 20 }], ['高度医療処置', 3, { d: 45, ha: 20 }]);
+rv('准看護師', 10, ['検温・血圧測定・改', 1, { d: 15, h: 5 }], ['服薬管理の徹底', 2, { d: 25, ha: 20 }]);
+rv('配置医師', 10, ['名医の回診', 2, { d: 25, ha: 25 }], ['高度医学的管理', 4, { d: 75, g: 20 }]);
+rv('薬剤師', 10, ['服薬確認・精査', 1, { d: 15, w: 5 }], ['薬剤調整', 2, { d: 25, w: 15, dr: 1 }]);
+rv('歯科衛生士', 10, ['口腔ケア・徹底', 1, { d: 15, h: 10 }], ['誤嚥予防・徹底', 3, { d: 35, g: 20 }]);
+rv('看護主任', 10, ['看護計画・改', 1, { d: 15, b: 15 }], ['看取りケア・慈', 3, { d: 30, ha: 30, g: 10 }]);
+/* 相談 */
+rv('施設長', 10, ['運営方針・刷新', 2, { d: 25, b: 20 }], ['経営判断・英断', 4, { d: 70, g: 15, cp: 1 }]);
+rv('生活相談員', 10, ['家族面談・信頼', 1, { d: 10, ha: 10 }], ['多職種連携調整', 2, { d: 30, dr: 1, cp: 1 }]);
+rv('支援相談員', 10, ['在宅復帰支援・改', 1, { d: 15, g: 10 }], ['退所調整・改', 3, { d: 40, dr: 2 }]);
+rv('介護支援専門員', 10, ['アセスメント・精査', 1, { d: 15, w: 10 }], ['ケアプラン最適化', 3, { d: 35, b: 20, dr: 1 }]);
+rv('サービス提供責任者', 10, ['訪問調整・改', 1, { d: 15, dr: 1 }], ['ヘルパー最適配置', 2, { d: 25, dr: 1, b: 10 }]);
+rv('社会福祉士', 10, ['傾聴・深', 1, { d: 10, ha: 15 }], ['権利擁護・改', 3, { d: 35, g: 25 }]);
+rv('公認心理師', 10, ['カウンセリング・深', 1, { d: 15, h: 10 }], ['不安の軽減・改', 2, { d: 20, w: 20 }]);
+rv('認知症ケア専門士', 10, ['声かけ・傾聴・改', 1, { d: 15, w: 10 }], ['BPSD対応・改', 3, { d: 35, w: 20 }]);
+/* 栄養 */
+rv('管理栄養士', 10, ['献立作成・改', 1, { d: 15, ha: 10 }], ['栄養ケア統括', 3, { d: 35, ha: 30 }]);
+rv('栄養士', 10, ['栄養チェック・改', 1, { d: 15, h: 5 }], ['治療食の調整・改', 2, { d: 25, h: 20 }]);
+rv('給食調理員', 10, ['下ごしらえ・改', 1, { d: 15 }], ['大量調理・改', 2, { d: 30, ha: 15 }]);
+rv('調理師', 10, ['包丁さばき・達人', 1, { d: 20 }], ['嚥下食づくり・改', 3, { d: 35, g: 25 }]);
+rv('配膳スタッフ', 10, ['配膳・改', 1, { d: 10, ha: 15 }], ['水分補給の徹底', 2, { d: 20, h: 15 }]);
+/* 訓練 */
+rv('機能訓練指導員', 10, ['体操指導・改', 1, { d: 20 }], ['個別機能訓練・改', 3, { d: 45, g: 15 }]);
+rv('理学療法士', 10, ['歩行訓練・改', 1, { d: 20 }], ['筋力トレーニング・改', 3, { d: 55 }]);
+rv('作業療法士', 10, ['生活動作訓練・改', 1, { d: 20 }], ['手工芸リハ・改', 3, { d: 35, ha: 20 }]);
+rv('言語聴覚士', 10, ['発声訓練・改', 1, { d: 15, w: 5 }], ['嚥下訓練・改', 3, { d: 40, g: 20 }]);
+rv('柔道整復師', 10, ['手技療法・改', 1, { d: 20 }], ['関節可動域訓練・改', 2, { d: 30, h: 15 }]);
+rv('あん摩マッサージ指圧師', 10, ['マッサージ・改', 1, { d: 15, h: 10 }], ['指圧療法・改', 2, { d: 25, ha: 20 }]);
+rv('レクリエーション担当', 10, ['レク体操・改', 1, { d: 15, b: 10 }], ['季節行事・改', 3, { d: 30, ha: 15, b: 15 }]);
+/* 環境 */
+rv('介護事務員', 10, ['書類整理・改', 1, { d: 10, dr: 1 }], ['介護報酬請求・改', 2, { d: 25, cp: 1, dr: 1 }]);
+rv('送迎ドライバー', 10, ['送迎走行・改', 1, { d: 20 }], ['乗降介助・改', 2, { d: 30, g: 15 }]);
+rv('清掃スタッフ', 10, ['環境整備・改', 1, { d: 10, g: 10 }], ['消毒・除菌・改', 2, { d: 25, w: 15 }]);
+rv('リネン・洗濯スタッフ', 10, ['シーツ交換・改', 1, { d: 15, g: 5 }], ['洗濯・乾燥・改', 2, { d: 20, ha: 15 }]);
+rv('福祉用具専門相談員', 10, ['用具選定・改', 1, { d: 15, b: 10 }], ['住環境の改善提案', 3, { d: 35, g: 25 }]);
+rv('施設管理担当', 10, ['設備点検・改', 1, { d: 15, g: 5 }], ['修繕対応・改', 2, { d: 30, g: 20 }]);
+rv('ボランティア', 10, ['傾聴・改', 1, { d: 10, ha: 15 }], ['行事のお手伝い・改', 2, { d: 20, b: 15 }]);
 const DECK_SIZE = 20, WIN_PTS = 3, BENCH = 3, COST_MAX = 60, MAX_COPY = 4, GACHA_MAX = 2, GACHA_PULL = 5;
 const LBL = { p: 'あなた', e: '相手' };
 const opp = s => (s === 'p' ? 'e' : 'p');
@@ -962,12 +1019,14 @@ function ownTotal() { return Object.keys(OWN).reduce((t, k) => t + OWN[k], 0); }
 function gachaLeft() { return GACHA.date === today() ? Math.max(0, GACHA_MAX - GACHA.used) : GACHA_MAX; }
 const RARE_RATE = 0.03;
 function pullIds(n, init) {
-  const rare = CARDS.filter(x => x.rare), norm = CARDS.filter(x => !x.rare && !x.item), r = [];
+  const rare = CARDS.filter(x => x.rare && !x.variant), vars = CARDS.filter(x => x.variant), norm = CARDS.filter(x => !x.rare && !x.item), r = [];
+  const itemEnd = init ? RARE_RATE + ITEM_RATE : RARE_RATE + VAR_RATE + ITEM_RATE;
   const items = CARDS.filter(x => x.item && (!init || !x.only)), tot = items.reduce((t, x) => t + x.w, 0);
   for (let i = 0; i < n; i++) {
     const q = Math.random();
     if (!init && q < RARE_RATE) r.push(rare[Math.floor(Math.random() * rare.length)].id);
-    else if (q < RARE_RATE + ITEM_RATE) {
+    else if (!init && q < RARE_RATE + VAR_RATE) r.push(vars[Math.floor(Math.random() * vars.length)].id);
+    else if (q < itemEnd) {
       let z = Math.random() * tot, pick = items[items.length - 1];
       for (const x of items) { z -= x.w; if (z < 0) { pick = x; break; } }
       r.push(pick.id);
@@ -1540,7 +1599,7 @@ function tcRow(ids) {
   return one + one;
 }
 function renderTitle() {
-  if (!UI.titleRows) { const all = shuffle(CARDS.map(c => c.id)); UI.titleRows = [all.slice(0, 14), all.slice(14, 28).concat(all.slice(0, 0))]; }
+  if (!UI.titleRows) { const all = shuffle(CARDS.filter(c => !c.rare && !c.item && c.cost < 5).map(c => c.id)); UI.titleRows = [all.slice(0, 14), all.slice(14, 28).concat(all.slice(0, 0))]; }
   const sp = [[12, 30, 0], [84, 24, 1.1], [22, 62, 2.2], [78, 66, 0.6], [50, 18, 1.7], [8, 50, 2.8], [92, 46, 0.3]].map(q => '<i class="tsp" style="left:' + q[0] + '%;top:' + q[1] + '%;animation-delay:' + q[2] + 's">✦</i>').join('');
   return '<div class="wrap"><div class="ttl">' +
     '<div class="trow top"><div class="ttrack r">' + tcRow(UI.titleRows[0]) + '</div></div>' + sp +
@@ -2124,7 +2183,7 @@ function helpRule() {
       '<p class="hp-t">わざは<b>前衛だけ</b>が1ターンに1回。交代はCP1で1ターンに1回です。<b>先攻は最初のターン、わざを使えません。</b>先攻・後攻は、対戦のはじめのコイントス（表ならあなた）で決まります。</p>') +
     hpSec(4, 'シールドと弱体', '<div class="hp-two"><div class="hp-card g"><span class="ic">🛡️</span><b>シールド</b><small>次の相手ターンまで、ダメージを吸収</small></div><div class="hp-card w"><span class="ic">⬇️</span><b>弱体</b><small>相手の次のわざのダメージを減らす</small></div></div>') +
     hpSec(5, 'デッキとガチャ', '<div class="hp-tiles"><div><b>' + DECK_SIZE + '</b><small>枚で1デッキ</small></div><div><b>' + MAX_COPY + '</b><small>同じカードは最大</small></div><div><b>' + COST_MAX + '</b><small>CP合計の上限</small></div><div><b>' + GACHA_MAX + '</b><small>ガチャは1日 / 回</small></div></div>' +
-      '<p class="hp-t">ガチャは1回で<b>' + GACHA_PULL + '枚</b>。手に入れたカードだけがデッキに入れられます。<b>アイテムカード</b>は同じカードを' + ITEM_COPY + '枚まで入れられます。<b>レアカード</b>（CP5・強力なわざ）はガチャでだけ手に入ります。デッキ画面で、手持ちカードの「＋」やドラッグ＆ドロップ、ダブルクリックで入れましょう。</p>') + helpItem();
+      '<p class="hp-t">ガチャは1回で<b>' + GACHA_PULL + '枚</b>。手に入れたカードだけがデッキに入れられます。<b>アイテムカード</b>は同じカードを' + ITEM_COPY + '枚まで入れられます。<b>レアカード</b>（CP5・強力なわざ）と、各キャラクターの<b>レア版（★）</b>（CP+1・HPアップ・わざ強化。出現率13％）はガチャでだけ手に入ります。デッキ画面で、手持ちカードの「＋」やドラッグ＆ドロップ、ダブルクリックで入れましょう。</p>') + helpItem();
 }
 function helpItem() {
   const rows = CARDS.filter(x => x.item).map(x => '<div class="hp-fxr"><span class="ic">' + x.ic + '</span><b class="hp-itn">' + x.name + (x.only ? '<i>ガチャ限定</i>' : '') + '</b><span class="hp-fd">' + x.desc + '</span></div>').join('');
@@ -2261,7 +2320,7 @@ function act(a, d) {
     }
     saveOwn();
     UI.msg = '';
-    const hasRare = ids.some(id => CARDS[id].rare), A = { ids, fresh, hasRare, ms: hasRare ? GACHA_MS_RARE : GACHA_MS, t0: Date.now(), done: false };
+    const hasRare = ids.some(id => CARDS[id].rare && !CARDS[id].variant), A = { ids, fresh, hasRare, ms: hasRare ? GACHA_MS_RARE : GACHA_MS, t0: Date.now(), done: false };
     UI.gAnim = A;
     setTimeout(() => { if (UI.gAnim === A && !A.done) { A.done = true; render(); } }, A.ms);
     render(); return;
