@@ -479,9 +479,9 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 .dc-bub.bad::before { border-left: 2px solid #ff5c5c; border-top: 2px solid #ff5c5c; }
 .dc-sbub .dc-bub::before { display: none; }
 .dc-sbub { min-height: 38px; display: flex; justify-content: center; align-items: center; }
-.dc-filters { position: absolute; left: 0; right: 0; top: 456px; height: 32px; display: flex; gap: 6px; padding: 0 12px; overflow-x: auto; scrollbar-width: none; }
+.dc-filters { position: absolute; left: 0; right: 0; top: 456px; height: 32px; display: flex; gap: 4px; padding: 0 12px; overflow-x: auto; scrollbar-width: none; }
 .dc-filters::-webkit-scrollbar, .dc-car::-webkit-scrollbar { display: none; }
-.dc-flt { flex: none; height: 30px; padding: 0 13px; border: 1px solid #3b3b3b; border-radius: 15px; background: transparent; color: #f3f3f3; font: inherit; font-size: 13px; cursor: pointer; }
+.dc-flt { flex: 1 1 auto; height: 28px; padding: 0 4px; border: 1px solid #3b3b3b; border-radius: 14px; background: transparent; color: #f3f3f3; font: inherit; font-size: 11px; white-space: nowrap; cursor: pointer; }
 .dc-flt[aria-pressed="true"] { background: #fff; color: #000; border-color: #fff; }
 .dc-carw { position: absolute; left: 0; right: 0; top: 494px; height: 158px; }
 .dc-carw.dropok { outline: 2px solid #c9ecd5; outline-offset: -2px; background: rgba(201, 236, 213, .08); }
@@ -684,6 +684,94 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 @keyframes holo { 0% { background-position: 130% 0, 0 0, 0 0, 0 0; } 60%, 100% { background-position: -30% 0, 0 0, 0 0, 0 0; } }
 .dc-slot.rare .ic, .gc.rare .ic, .dc-ci.rare .ic { filter: drop-shadow(0 0 6px rgba(255, 211, 122, .75)); }
 @media (prefers-reduced-motion: reduce) { .dc-ci.rare .dc-art, .dc-slot.rare, .gc.mc.rare, .bs-card.rare, .bs-tok.rare, .bs-row.rare, .bs-cardface.rare, .go.rr .robot, .go.rr .rays { animation: none; } }
+
+/* ===== アイテムカード ===== */
+.crown { position: absolute; left: 4px; bottom: 3px; font-size: 14px; line-height: 1; z-index: 2; filter: drop-shadow(0 0 3px rgba(255, 211, 122, .9)); pointer-events: none; }
+.bs-tok .crown { font-size: 12px; left: 3px; bottom: 2px; }
+.itl { font-size: 12px; letter-spacing: .12em; color: #000; background: #f3f3f3; border-radius: 6px; padding: 0 8px; line-height: 20px; display: inline-block; }
+.bs-pill.itp { background: #f3f3f3; color: #000; }
+.bs-cardface.item { border-color: #f3f3f3; background: linear-gradient(180deg, #202020, #121212); box-shadow: 0 0 14px rgba(255, 255, 255, .1); }
+.bs-eff { font-size: 14px; line-height: 1.5; border: 1px solid #555; border-radius: 8px; padding: 8px 10px; background: #0d0d0d; }
+.bs-eff b { color: #ffd37a; }
+.bs-chips { position: absolute; left: 12px; right: 12px; top: 536px; display: flex; gap: 4px; flex-wrap: wrap; z-index: 5; pointer-events: none; }
+.bs-chips span { font-size: 11px; font-weight: 700; padding: 0 7px; line-height: 18px; border-radius: 9px; background: #0d0d0d; border: 1px solid #ffd37a; color: #ffd37a; }
+.bs-itemfx { position: absolute; left: 50%; top: 250px; transform: translate(-50%, 0); z-index: 30; width: 280px; border: 2px solid #f3f3f3; border-radius: 14px; background: rgba(10, 10, 10, .94); padding: 12px 14px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; animation: itfx 1s ease-out both; box-shadow: 0 0 24px rgba(255, 255, 255, .25); pointer-events: none; }
+.bs-itemfx.foe { border-color: #ff9a9a; }
+.bs-itemfx .ifi { font-size: 46px; line-height: 1.1; }
+.bs-itemfx b { font-size: 16px; }
+.bs-itemfx small { font-size: 12px; color: #cfcfcf; line-height: 1.4; }
+@keyframes itfx { 0% { opacity: 0; transform: translate(-50%, 16px) scale(.7); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.06); } 30% { transform: translate(-50%, 0) scale(1); } 85% { opacity: 1; } 100% { opacity: 0; } }
+.hp-itn { font-size: 12px; min-width: 120px; }
+.hp-itn i { display: inline-block; margin-left: 4px; font-style: normal; font-size: 9px; background: linear-gradient(90deg, #ffe08a, #ffb347); color: #000; border-radius: 4px; padding: 0 4px; }
+
+.sv-dlg { position: absolute; left: 20px; right: 20px; top: 220px; z-index: 22; background: #141414; border: 2px solid #f3f3f3; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.sv-dlg b { font-size: 16px; }
+.sv-in { font: inherit; font-size: 16px; color: #fff; background: #0a0a0a; border: 2px solid #6a6a6a; border-radius: 10px; padding: 10px 12px; width: 100%; }
+.sv-in:focus { outline: none; border-color: #c9ecd5; }
+
+/* 対戦モード選択（子ウインドウ） */
+.md-back { position: fixed; inset: 0; background: rgba(0, 0, 0, .78); z-index: 60; animation: bsfade .2s ease-out both; }
+.md-dlg { position: fixed; z-index: 61; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(360px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; box-sizing: border-box; background: #0e0e0e; color: #fff; border: 2px solid #f3f3f3; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 0 0 1px #000, 0 20px 60px rgba(0, 0, 0, .8); }
+.md-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.md-head b { font-size: 17px; letter-spacing: .08em; }
+.md-btn { font: inherit; font-size: 16px; font-weight: 700; letter-spacing: .06em; color: #fff; background: #151515; border: 1px solid #6a6a6a; border-radius: 12px; min-height: 58px; width: 100%; box-sizing: border-box; padding: 8px 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; text-align: center; }
+.md-btn small { font-size: 11px; font-weight: 400; letter-spacing: 0; opacity: .75; }
+.md-btn:hover { border-color: #fff; }
+.md-btn.main { background: #fff; color: #000; border-color: #fff; }
+
+.nav .autob { margin-left: auto; height: 42px; padding: 0 14px; border-radius: 21px; border: 1px solid var(--line); background: transparent; color: #fff; font: inherit; font-size: 14px; font-weight: 700; letter-spacing: .06em; cursor: pointer; }
+.nav .autob + .helpb { margin-left: 0; }
+.nav .autob.on { background: #fff; color: #000; border-color: #fff; box-shadow: 0 0 12px rgba(255, 255, 255, .35); }
+
+/* ===== オープニング ===== */
+.ttl { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; min-height: min(86vh, 720px); display: flex; flex-direction: column; justify-content: space-between; padding: 14px 0; background: radial-gradient(circle at 50% 48%, #2a2412 0%, #121212 48%, #070707 100%); }
+.trow { overflow: hidden; width: 100%; }
+.ttrack { display: flex; gap: 10px; width: max-content; padding: 6px 0; }
+.ttrack.r { animation: tslr 38s linear infinite; }
+.ttrack.l { animation: tsrl 38s linear infinite; }
+@keyframes tslr { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+@keyframes tsrl { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.tc { position: relative; flex: none; width: 92px; height: 120px; border: 2px solid var(--c); border-radius: 10px; background: linear-gradient(180deg, #1d1d1d, #0e0e0e); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 6px; box-shadow: 0 0 10px color-mix(in srgb, var(--c) 35%, transparent); }
+.tc .ic { font-size: 40px; line-height: 1; }
+.tc b { font-size: 11px; text-align: center; line-height: 1.25; }
+.tc .tcp { position: absolute; left: 5px; top: 4px; font-size: 10px; font-weight: 700; background: #fff; color: #000; border-radius: 8px; padding: 0 5px; line-height: 14px; }
+.tc.rare { border-color: #ffd37a; box-shadow: 0 0 14px rgba(255, 211, 122, .6); }
+.tmid { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 10px 14px; }
+.tsub { font-size: 22px; font-weight: 700; letter-spacing: .4em; padding-left: .4em; color: #ffe9b0; text-shadow: 0 0 10px rgba(255, 211, 122, .8); }
+.tmain { margin: 0; font-size: 50px; line-height: 1.12; font-weight: 900; letter-spacing: .04em; background: linear-gradient(100deg, #fff 0%, #ffe08a 30%, #fff 50%, #ffb347 70%, #fff 100%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; animation: tshine 3.2s linear infinite, tglow 2.4s ease-in-out infinite; filter: drop-shadow(0 0 12px rgba(255, 211, 122, .65)); }
+@keyframes tshine { from { background-position: 250% 0; } to { background-position: -50% 0; } }
+@keyframes tglow { 0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 211, 122, .5)); } 50% { filter: drop-shadow(0 0 24px rgba(255, 224, 138, .95)); } }
+.tline { width: 220px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, transparent, #ffd37a, transparent); animation: tglow 2.4s ease-in-out infinite; }
+.tic { font-size: 22px; letter-spacing: .3em; }
+.tstart { margin-top: 8px; font: inherit; font-size: 20px; font-weight: 800; letter-spacing: .12em; color: #000; background: #fff; border: 0; border-radius: 999px; padding: 14px 40px; min-height: 56px; cursor: pointer; animation: tpulse 1.6s ease-in-out infinite; }
+.tstart:hover { background: #ffe9b0; }
+@keyframes tpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, .5); transform: scale(1); } 50% { box-shadow: 0 0 0 14px rgba(255, 255, 255, 0); transform: scale(1.04); } }
+.tsp { position: absolute; z-index: 1; font-style: normal; color: #ffd37a; font-size: 18px; opacity: 0; animation: ttw 3s ease-in-out infinite; pointer-events: none; }
+@keyframes ttw { 0%, 100% { opacity: 0; transform: scale(.3) rotate(0); } 50% { opacity: 1; transform: scale(1.3) rotate(40deg); } }
+.welcome { border: 2px solid #ffd37a; border-radius: 12px; padding: 10px 14px; background: linear-gradient(180deg, #2a2412, #161208); display: flex; flex-direction: column; gap: 4px; text-align: center; font-size: 13px; line-height: 1.5; box-shadow: 0 0 18px rgba(255, 211, 122, .3); }
+.welcome > b { font-size: 15px; color: #ffe9b0; }
+.welcome span b { color: #ffd37a; }
+@media (max-width: 420px) { .tmain { font-size: 42px; } }
+@media (prefers-reduced-motion: reduce) { .ttrack, .tmain, .tstart, .tsp, .tline { animation: none; } }
+
+/* ===== コイントス ===== */
+.bs-pop.coinw { top: 190px; bottom: auto; align-items: center; text-align: center; gap: 6px; padding: 14px; cursor: pointer; animation: bspop .3s ease-out both; }
+.cw-t { font-size: 18px; letter-spacing: .2em; }
+.coin-wrap { position: relative; height: 170px; width: 100%; perspective: 700px; display: flex; justify-content: center; align-items: center; }
+.coin-toss { animation: ctoss 2.2s cubic-bezier(.3, .6, .4, 1) both; }
+.coin { width: 104px; height: 104px; position: relative; transform-style: preserve-3d; animation: cflip 2.2s cubic-bezier(.25, .7, .3, 1) both; }
+.cf { position: absolute; inset: 0; border-radius: 50%; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 5px solid #b8860b; box-shadow: inset 0 0 0 3px #ffe9b0, 0 0 18px rgba(255, 211, 122, .6); background: radial-gradient(circle at 35% 30%, #fff3c4, #ffd37a 55%, #c9962b); color: #5a3d00; }
+.cf span { font-size: 44px; font-weight: 900; line-height: 1; }
+.cf small { font-size: 12px; font-weight: 700; }
+.cf.b { transform: rotateY(180deg); background: radial-gradient(circle at 35% 30%, #f2f2f2, #cfcfcf 55%, #8f8f8f); border-color: #6a6a6a; box-shadow: inset 0 0 0 3px #fff, 0 0 18px rgba(255, 255, 255, .4); color: #222; }
+.coin-sh { position: absolute; bottom: 10px; width: 80px; height: 12px; border-radius: 50%; background: rgba(0, 0, 0, .6); animation: csh 2.2s cubic-bezier(.3, .6, .4, 1) both; }
+@keyframes cflip { from { transform: rotateY(0); } to { transform: rotateY(var(--end)); } }
+@keyframes ctoss { 0% { transform: translateY(40px) scale(1); } 45% { transform: translateY(-50px) scale(1.35); } 100% { transform: translateY(40px) scale(1); } }
+@keyframes csh { 0%, 100% { transform: scale(1); opacity: .6; } 45% { transform: scale(.55); opacity: .25; } }
+.cw-res { display: flex; flex-direction: column; gap: 2px; opacity: 0; animation: bsfade .4s ease-out 2.3s both; }
+.cw-res b { font-size: 20px; }
+.cw-res.win b { color: #ffd37a; }
+.cw-res.lose b { color: #9bc4ff; }
 </style>
 
 <div id="app"></div>
@@ -696,6 +784,7 @@ const RULE_LINES = {
   '栄養': ['訓練', '環境'], '訓練': ['環境', '介護'], '環境': ['介護', '医療']
 };
 function mult(a, b) {
+  if (ATTRS.indexOf(a) < 0 || ATTRS.indexOf(b) < 0) return 1;
   const d = (ATTRS.indexOf(b) - ATTRS.indexOf(a) + 6) % 6;
   if (d === 1 || d === 2) return 1.5;
   if (d === 4 || d === 5) return 0.5;
@@ -798,17 +887,35 @@ cr('コンサルタント', '環境', 95, '外部の専門家として、施設�
 cr('ケアマネ協会', '相談', 100, '全国のケアマネジャーが集う団体。ケアプランの知恵と人脈で支える。', ['ケアプラン研修', 2, { d: 30, ha: 15, dr: 1 }], ['全国ネットワーク', 5, { d: 80, b: 25, dr: 2 }]);
 cr('医師会', '医療', 100, '地域の医師が集う団体。医療と介護の連携を強力に後押しする。', ['地域連携会議', 2, { d: 30, ha: 25 }], ['地域医療総力戦', 5, { d: 90, s: 15 }]);
 
+/* アイテムカード（CP0・属性なし・1ターンに1回） */
+const ITEM_COPY = 2, ITEM_RATE = 0.2;
+function ci(key, name, ic, desc, w, only) {
+  CARDS.push({ id: CARDS.length, name, attr: 'なし', hp: 0, cost: 0, desc, ic, moves: [], item: true, key, w, only: !!only });
+}
+ci('drink', '元気ドリンク', '🍺', '選んだ味方カード1枚のHPを30回復する。', 9.33);
+ci('candy', '持ち寄りお菓子', '🍬', '場に出ている味方カードすべてのHPを15回復する。', 9.33);
+ci('lock', 'オートロック', '🔏', '相手は次のターン、交代ができない。', 10, true);
+ci('naisen', '内線呼び出し', '📴', '相手のベンチのカード1体を選び、前衛と交代させる。', 10, true);
+ci('holiday', '本日お休み頂戴します', '📞', '相手は手札をすべて捨てる。', 10, true);
+ci('ninshoku', '本日から入職', '🙎', 'カードを1枚ドローする。', 9.34);
+ci('tech', 'テクノロジー導入', '💻', 'CPをすべて回復する。', 7, true);
+ci('boss', '役職者', '👑', '場の味方カード1枚を選ぶ。そのカードがダメージを受けるたび、攻撃した相手に10ダメージ。HP0になるまで有効。', 7, true);
+ci('evi', 'エビデンス', '🦐', '次の自分のターンまで、属性の相性を無視して、すべての属性に強くなる（×1.5）。', 7, true);
+ci('bcp', 'BCP', '⚡', '次の自分のターンまで、だれもアイテムを使えない。', 7, true);
+ci('yakin', '夜勤明け', '🌅', '相手のカード1体を選ぶ。HP0になるまで、そのカードの攻撃-10。', 7, true);
+ci('tsuru', '鶴の一声', '💬', '次の自分のターンまで、だれもダメージを受けない。', 7, true);
 const DECK_SIZE = 20, WIN_PTS = 3, BENCH = 3, COST_MAX = 60, MAX_COPY = 4, GACHA_MAX = 2, GACHA_PULL = 5;
 const LBL = { p: 'あなた', e: '相手' };
 const opp = s => (s === 'p' ? 'e' : 'p');
+const maxCopy = id => (CARDS[id].item ? ITEM_COPY : MAX_COPY);
 
 /* ---------- 状態 ---------- */
 let G = null;
-let UI = { screen: 'deck', filter: 'all', sel: null, open: {}, carX: 0, dsel: -1, drag: null, win: null, anim: null, dwin: null, lastAdd: -1, help: null, helpAttr: 0 };
+let UI = { screen: 'title', filter: 'all', sel: null, open: {}, carX: 0, dsel: -1, drag: null, win: null, anim: null, dwin: null, lastAdd: -1, help: null, helpAttr: 0, modeDlg: false, modeMsg: '', opp: null };
 let DECK = [];
 let OWN = {}, GACHA = { date: '', used: 0 };
 let uidc = 0;
-let sleep = ms => new Promise(r => setTimeout(r, ms));
+let sleep = ms => new Promise(r => setTimeout(r, UI.auto === 2 ? ms / 3 : ms));
 
 function shuffle(a) {
   a = a.slice();
@@ -821,34 +928,50 @@ function shuffle(a) {
 function deckCost(ids) { return (ids || DECK).reduce((t, i) => t + CARDS[i].cost, 0); }
 function saveDeck() { try { localStorage.setItem('kaigo-card-deck', JSON.stringify(DECK)); } catch (e) { /* ignore */ } }
 
-function randomDeck(pool) {
-  const src = pool || CARDS.filter(x => !x.rare).map(x => x.id);
+function randomDeck(pool, size) {
+  size = size || DECK_SIZE;
+  const src = pool || CARDS.filter(x => !x.rare && !x.item).map(x => x.id);
   for (let k = 0; k < 200; k++) {
     const sh = shuffle(src), d = [], cnt = {};
     let cost = 0;
     for (const id of sh) {
-      if (d.length >= DECK_SIZE) break;
-      if ((cnt[id] || 0) >= MAX_COPY || cost + CARDS[id].cost > COST_MAX) continue;
+      if (d.length >= size) break;
+      if ((cnt[id] || 0) >= maxCopy(id) || cost + CARDS[id].cost > COST_MAX) continue;
       cnt[id] = (cnt[id] || 0) + 1; cost += CARDS[id].cost; d.push(id);
     }
-    if (d.length === DECK_SIZE) return d;
+    if (d.length === size) return d;
   }
-  return src.slice().sort((a, b) => CARDS[a].cost - CARDS[b].cost).slice(0, DECK_SIZE);
+  return src.slice().sort((a, b) => CARDS[a].cost - CARDS[b].cost).slice(0, size);
+}
+/* 相手（CPU）のデッキ：アイテムは全12種から、構成比7〜15%（同じカードは2枚まで） */
+function cpuDeck() {
+  const n = Math.max(1, Math.round(DECK_SIZE * (0.07 + Math.random() * 0.08)));
+  const items = [], cnt = {};
+  shuffle(CARDS.filter(x => x.item).map(x => x.id).concat(CARDS.filter(x => x.item).map(x => x.id))).forEach(id => {
+    if (items.length < n && (cnt[id] || 0) < ITEM_COPY) { cnt[id] = (cnt[id] || 0) + 1; items.push(id); }
+  });
+  return randomDeck(null, DECK_SIZE - items.length).concat(items);
 }
 function today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
 function ownedPool() {
   const a = [];
-  Object.keys(OWN).forEach(k => { for (let i = 0; i < Math.min(OWN[k], MAX_COPY); i++) a.push(+k); });
+  Object.keys(OWN).forEach(k => { for (let i = 0; i < Math.min(OWN[k], maxCopy(+k)); i++) a.push(+k); });
   return a;
 }
 function ownTotal() { return Object.keys(OWN).reduce((t, k) => t + OWN[k], 0); }
 function gachaLeft() { return GACHA.date === today() ? Math.max(0, GACHA_MAX - GACHA.used) : GACHA_MAX; }
 const RARE_RATE = 0.03;
-function pullIds(n, noRare) {
-  const rare = CARDS.filter(x => x.rare), norm = CARDS.filter(x => !x.rare), r = [];
+function pullIds(n, init) {
+  const rare = CARDS.filter(x => x.rare), norm = CARDS.filter(x => !x.rare && !x.item), r = [];
+  const items = CARDS.filter(x => x.item && (!init || !x.only)), tot = items.reduce((t, x) => t + x.w, 0);
   for (let i = 0; i < n; i++) {
-    const pool = !noRare && Math.random() < RARE_RATE ? rare : norm;
-    r.push(pool[Math.floor(Math.random() * pool.length)].id);
+    const q = Math.random();
+    if (!init && q < RARE_RATE) r.push(rare[Math.floor(Math.random() * rare.length)].id);
+    else if (q < RARE_RATE + ITEM_RATE) {
+      let z = Math.random() * tot, pick = items[items.length - 1];
+      for (const x of items) { z -= x.w; if (z < 0) { pick = x; break; } }
+      r.push(pick.id);
+    } else r.push(norm[Math.floor(Math.random() * norm.length)].id);
   }
   return r;
 }
@@ -865,7 +988,7 @@ function loadOwn() {
   for (let k = 0; k < 300; k++) {
     const ids = pullIds(DECK_SIZE, true), cnt = {};
     ids.forEach(i => { cnt[i] = (cnt[i] || 0) + 1; });
-    if (Object.keys(cnt).every(i => cnt[i] <= MAX_COPY) && deckCost(ids) <= COST_MAX) { OWN = cnt; saveOwn(); return; }
+    if (Object.keys(cnt).every(i => cnt[i] <= maxCopy(+i)) && deckCost(ids) <= COST_MAX) { OWN = cnt; saveOwn(); return; }
   }
   OWN = {}; randomDeck().forEach(i => { OWN[i] = 1; }); saveOwn();
 }
@@ -873,25 +996,25 @@ function loadDeck() {
   try {
     const v = JSON.parse(localStorage.getItem('kaigo-card-deck') || 'null');
     if (Array.isArray(v) && v.length === DECK_SIZE && v.every(i => CARDS[i]) && deckCost(v) <= COST_MAX &&
-      v.every(i => { const n = v.filter(j => j === i).length; return n <= MAX_COPY && n <= (OWN[i] || 0); })) return v;
+      v.every(i => { const n = v.filter(j => j === i).length; return n <= maxCopy(i) && n <= (OWN[i] || 0); })) return v;
   } catch (e) { /* ignore */ }
   return randomDeck(ownedPool());
 }
 function inst(id) {
   const d = CARDS[id];
-  return { uid: ++uidc, id: d.id, ic: d.ic, name: d.name, attr: d.attr, cost: d.cost, desc: d.desc, moves: d.moves, hp: d.hp, max: d.hp, sh: 0, db: 0, rare: !!d.rare };
+  return { uid: ++uidc, id: d.id, ic: d.ic, name: d.name, attr: d.attr, cost: d.cost, desc: d.desc, moves: d.moves, hp: d.hp, max: d.hp, sh: 0, db: 0, nd: 0, boss: false, rare: !!d.rare, item: !!d.item, key: d.key };
 }
 function newSide(ids) {
   let deck, hand;
   for (let k = 0; k < 30; k++) {
     deck = shuffle(ids.map(inst));
     hand = deck.slice(0, 4);
-    if (hand.some(x => x.cost <= 2)) break;
+    if (hand.some(x => !x.item && x.cost <= 2)) break;
   }
-  return { deck: deck.slice(4), hand, active: null, bench: [null, null, null], disc: [], pts: 0, cp: 0, max: 0, t: 0, buff: 0 };
+  return { deck: deck.slice(4), hand, active: null, bench: [null, null, null], disc: [], pts: 0, cp: 0, max: 0, t: 0, buff: 0, noSwap: false, evi: false };
 }
-function newGame(ids) {
-  G = { p: newSide(ids), e: newSide(randomDeck()), turn: 'p', attacked: false, swapped: false, log: [], over: null, mustPromote: false, busy: false, pr: null, fx: { dmg: {}, heal: {}, ghost: {} } };
+function newGame(ids, oppIds) {
+  G = { first: 'p', p: newSide(ids), e: newSide(oppIds || cpuDeck()), itemUsed: false, bcp: null, nodmg: null, cq: [], itemFx: null, turn: 'p', attacked: false, swapped: false, log: [], over: null, mustPromote: false, busy: false, pr: null, fx: { dmg: {}, heal: {}, ghost: {} } };
   UI.sel = null;
 }
 function log(m) { G.log.push(m); if (G.log.length > 40) G.log.shift(); }
@@ -915,7 +1038,7 @@ function check() {
   }
   for (const s of ['p', 'e']) {
     const S = G[s];
-    if (!S.active && !S.bench.some(Boolean) && S.hand.length === 0) {
+    if (!S.active && !S.bench.some(Boolean) && !S.hand.some(x => !x.item)) {
       G.over = { winner: opp(s), reason: LBL[s] + 'のチームに出せる職員がいなくなった。' };
       return true;
     }
@@ -950,6 +1073,7 @@ function ko(side, card) {
   S.disc.push(card);
 }
 function hit(side, card, amt) {
+  if (G.nodmg && amt > 0) { log('鶴の一声！ダメージを受けない。'); amt = 0; }
   if (card.sh > 0 && amt > 0) { const a = Math.min(card.sh, amt); card.sh -= a; amt -= a; }
   card.hp = Math.max(0, card.hp - amt);
   G.fx.dmg[card.uid] = (G.fx.dmg[card.uid] || 0) + amt;
@@ -965,7 +1089,8 @@ function heal(card, n) {
 
 function startTurn(s) {
   const S = G[s];
-  S.t++; S.max = Math.min(2 + S.t, 9); S.cp = S.max; S.buff = 0;
+  S.t++; S.max = Math.min(2 + S.t, 9); S.cp = S.max; S.buff = 0; S.evi = false;
+  G.itemUsed = false; if (G.bcp === s) G.bcp = null; if (G.nodmg === s) G.nodmg = null;
   fieldCards(s).forEach(x => { x.sh = 0; });
   draw(s, 1);
   G.turn = s; G.attacked = false; G.swapped = false;
@@ -978,9 +1103,10 @@ function startTurn(s) {
 }
 function endTurn(s) {
   fieldCards(s).forEach(x => { x.db = 0; });
-  G[s].buff = 0;
+  G[s].buff = 0; G[s].noSwap = false;
 }
-function canAttack(s) { return !(s === 'p' && G.p.t === 1); }
+function atkK(s, a, t) { return G[s].evi ? 1.5 : mult(a.attr, t.attr); }
+function canAttack(s) { return !(s === G.first && G[s].t === 1); }
 function summon(s, hi, slot) {
   const S = G[s], card = S.hand[hi];
   if (!card || S.cp < card.cost) return false;
@@ -999,6 +1125,7 @@ function summon(s, hi, slot) {
 function swap(s, bi) {
   const S = G[s], card = S.bench[bi];
   if (!card || G.swapped) return false;
+  if (S.noSwap) { log('オートロック！交代できない。'); return false; }
   if (S.active) {
     if (S.cp < 1) return false;
     S.cp -= 1;
@@ -1029,18 +1156,109 @@ function useMove(s, mi) {
   if (e.w && O.active) O.active.db += e.w;
   if (e.d) {
     if (O.active) {
-      const k = mult(a.attr, O.active.attr);
-      let amt = (e.d + S.buff) * k - a.db;
+      const k = atkK(s, a, O.active), T = O.active;
+      let amt = (e.d + S.buff) * k - a.db - a.nd;
       amt = Math.max(0, Math.round(amt / 5) * 5);
       S.buff = 0;
-      if (k > 1) log('相性がよい！（' + a.attr + '→' + O.active.attr + '）');
-      if (k < 1) log('相性がいまひとつ…（' + a.attr + '→' + O.active.attr + '）');
-      hit(opp(s), O.active, amt);
+      if (S.evi) log('エビデンス！すべての属性に強い。');
+      else if (k > 1) log('相性がよい！（' + a.attr + '→' + O.active.attr + '）');
+      else if (k < 1) log('相性がいまひとつ…（' + a.attr + '→' + O.active.attr + '）');
+      hit(opp(s), T, amt);
+      if (T.boss && amt > 0 && !G.nodmg) G.cq.push({ s, a });
     } else log('相手の前衛がいない。');
   }
-  if (e.s) O.bench.slice().forEach(x => { if (x) hit(opp(s), x, e.s); });
+  if (e.s) O.bench.slice().forEach(x => { if (x) { hit(opp(s), x, e.s); if (x.boss && !G.nodmg) G.cq.push({ s, a }); } });
   after();
   return true;
+}
+
+/* ---------- アイテム ---------- */
+function itemTargets(s, x) {
+  const refs = (side, only) => {
+    const S = G[side], r = [];
+    if (S.active && only !== 'b') r.push({ s: side, z: 'a', i: 0, card: S.active });
+    if (only !== 'a') S.bench.forEach((c, i) => { if (c) r.push({ s: side, z: 'b', i, card: c }); });
+    return r;
+  };
+  switch (x.key) {
+    case 'drink': return refs(s);
+    case 'boss': return refs(s).filter(r => !r.card.boss);
+    case 'yakin': return refs(opp(s));
+    case 'naisen': return G[opp(s)].active ? refs(opp(s), 'b') : [];
+    default: return null;
+  }
+}
+function itemBlock(s, x) {
+  if (G.bcp) return 'BCP中：' + LBL[G.bcp] + 'の次のターンまで、アイテムは使えません';
+  if (G.itemUsed) return 'アイテムは1ターンに1回です';
+  const tg = itemTargets(s, x);
+  if (tg && !tg.length) return '対象がいません';
+  return '';
+}
+function tgRef(side, card) { const S = G[side]; return S.active === card ? { s: side, z: 'a', i: 0 } : { s: side, z: 'b', i: S.bench.indexOf(card) }; }
+function useItem(s, hi, tg) {
+  const S = G[s], O = G[opp(s)], x = S.hand[hi];
+  if (!x || !x.item || itemBlock(s, x)) return false;
+  const cardOf = r => (r.z === 'a' ? G[r.s].active : G[r.s].bench[r.i]);
+  const c = tg ? cardOf(tg) : null;
+  if (itemTargets(s, x) && !c) return false;
+  log(LBL[s] + 'は「' + x.name + '」を使った！');
+  switch (x.key) {
+    case 'drink': log(c.name + 'のHPが' + heal(c, 30) + '回復。'); break;
+    case 'candy': fieldCards(s).forEach(f => { heal(f, 15); }); log('場の味方全員のHPが回復。'); break;
+    case 'lock': O.noSwap = true; log(LBL[opp(s)] + 'は次のターン、交代できない。'); break;
+    case 'naisen': {
+      const i = tg.i;
+      if (O.active) { O.bench[i] = O.active; O.active = c; } else { O.active = c; O.bench[i] = null; }
+      log(c.name + 'が前衛に呼び出された。'); break;
+    }
+    case 'holiday': log(LBL[opp(s)] + 'は手札' + O.hand.length + '枚をすべて捨てた。'); O.disc.push(...O.hand); O.hand = []; break;
+    case 'ninshoku': draw(s, 1); break;
+    case 'tech': S.cp = S.max; log('CPが全回復！'); break;
+    case 'boss': c.boss = true; log(c.name + 'に役職者の力が宿った。'); break;
+    case 'evi': S.evi = true; log('次の自分のターンまで、すべての属性に強くなる。'); break;
+    case 'bcp': G.bcp = s; log('次の' + LBL[s] + 'のターンまで、だれもアイテムを使えない。'); break;
+    case 'yakin': c.nd = (c.nd || 0) + 10; log(c.name + 'の攻撃が-10された。'); break;
+    case 'tsuru': G.nodmg = s; log('次の' + LBL[s] + 'のターンまで、だれもダメージを受けない。'); break;
+  }
+  S.hand.splice(hi, 1); S.disc.push(x); G.itemUsed = true;
+  G.itemFx = { s, ic: x.ic, name: x.name, desc: x.desc };
+  after();
+  return true;
+}
+async function showItemFx() {
+  render(); await sleep(1000);
+  G.itemFx = null; render();
+}
+async function doItem(hi, tg) {
+  G.busy = true;
+  const ok = useItem('p', hi, tg);
+  UI.sel = null; UI.win = null; UI.tgi = null;
+  if (ok) await showItemFx(); else render();
+  G.busy = false; render();
+}
+async function aiItem(s) {
+  const S = G[s], O = G[opp(s)];
+  if (G.itemUsed || G.bcp) return;
+  const f = fieldCards(s), miss = k => k.max - k.hp;
+  for (const x of S.hand.filter(h => h.item)) {
+    let ok = false, tg = null;
+    switch (x.key) {
+      case 'drink': { const k = f.slice().sort((a, b) => miss(b) - miss(a))[0]; if (k && miss(k) >= 20) { ok = true; tg = tgRef(s, k); } break; }
+      case 'candy': ok = f.filter(k => miss(k) >= 10).length >= 2; break;
+      case 'lock': ok = O.bench.some(Boolean) && Math.random() < 0.6; break;
+      case 'naisen': { const b = O.bench.map((k, i) => ({ k, i })).filter(o => o.k).sort((a, b2) => a.k.hp - b2.k.hp)[0]; if (O.active && b && b.k.hp <= 45) { ok = true; tg = { s: opp(s), z: 'b', i: b.i }; } break; }
+      case 'holiday': ok = O.hand.length >= 3; break;
+      case 'ninshoku': ok = S.deck.length > 0; break;
+      case 'tech': ok = S.cp <= S.max - 3 && S.hand.some(h => !h.item && h.cost > S.cp); break;
+      case 'boss': { const k = (S.active && !S.active.boss) ? S.active : f.find(z => !z.boss); if (k) { ok = true; tg = tgRef(s, k); } break; }
+      case 'evi': ok = !!(S.active && O.active && mult(S.active.attr, O.active.attr) <= 1); break;
+      case 'bcp': ok = Math.random() < 0.35; break;
+      case 'yakin': if (O.active) { ok = true; tg = tgRef(opp(s), O.active); } break;
+      case 'tsuru': ok = !!(S.active && S.active.hp <= 45); break;
+    }
+    if (ok && useItem(s, S.hand.indexOf(x), tg)) { await showItemFx(); return; }
+  }
 }
 
 /* ---------- CPU ---------- */
@@ -1048,7 +1266,7 @@ function aiScore(s, m) {
   const S = G[s], O = G[opp(s)], a = S.active, e = m.e;
   let sc = 0;
   if (e.d && O.active) {
-    const amt = Math.max(0, Math.round(((e.d + S.buff) * mult(a.attr, O.active.attr) - a.db) / 5) * 5);
+    const amt = Math.max(0, Math.round(((e.d + S.buff) * atkK(s, a, O.active) - a.db - a.nd) / 5) * 5);
     const eff = Math.max(0, amt - O.active.sh);
     sc += eff;
     if (eff >= O.active.hp) sc += 40;
@@ -1080,7 +1298,7 @@ function aiSummon(s) {
   const reserve = (S.active && !G.attacked && canAttack(s)) ? 1 : 0;
   const slots = !S.active || S.bench.includes(null);
   if (!slots || fieldCards(s).length >= 4) return false;
-  const cand = S.hand.map((x, i) => ({ x, i })).filter(o => o.x.cost <= S.cp - reserve)
+  const cand = S.hand.map((x, i) => ({ x, i })).filter(o => !o.x.item && o.x.cost <= S.cp - reserve)
     .sort((a, b) => b.x.cost - a.x.cost || b.x.hp - a.x.hp);
   if (!cand.length) return false;
   return summon(s, cand[0].i);
@@ -1088,6 +1306,8 @@ function aiSummon(s) {
 let waitPromotion = () => (G.mustPromote ? new Promise(r => { G.pr = r; }) : Promise.resolve());
 async function cpuTurn(s) {
   startTurn(s); render(); await sleep(650);
+  if (G.over) return;
+  await aiItem(s);
   if (G.over) return;
   aiSwap(s); render();
   for (let k = 0; k < 5; k++) {
@@ -1116,6 +1336,70 @@ async function enemyTurn() {
   G.busy = false; render();
 }
 
+/* ---------- コイントス ---------- */
+async function runCoin(c) {
+  await sleep(2500);
+  for (let i = 0; i < 40 && UI.coin === c && !c.skip; i++) await sleep(60);
+  if (UI.coin !== c || !G) return;
+  UI.coin = null;
+  log(c.heads ? '表！あなたが先攻です。' : '裏！相手が先攻です。');
+  if (c.heads) { startTurn('p'); G.busy = false; render(); } else { render(); enemyTurn(); }
+}
+function coinWin() {
+  const c = UI.coin;
+  return '<div class="bs-back"></div><div class="bs-pop coinw" data-act="coinskip" role="dialog" aria-label="コイントス">' +
+    '<b class="cw-t">コイントス</b><span class="dim sm">表ならあなたが先攻、裏なら相手が先攻</span>' +
+    '<div class="coin-wrap"><div class="coin-toss"><div class="coin" style="--end:' + (c.heads ? 1800 : 1980) + 'deg">' +
+    '<div class="cf f"><span>表</span><small>あなた</small></div><div class="cf b"><span>裏</span><small>相手</small></div></div></div><i class="coin-sh"></i></div>' +
+    '<div class="cw-res ' + (c.heads ? 'win' : 'lose') + '"><b>' + (c.heads ? '表！ あなたが先攻！' : '裏！ 相手が先攻！') + '</b><span class="dim sm">先攻は最初のターン、わざを使えません</span></div></div>';
+}
+/* ---------- 対戦成績・オート ---------- */
+let REC = { w: 0, l: 0 };
+function welcomeDone() { try { return !!localStorage.getItem('kaigo-welcome'); } catch (e) { return false; } }
+function loadRec() { try { const v = JSON.parse(localStorage.getItem('kaigo-record') || 'null'); if (v && v.w >= 0 && v.l >= 0) REC = { w: v.w | 0, l: v.l | 0 }; } catch (e) { /* ignore */ } }
+function saveRec() { try { localStorage.setItem('kaigo-record', JSON.stringify(REC)); } catch (e) { /* ignore */ } }
+function recText() { return '対戦成績　' + (REC.w + REC.l) + '戦 ' + REC.w + '勝 ' + REC.l + '負'; }
+function recordResult() {
+  if (!G || !G.over || G.recorded) return;
+  G.recorded = true;
+  if (G.over.winner === 'p') REC.w++; else REC.l++;
+  saveRec();
+}
+function autoPromote() {
+  if (!UI.auto || !G || !G.mustPromote || UI.screen !== 'battle') return;
+  const e = G.e.active; let bi = -1, bs = -1e9;
+  G.p.bench.forEach((x, i) => { if (!x) return; const v = (e ? (mult(x.attr, e.attr) - mult(e.attr, x.attr)) * 1000 : 0) + x.hp; if (v > bs) { bs = v; bi = i; } });
+  if (bi >= 0) act('pick', { zone: 'pb', idx: bi });
+}
+let autoBusy = false;
+async function autoPlayerTurn() {
+  const s = 'p';
+  G.busy = true; UI.win = null; UI.sel = null; render();
+  await sleep(500);
+  await aiItem(s);
+  if (G.over || !UI.auto) { G.busy = false; render(); return; }
+  aiSwap(s); render();
+  for (let k = 0; k < 5; k++) { if (!aiSummon(s)) break; render(); await sleep(450); }
+  const S = G[s];
+  if (S.active && !G.attacked && canAttack(s)) {
+    const opts = S.active.moves.map((m, i) => ({ i, m, sc: aiScore(s, m) })).filter(o => S.cp >= o.m.c).sort((a, b) => b.sc - a.sc);
+    if (opts.length && opts[0].sc > 0) {
+      await animMove(s, opts[0].i); render(); await sleep(250);
+      await waitPromotion();
+      if (G.over) { G.busy = false; render(); return; }
+    }
+  }
+  for (let k = 0; k < 5; k++) { if (!aiSummon(s)) break; render(); await sleep(450); }
+  endTurn(s); UI.sel = null; UI.win = null;
+  enemyTurn();
+}
+async function autoTick() {
+  if (!UI.auto || autoBusy || UI.screen !== 'battle' || !G || G.over || G.busy || G.mustPromote || G.turn !== 'p') return;
+  autoBusy = true;
+  try { await autoPlayerTurn(); } finally { autoBusy = false; }
+}
+setInterval(() => { autoPromote(); autoTick(); }, 250);
+
 /* ---------- 画面 ---------- */
 function selCard() {
   const s = UI.sel; if (!s || !G) return null;
@@ -1126,6 +1410,7 @@ function selCard() {
   if (s.zone === 'eb') return G.e.bench[s.idx];
   return null;
 }
+const attrLbl = a => (a === 'なし' ? 'アイテム' : a);
 function costBadge(n, s) {
   return '<span class="costb' + (s ? ' s' : '') + '"><small>コスト</small><b>' + n + '</b></span>';
 }
@@ -1221,21 +1506,23 @@ function renderGacha() {
   const left = gachaLeft();
   let btn;
   if (running) btn = '<button class="btn big" disabled>ガチャを回しています…</button>';
+  else if (UI.welcome) btn = '<button class="btn big" data-act="gacha">特別ガチャを回す（20個）</button>';
   else if (left > 0) btn = '<button class="btn big" data-act="gacha">ガチャをする（残り' + left + '/' + GACHA_MAX + '）</button>';
   else btn = '<button class="btn big" disabled>本日のガチャは終了しました</button>';
   let res = '';
   if (A && A.done) {
     res = '<div class="panel"><h2>ゲットしたカード</h2><div class="gcards">' + A.ids.map((id, k) => {
       const c = CARDS[id];
-      const x = { cost: c.cost, attr: c.attr, ic: c.ic, name: c.name, hp: c.hp, max: c.hp, sh: 0, db: 0 };
+      const x = { cost: c.cost, attr: c.attr, ic: c.ic, name: c.name, hp: c.hp, max: c.hp, sh: 0, db: 0, item: c.item };
       return '<div class="gcol" style="animation-delay:' + (k * 0.12).toFixed(2) + 's"><div class="gc mc' + (c.rare ? ' rare' : '') + '">' + (c.rare ? '<span class="rareb">RARE</span>' : '') + (A.fresh.includes(id) ? '<span class="newb">NEW</span>' : '') + miniBody(x, { bar: false }) + '</div><span class="dim sm">所持 ×' + (OWN[id] || 0) + '</span></div>';
     }).join('') + '</div></div>';
   }
   return '<div class="wrap">' + navHTML() +
     '<div class="scene' + (running ? ' go' : '') + (running && A.hasRare ? ' rr' : '') + '" style="--el:' + el + 's">' + facilitySVG(running && A.hasRare) + '</div>' +
+    (UI.welcome && !running ? '<div class="welcome"><b>🎉 ようこそ！はじめての特別プレゼント</b><span>今回だけ、ランダムなカプセルを<b>20個</b>まとめて回せます。<br>1日のガチャ回数は減りません。ボタンを押してスタート！</span></div>' : '') +
     '<div class="gctl">' + btn +
     (running ? '<div class="gprog"><i style="--el:' + el + 's;--dur:' + A.ms / 1000 + 's"></i></div>' : '') +
-    '<p class="dim sm">1日' + GACHA_MAX + '回まで。1回で' + GACHA_PULL + '枚のカードをランダムで獲得します（日付が変わるとリセット）。レアカード（CP5）は約' + Math.round(RARE_RATE * 100) + '%の確率で出ます。</p>' +
+    '<p class="dim sm">1日' + GACHA_MAX + '回まで。1回で' + GACHA_PULL + '枚のカードをランダムで獲得します。</p>' +
     (UI.msg ? '<p class="sm warn">' + UI.msg + '</p>' : '') + '</div>' + res + '</div>';
 }
 function renderBattleStart() {
@@ -1243,9 +1530,28 @@ function renderBattleStart() {
   return '<div class="wrap">' + navHTML() +
     '<div class="panel"><h2>対戦</h2><p>デッキ ' + DECK.length + '/' + DECK_SIZE + '枚 · CP合計 ' + deckCost() + '/' + COST_MAX + '</p>' +
     (ok ? '<p class="dim sm">先に相手の職員を' + WIN_PTS + '体、戦闘不能にした方の勝ちです。</p>' : '<p class="sm warn">デッキを' + DECK_SIZE + '枚（CP合計' + COST_MAX + '以内）にそろえてください。</p>') +
-    '<div class="row"><button class="btn big" data-act="start"' + (ok ? '' : ' disabled') + '>対戦開始</button><button class="btn ghost" data-act="nav" data-v="deck">デッキを編成する</button></div></div></div>';
+    '<div class="row"><button class="btn big" data-act="modeopen"' + (ok ? '' : ' disabled') + '>対戦する</button><button class="btn ghost" data-act="nav" data-v="deck">デッキを編成する</button></div></div></div>';
+}
+function tcRow(ids) {
+  const one = ids.map(id => {
+    const c = CARDS[id];
+    return '<div class="tc' + (c.rare ? ' rare' : '') + (c.item ? ' item' : '') + '" style="--c:' + (ATTR_COL[c.attr] || '#f3f3f3') + '"><span class="tcp">CP' + c.cost + '</span><span class="ic">' + c.ic + '</span><b>' + c.name + '</b></div>';
+  }).join('');
+  return one + one;
+}
+function renderTitle() {
+  if (!UI.titleRows) { const all = shuffle(CARDS.map(c => c.id)); UI.titleRows = [all.slice(0, 14), all.slice(14, 28).concat(all.slice(0, 0))]; }
+  const sp = [[12, 30, 0], [84, 24, 1.1], [22, 62, 2.2], [78, 66, 0.6], [50, 18, 1.7], [8, 50, 2.8], [92, 46, 0.3]].map(q => '<i class="tsp" style="left:' + q[0] + '%;top:' + q[1] + '%;animation-delay:' + q[2] + 's">✦</i>').join('');
+  return '<div class="wrap"><div class="ttl">' +
+    '<div class="trow top"><div class="ttrack r">' + tcRow(UI.titleRows[0]) + '</div></div>' + sp +
+    '<div class="tmid"><div class="tsub">つながる</div><h1 class="tmain" aria-label="つながる介護カードバトラーズ">介護カード<br>バトラーズ</h1>' +
+    '<div class="tline"></div><div class="tic">🤝 💉 💬 🥗 🦵 🧹</div>' +
+    '<button class="tstart" data-act="gamestart">ゲームスタート</button></div>' +
+    '<div class="trow bot"><div class="ttrack l">' + tcRow(UI.titleRows[1]) + '</div></div>' +
+    '</div></div>';
 }
 function renderScreen() {
+  if (UI.screen === 'title') return renderTitle();
   if (UI.screen === 'gacha') return renderGacha();
   if (UI.screen === 'battle') return G && !(G.over && G.dismissed) ? renderBattle() : renderBattleStart();
   return renderDeck();
@@ -1261,14 +1567,14 @@ function say(m) {
 }
 function canAddCard(id) {
   const n = DECK.filter(i => i === id).length;
-  return !(n >= Math.min(MAX_COPY, OWN[id] || 0) || DECK.length >= DECK_SIZE || deckCost() + CARDS[id].cost > COST_MAX);
+  return !(n >= Math.min(maxCopy(id), OWN[id] || 0) || DECK.length >= DECK_SIZE || deckCost() + CARDS[id].cost > COST_MAX);
 }
 function dcCard(x, i) {
-  const n = DECK.filter(j => j === x.id).length, max = Math.min(MAX_COPY, OWN[x.id] || 0);
+  const n = DECK.filter(j => j === x.id).length, max = Math.min(maxCopy(x.id), OWN[x.id] || 0);
   return '<div class="dc-ci' + (n ? ' on' : '') + (x.rare ? ' rare' : '') + '" draggable="true" data-dk="coll" data-id="' + x.id + '">' +
     '<div class="dc-art" role="button" tabindex="0" aria-label="' + x.name + 'の詳細" data-act="cfocus" data-i="' + i + '" data-id="' + x.id + '">' +
-    '<span class="dc-top"><span class="dc-cp">CP' + x.cost + '</span><span class="tag">' + x.attr + '</span></span>' + (x.rare ? '<span class="rareb s">RARE</span>' : '') +
-    '<span class="ic">' + x.ic + '</span><span class="dc-nm">' + x.name + '</span><b class="dc-hp">HP' + x.hp + '</b></div>' +
+    '<span class="dc-top"><span class="dc-cp">CP' + x.cost + '</span><span class="tag">' + attrLbl(x.attr) + '</span></span>' + (x.rare ? '<span class="rareb s">RARE</span>' : '') +
+    '<span class="ic">' + x.ic + '</span><span class="dc-nm">' + x.name + '</span><b class="dc-hp">' + (x.item ? 'ITEM' : 'HP' + x.hp) + '</b></div>' +
     '<div class="dc-foot"><span class="dc-n">' + (n ? '採用 ' + n + '/' + max : '所持 ' + (OWN[x.id] || 0)) + '</span>' +
     '<button class="dc-plus' + (canAddCard(x.id) ? '' : ' full') + '" data-act="dadd" data-id="' + x.id + '" aria-label="' + x.name + 'を採用">＋</button></div></div>';
 }
@@ -1277,15 +1583,15 @@ function dslotHTML(i) {
   if (id === undefined) return '<div class="dc-slot empty" aria-hidden="true">' + (i + 1) + '</div>';
   const x = CARDS[id];
   return '<div class="dc-slot' + (UI.dsel === i ? ' sel' : '') + (x.rare ? ' rare' : '') + (UI.lastAdd === i ? ' pop' : '') + '" role="button" tabindex="0" draggable="true" title="' + x.name + '" aria-label="' + x.name + ' CP' + x.cost + ' HP' + x.hp + '" data-act="dslot" data-dk="deck" data-idx="' + i + '">' +
-    '<span class="dc-cp s">CP' + x.cost + '</span><span class="ic">' + x.ic + '</span><b class="dc-hp">HP' + x.hp + '</b></div>';
+    '<span class="dc-cp s">CP' + x.cost + '</span><span class="ic">' + x.ic + '</span><b class="dc-hp">' + (x.item ? 'ITEM' : 'HP' + x.hp) + '</b></div>';
 }
 function balanceHTML() {
   const n = DECK.length;
-  const cnt = ATTRS.map(a => DECK.filter(i => CARDS[i].attr === a).length);
+  const AL = ATTRS.concat('なし'), cnt = AL.map(a => DECK.filter(i => CARDS[i].attr === a).length);
   const bar = n
-    ? '<div class="dc-bal" role="img" aria-label="属性のバランス">' + ATTRS.map((a, i) => cnt[i] ? '<span style="flex:' + cnt[i] + ';background:' + ATTR_COL[a] + '">' + cnt[i] + '</span>' : '').join('') + '</div>'
+    ? '<div class="dc-bal" role="img" aria-label="属性のバランス">' + AL.map((a, i) => cnt[i] ? '<span style="flex:' + cnt[i] + ';background:' + ATTR_COL[a] + '">' + cnt[i] + '</span>' : '').join('') + '</div>'
     : '<div class="dc-bal empty">デッキが空です</div>';
-  const leg = '<div class="dc-leg">' + ATTRS.map((a, i) => '<span' + (cnt[i] ? '' : ' class="z"') + '><i style="background:' + ATTR_COL[a] + '"></i>' + a + ' ' + cnt[i] + '</span>').join('') + '</div>';
+  const leg = '<div class="dc-leg">' + AL.map((a, i) => '<span' + (cnt[i] ? '' : ' class="z"') + '><i style="background:' + ATTR_COL[a] + '"></i>' + attrLbl(a) + ' ' + cnt[i] + '</span>').join('') + '</div>';
   return '<div class="dc-balw"><b class="dc-bt1">属性のバランス</b>' + bar + leg + '</div>';
 }
 function bubHTML(cls) {
@@ -1295,16 +1601,16 @@ function bubHTML(cls) {
 function dSheet() {
   if (UI.dwin === null || UI.dwin === undefined) return '';
   const x = CARDS[UI.dwin];
-  const n = DECK.filter(j => j === x.id).length, max = Math.min(MAX_COPY, OWN[x.id] || 0);
+  const n = DECK.filter(j => j === x.id).length, max = Math.min(maxCopy(x.id), OWN[x.id] || 0);
   return '<div class="dc-back' + fr() + '" data-act="dclose"></div><div class="dc-sheet' + fr() + '">' +
     '<div class="dc-sh"><span class="dc-grip"></span><button class="bs-x" data-act="dclose">閉じる</button></div>' +
-    '<div class="row"><span class="ic" style="font-size:36px">' + x.ic + '</span><span class="col"><b style="font-size:16px">' + x.name + '</b><span class="row"><span class="tag">' + x.attr + '</span><span class="dc-cp">CP' + x.cost + '</span><b class="sm">HP' + x.hp + '</b></span></span></div>' +
+    '<div class="row"><span class="ic" style="font-size:36px">' + x.ic + '</span><span class="col"><b style="font-size:16px">' + x.name + '</b><span class="row"><span class="tag">' + attrLbl(x.attr) + '</span><span class="dc-cp">CP' + x.cost + '</span>' + (x.item ? '<b class="sm">1ターンに1回</b>' : '<b class="sm">HP' + x.hp + '</b>') + '</span></span></div>' +
     '<div class="dim sm">' + x.desc + '</div>' + x.moves.map(moveBox).join('') +
     '<div class="dc-cnt"><button class="dc-bt" data-act="ddec" data-id="' + x.id + '"' + (n ? '' : ' data-off="1"') + '>− 解除</button><b class="sm">採用 ' + n + '/' + max + '（所持 ' + (OWN[x.id] || 0) + '）</b><button class="dc-bt main' + (canAddCard(x.id) ? '' : ' full') + '" data-act="dadd" data-id="' + x.id + '">＋ 採用</button></div>' +
     '<div class="dc-sbub">' + bubHTML() + '</div></div>';
 }
 function addToDeck(id) {
-  const n = DECK.filter(i => i === id).length, max = Math.min(MAX_COPY, OWN[id] || 0);
+  const n = DECK.filter(i => i === id).length, max = Math.min(maxCopy(id), OWN[id] || 0);
   let m = '';
   if (!OWN[id]) m = '所持していないカードです。';
   else if (n >= max) m = CARDS[id].name + 'は、これ以上入れられません（最大' + max + '枚）。';
@@ -1319,26 +1625,55 @@ function removeFromDeck(idx) {
   else { const nm = CARDS[DECK[idx]].name; DECK.splice(idx, 1); UI.dsel = -1; say(nm + 'を外しました。'); }
   saveDeck(); render();
 }
-function deckFileText() {
-  return JSON.stringify({ app: 'kaigo-card-battle', version: 1, savedAt: new Date().toISOString(), deck: DECK.map(i => ({ id: i, name: CARDS[i].name })) }, null, 1);
+function deckFileText(nm) {
+  return JSON.stringify({ app: 'kaigo-card-battle', version: 1, name: nm || '', savedAt: new Date().toISOString(), deck: DECK.map(i => ({ id: i, name: CARDS[i].name })) }, null, 1);
 }
-async function saveDeckFile() {
+function cleanDeckName(s) { return String(s || '').replace(/[\\/:*?"<>|\s.]+/g, '').slice(0, 30) || 'デッキ'; }
+function deckFileName(nm) {
+  const d = new Date(), z = n => String(n).padStart(2, '0');
+  return cleanDeckName(nm) + '_' + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '.dat';
+}
+function saveDlgHTML() {
+  if (!UI.saveDlg) return '';
+  let last = 'デッキ';
+  try { last = localStorage.getItem('kaigo-deck-name') || last; } catch (e) { /* ignore */ }
+  return '<div class="dc-back" data-act="saveclose"></div><div class="sv-dlg" role="dialog" aria-label="デッキの名前">' +
+    '<b>デッキの名前をつけて保存</b><label class="dim sm" for="dname">デッキ名（ファイル名になります）</label>' +
+    '<input id="dname" class="sv-in" type="text" maxlength="30" value="' + last.replace(/"/g, '&quot;') + '" autocomplete="off">' +
+    '<div class="dim sm" id="dprev"></div>' +
+    '<div class="row"><button class="dc-bt" data-act="saveclose">キャンセル</button><span class="grow"></span><button class="dc-bt main" data-act="savego">保存する</button></div></div>';
+}
+async function saveDeckFile(nm) {
   if (!DECK.length) { say('デッキが空です。カードを入れてから保存してください。'); render(); return; }
+  try { localStorage.setItem('kaigo-deck-name', cleanDeckName(nm)); } catch (e) { /* ignore */ }
+  const data = deckFileText(cleanDeckName(nm)), name = deckFileName(nm);
   let dl = null;
   try { dl = typeof window !== 'undefined' && window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
-  if (!dl) { say('この画面ではファイルを保存できません。'); render(); return; }
-  const data = deckFileText();
-  try {
-    await dl.save({ filename: 'kaigo-deck.dat', data });
-    say('デッキを保存しました（kaigo-deck.dat）。');
-  } catch (e) {
-    if (e && e.code === 'rejected_extension') {
-      try {
-        await dl.save({ filename: 'kaigo-deck.dat.txt', data });
-        say('kaigo-deck.dat.txtで保存しました（.datに直しても復元できます）。');
-      } catch (e2) { say(e2 && e2.code === 'declined' ? '保存をキャンセルしました。' : 'デッキを保存できませんでした。'); }
-    } else say(e && e.code === 'declined' ? '保存をキャンセルしました。' : 'デッキを保存できませんでした。');
+  if (dl) {
+    try { await dl.save({ filename: name, data }); say('デッキを保存しました（' + name + '）。'); render(); return; } catch (e) {
+      if (e && e.code === 'rejected_extension') {
+        /* この表示環境は .dat を許可していない。まず共有シートで .dat のまま保存を試す */
+        try {
+          const f = new File([data], name, { type: 'application/octet-stream' });
+          if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: name }); say('デッキを保存しました（' + name + '）。'); render(); return; }
+        } catch (e3) { if (e3 && e3.name === 'AbortError') { say('保存をキャンセルしました。'); render(); return; } }
+        try { await dl.save({ filename: name + '.txt', data }); say(name + '.txt で保存しました（.txt を消しても復元できます）。'); render(); return; } catch (e2) { e = e2; }
+      }
+      if (e && e.code === 'declined') { say('保存をキャンセルしました。'); render(); return; }
+    }
   }
+  /* ブラウザ／スマホ用：共有シート → ダウンロードリンクの順に試す */
+  try {
+    const file = new File([data], name, { type: 'application/octet-stream' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: name }); say('デッキを保存しました（' + name + '）。'); render(); return; }
+  } catch (e) { if (e && e.name === 'AbortError') { say('保存をキャンセルしました。'); render(); return; } }
+  try {
+    const url = URL.createObjectURL(new Blob([data], { type: 'application/octet-stream' }));
+    const a = document.createElement('a'); a.href = url; a.download = name; a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+    say('デッキを保存しました（' + name + '）。');
+  } catch (e) { say('デッキを保存できませんでした。'); }
   render();
 }
 function restoreFromText(text) {
@@ -1352,12 +1687,70 @@ function restoreFromText(text) {
   let cost = 0, noOwn = 0, over = 0;
   ids.forEach(id => {
     if (!OWN[id]) { noOwn++; return; }
-    if (nd.length >= DECK_SIZE || (cnt[id] || 0) >= Math.min(MAX_COPY, OWN[id]) || cost + CARDS[id].cost > COST_MAX) { over++; return; }
+    if (nd.length >= DECK_SIZE || (cnt[id] || 0) >= Math.min(maxCopy(id), OWN[id]) || cost + CARDS[id].cost > COST_MAX) { over++; return; }
     cnt[id] = (cnt[id] || 0) + 1; cost += CARDS[id].cost; nd.push(id);
   });
   DECK = nd; UI.dsel = -1; saveDeck();
   say('デッキを復元しました（' + nd.length + '枚）。' + (noOwn ? noOwn + '枚は未所持のため入れられませんでした。' : '') + (over ? over + '枚は枚数・CPの上限で入れられませんでした。' : ''));
   render();
+}
+/* ---------- 対戦モード選択（CPU対戦／デッキデータ対戦／デッキ編成） ---------- */
+function deckReady() { return DECK.length === DECK_SIZE && deckCost() <= COST_MAX; }
+function modeDlgHTML() {
+  if (!UI.modeDlg) return '';
+  const ok = deckReady();
+  const inner = '<span>デッキデータ対戦</span><small>[デッキ保存]のファイルを選んで対戦</small>';
+  const file = ok
+    ? '<label class="md-btn filebtn">' + inner + '<input class="vh" type="file" id="ofile" accept=".dat,.txt,.json,text/plain,application/octet-stream"></label>'
+    : '<button class="md-btn" data-act="modeneed">' + inner + '</button>';
+  return '<div class="md-back" data-act="modeclose"></div><div class="md-dlg" role="dialog" aria-modal="true" aria-label="対戦モードの選択">' +
+    '<div class="md-head"><b>対戦モード</b><button class="hp-x" data-act="modeclose" aria-label="閉じる">✕</button></div>' +
+    (ok ? '' : '<p class="sm warn">デッキを' + DECK_SIZE + '枚（CP合計' + COST_MAX + '以内）にそろえてください。（いま ' + DECK.length + '枚・CP' + deckCost() + '）</p>') +
+    (UI.modeMsg ? '<p class="sm warn" role="alert">' + UI.modeMsg + '</p>' : '') +
+    '<button class="md-btn main" data-act="modecpu"><span>CPU対戦</span><small>コンピューターのデッキと対戦</small></button>' +
+    file +
+    '<button class="md-btn" data-act="modedeck"><span>デッキ編成</span><small>デッキ画面へ移動</small></button></div>';
+}
+function parseOppDeck(text, fname) {
+  let v = null;
+  try { v = JSON.parse(text); } catch (e) { v = null; }
+  if (!v || !Array.isArray(v.deck)) return { err: 'デッキファイルを読み込めませんでした。[デッキ保存]で出力したファイルを選んでください。' };
+  const byName = Object.create(null);
+  CARDS.forEach(x => { byName[x.name] = x.id; });
+  const ids = [];
+  let bad = 0;
+  v.deck.forEach(d => {
+    const k = d ? +d.id : NaN;
+    const id = (d && byName[d.name] !== undefined) ? byName[d.name] : (Number.isInteger(k) && CARDS[k] ? k : -1);
+    if (id >= 0) ids.push(id); else bad++;
+  });
+  if (bad) return { err: '読み込めないカードが' + bad + '枚ありました。' };
+  if (ids.length !== DECK_SIZE) return { err: 'このデッキは' + ids.length + '枚です。対戦には' + DECK_SIZE + '枚のデッキが必要です。' };
+  if (deckCost(ids) > COST_MAX) return { err: 'CP合計が' + deckCost(ids) + 'で、上限' + COST_MAX + 'を超えています。' };
+  const cnt = {};
+  ids.forEach(i => { cnt[i] = (cnt[i] || 0) + 1; });
+  const over = Object.keys(cnt).find(i => cnt[i] > maxCopy(+i));
+  if (over !== undefined) return { err: CARDS[over].name + 'が' + maxCopy(+over) + '枚を超えて入っています。' };
+  return { ids, name: cleanDeckName(v.name || String(fname || '').replace(/\.[^.]*$/, '').replace(/_\d{8}$/, '')) };
+}
+function loadOppFile(file) {
+  const fail = m => { UI.modeMsg = m; render(); };
+  if (file.size > 200000) { fail('ファイルが大きすぎます。デッキファイルを選んでください。'); return; }
+  const r = new FileReader();
+  r.onload = () => {
+    const res = parseOppDeck(String(r.result), file.name);
+    if (res.err) { fail(res.err); return; }
+    UI.opp = { ids: res.ids, name: res.name };
+    UI.modeDlg = false; UI.modeMsg = '';
+    act('startopp', {});
+  };
+  r.onerror = () => { fail('ファイルを読み込めませんでした。'); };
+  r.readAsText(file);
+}
+function needDeck() {
+  UI.screen = 'deck';
+  say('対戦するには、デッキを' + DECK_SIZE + '枚（CP合計' + COST_MAX + '以内）にそろえてください。');
+  render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
 }
 function syncCar() {
   const car = document.getElementById('car');
@@ -1378,16 +1771,16 @@ function renderDeck() {
     '<div class="bs-status"><b>デッキ</b><span class="dc-pill">' + DECK.length + '/' + DECK_SIZE + '</span><span class="dc-pill' + (full ? ' warn' : '') + '">CP ' + deckCost() + '/' + COST_MAX + '</span><span class="grow"></span><span class="dim sm">所持 ' + ownTotal() + '枚（' + Object.keys(OWN).length + '/' + CARDS.length + '種）</span></div>' +
     '<div class="dc-board" data-dz="board">' + slots.join('') + '</div>' +
     '<div class="dc-bubrow">' + (UI.dwin === null || UI.dwin === undefined ? bubHTML() : '') + (UI.msg ? '' : balanceHTML()) + '</div>' +
-    '<div class="dc-filters">' + ['all'].concat(ATTRS).map(a => '<button class="dc-flt" data-act="filter" data-v="' + a + '" aria-pressed="' + (UI.filter === a) + '">' + (a === 'all' ? 'すべて' : a) + '</button>').join('') + '</div>' +
+    '<div class="dc-filters">' + ['all'].concat(ATTRS, 'なし').map(a => '<button class="dc-flt" data-act="filter" data-v="' + a + '" aria-pressed="' + (UI.filter === a) + '">' + (a === 'all' ? 'すべて' : attrLbl(a)) + '</button>').join('') + '</div>' +
     '<div class="dc-carw" data-dz="trash">' +
     (list.length ? '<div class="dc-car" id="car" tabindex="0" aria-label="手持ちのカード（左右にスライド）">' + list.map(dcCard).join('') + '</div>' +
       '<button class="dc-arr l" data-act="cmove" data-dir="-1" aria-label="左へ">‹</button><button class="dc-arr r" data-act="cmove" data-dir="1" aria-label="右へ">›</button>'
       : '<p class="dim cen-t" style="padding-top:50px">この属性のカードはまだありません。ガチャで手に入れましょう。</p>') + '</div>' +
     '<div class="dc-cmd">' +
     '<button data-act="random">ランダム<br>編成</button><button data-act="reset">リセット</button><button class="main" data-act="save">デッキ<br>保存</button>' +
-    '<label class="filebtn">復元<input class="vh" type="file" id="dfile" accept=".dat,.txt,.json,text/plain"></label>' +
+    '<label class="filebtn">復元<input class="vh" type="file" id="dfile" accept=".dat,.txt,.json,text/plain,application/octet-stream"></label>' +
     '<button data-act="del" data-dz="trash" style="opacity:' + (UI.dsel >= 0 ? 1 : .55) + '">外す</button></div>' +
-    dSheet() + '</div></div>';
+    dSheet() + saveDlgHTML() + '</div></div>';
   return '<div class="wrap">' + navHTML() + stage +
     '<p class="dim sm foot">HP・属性・わざの数値と相性は、ゲーム用のフィクションです。</p>' +
     '</div>';
@@ -1398,6 +1791,8 @@ function burst(n, isHeal) {
 }
 function miniBody(x, o) {
   o = o || {};
+  if (x.item) return '<div class="mtop"><span class="cpb2"><small>CP</small><b>0</b></span><span class="tag">アイテム</span></div>' +
+    '<div class="mart"><span class="ic">' + x.ic + '</span></div><div class="tname">' + x.name + '</div><div class="hpn"><b class="itl">ITEM</b></div>';
   const bar = o.bar !== false;
   const sts = (x.sh ? '<span class="st">盾' + x.sh + '</span>' : '') + (x.db ? '<span class="st">弱-' + x.db + '</span>' : '');
   return '<div class="mtop"><span class="cpb2"><small>CP</small><b>' + x.cost + '</b></span><span class="tag">' + x.attr + '</span></div>' +
@@ -1432,6 +1827,8 @@ function statusHTML(s) {
   return '<div class="status"><b>' + LBL[s] + '</b><span>撃破 ' + S.pts + '/' + WIN_PTS + '</span><span>CP ' + S.cp + '/' + S.max + '</span><span>手札 ' + S.hand.length + '</span><span>山札 ' + S.deck.length + '</span></div>';
 }
 function detailHTML(x) {
+  if (x.item) return '<div class="chead">' + costBadge(0) + '<span class="cname"><span class="ic">' + x.ic + '</span><span>' + x.name + '</span></span></div>' +
+    '<div class="row"><span class="tag">アイテム</span><span class="dim sm">CP0・1ターンに1回</span></div><div class="dim sm">' + x.desc + '</div>';
   return '<div class="chead">' + costBadge(x.cost) + '<span class="cname"><span class="ic">' + x.ic + '</span><span>' + x.name + '</span></span>' + hpBadge(x.hp, x.max) + '</div>' +
     '<div class="row"><span class="tag">' + x.attr + '</span></div>' +
     '<div class="dim sm">' + x.desc + '</div>' + x.moves.map(moveBox).join('');
@@ -1444,12 +1841,13 @@ function infoHTML() {
 /* ---------- 対戦画面（案B：スマホ 440×750 のステージ） ---------- */
 function arrowOf(m) { return m > 1 ? ['↑', '#ff5c5c', '有利'] : m < 1 ? ['↓', '#4aa3ff', '不利'] : ['→', '#cfcfcf', '等倍']; }
 function arBadge(a, b) {
-  if (!a || !b) return '';
+  if (!a || !b || a.item) return '';
   const r = arrowOf(mult(a.attr, b.attr));
   return '<span class="bs-ar" style="color:' + r[1] + ';border-color:' + r[1] + '" role="img" aria-label="' + r[2] + '">' + r[0] + '</span>';
 }
 function bsPill(n, s) { return '<span class="bs-pill' + (s ? ' s' : '') + '">CP' + n + '</span>'; }
-function stTags(x) { return (x.sh ? '<span class="st">盾' + x.sh + '</span>' : '') + (x.db ? '<span class="st">弱-' + x.db + '</span>' : ''); }
+function stTags(x) { return (x.sh ? '<span class="st">盾' + x.sh + '</span>' : '') + (x.db ? '<span class="st">弱-' + x.db + '</span>' : '') + (x.nd ? '<span class="st">攻-' + x.nd + '</span>' : ''); }
+function crown(x) { return x.boss ? '<span class="crown" title="役職者">👑</span>' : ''; }
 function fxCls(x) {
   const d = G.fx.dmg[x.uid], h = G.fx.heal[x.uid];
   return d !== undefined ? ' hit' : (h !== undefined ? ' heal' : '');
@@ -1465,7 +1863,7 @@ function fxStar(x) {
 function cardInner(x) {
   return '<div class="bs-top">' + bsPill(x.cost) + '<span class="tag">' + x.attr + '</span></div>' +
     '<div class="bs-art"><span class="ic">' + x.ic + '</span>' + (stTags(x) ? '<span class="sts">' + stTags(x) + '</span>' : '') + '</div>' +
-    '<div class="bs-nm">' + x.name + '</div>';
+    '<div class="bs-nm">' + x.name + '</div>' + crown(x);
 }
 function bsCard(x, zone) {
   const mine = zone === 'pa', side = mine ? 'mine' : 'foe';
@@ -1489,7 +1887,7 @@ function bsTok(x, zone, idx) {
   const sel = mine && UI.sel && UI.sel.zone === 'pb' && UI.sel.idx === idx;
   return '<div class="bs-tok ' + side + (x.rare ? ' rare' : '') + fxCls(x) + (sel ? ' sel' : '') + '" role="button" tabindex="0" data-act="' + (mine ? 'swapopen' : 'info') + '" data-zone="' + zone + '" data-idx="' + idx + '"' +
     dropAttr(zone, idx) + (mine ? ' draggable="true"' : '') + ' aria-label="' + x.name + '">' +
-    '<span class="ic">' + x.ic + '</span>' + bsPill(x.cost, true) + '<b>HP' + x.hp + '</b>' + fxBurst(x) + '</div>';
+    '<span class="ic">' + x.ic + '</span>' + bsPill(x.cost, true) + '<b>HP' + x.hp + '</b>' + crown(x) + fxBurst(x) + '</div>';
 }
 function bsPlate(x, side, other) {
   const mine = side === 'p', S = G[side];
@@ -1529,6 +1927,7 @@ function msgText(can) {
   if (G.mustPromote) return '前衛が倒れました。ベンチから出す職員を選んでください。';
   if (UI.anim) return UI.anim.msg;
   if (can && !canAttack('p') && !G.attacked) return '先攻の最初のターンは、わざを使えません。出す・交代はできます。';
+  if (UI.coin) return 'コイントスで先攻を決めます…';
   return G.log[G.log.length - 1] || '';
 }
 function winHead(title, sub, closable) {
@@ -1539,9 +1938,9 @@ function movesWin(can) {
   const P = G.p, a = P.active, ea = G.e.active;
   if (!a) return '<div class="bs-pop">' + winHead('わざ', '', true) + '<p class="dim">前衛がいません。</p></div>';
   const blocked = !canAttack('p');
-  const k = ea ? mult(a.attr, ea.attr) : 1;
+  const k = ea ? atkK('p', a, ea) : 1;
   const rows = a.moves.map((m, i) => {
-    const dmg = m.e.d && ea ? Math.max(0, Math.round(((m.e.d + P.buff) * k - a.db) / 5) * 5) : 0;
+    const dmg = m.e.d && ea ? Math.max(0, Math.round(((m.e.d + P.buff) * k - a.db - a.nd) / 5) * 5) : 0;
     const why = !can ? '' : blocked ? '先攻の最初のターンは使えません' : G.attacked ? 'このターンは攻撃済み' : P.cp < m.c ? 'CPが足りません' : '';
     const note = why || (dmg ? (k > 1 ? '相性◎ ' : k < 1 ? '相性△ ' : '') + dmg + 'ダメージ' : '');
     const dis = !can || !!why;
@@ -1553,13 +1952,13 @@ function swapWin(can) {
   const P = G.p, mp = G.mustPromote;
   const rows = P.bench.map((x, i) => {
     if (!x) return '';
-    const off = !mp && (!can || G.swapped || (P.active && P.cp < 1));
+    const off = !mp && (!can || G.swapped || P.noSwap || (P.active && P.cp < 1));
     const sel = UI.sel && UI.sel.zone === 'pb' && UI.sel.idx === i;
     return '<div class="bs-row' + (sel ? ' sel' : '') + (x.rare ? ' rare' : '') + '"><span class="ic">' + x.ic + '</span><span class="grow col"><b class="rn">' + x.name + '</b><span class="row">' + bsPill(x.cost, true) + '<b class="sm">HP' + x.hp + '/' + x.max + '</b><span class="tag">' + x.attr + '</span>' + arBadge(x, G.e.active) + '</span></span>' +
       '<button class="bs-go" data-act="' + (mp ? 'pick' : 'swapto') + '" data-zone="pb" data-idx="' + i + '"' + (off ? ' disabled' : '') + '>' + (mp ? '前衛に出す' : '交代 CP1') + '</button></div>';
   }).join('');
   const empty = P.bench.some(Boolean) ? '' : '<p class="dim">ベンチに職員がいません。</p>';
-  const note = !mp && can && G.swapped ? '<p class="dim sm">交代は1ターンに1回です。</p>' : '';
+  const note = !mp && can && P.noSwap ? '<p class="dim sm">🔏オートロック中：このターンは交代できません。</p>' : (!mp && can && G.swapped ? '<p class="dim sm">交代は1ターンに1回です。</p>' : '');
   return '<div class="bs-pop' + fr() + '">' + winHead(mp ? '前衛が倒れた！出す職員を選ぼう' : 'だれと交代する？', mp ? (G.e.active ? '相手の前衛：' + G.e.active.name + '（' + G.e.active.attr + '）' : '') : 'CP1・1ターン1回' + (G.e.active ? '・相手：' + G.e.active.name + '（' + G.e.active.attr + '）' : ''), !mp) + rows + empty + note + '</div>';
 }
 function matchChip(x) {
@@ -1575,22 +1974,51 @@ function handWin(can) {
   const rows = P.hand.map((x, i) => {
     const s = UI.sel && UI.sel.zone === 'hand' && UI.sel.idx === i, ok = P.cp >= x.cost;
     return '<div class="bs-row' + (s ? ' sel' : '') + (x.rare ? ' rare' : '') + (ok ? '' : ' dim') + '" role="button" tabindex="0" data-act="pick" data-zone="hand" data-idx="' + i + '">' +
-      '<span class="ic">' + x.ic + '</span><span class="grow rn">' + x.name + '</span>' + arBadge(x, G.e.active) + '<span class="tag">' + x.attr + '</span>' + bsPill(x.cost, true) + '<b class="rh">HP' + x.hp + '</b></div>';
+      '<span class="ic">' + x.ic + '</span><span class="grow rn">' + x.name + '</span>' + arBadge(x, G.e.active) + (x.item ? '' : '<span class="tag">' + x.attr + '</span>') + (x.item ? '<span class="bs-pill s itp">ITEM</span><b class="rh"></b>' : bsPill(x.cost, true) + '<b class="rh">HP' + x.hp + '</b>') + '</div>';
   }).join('') || '<p class="dim">手札はありません。</p>';
   const room = !P.active || P.bench.includes(null);
   let label = '手札をえらんでください', dis = true;
-  if (sel) {
+  if (sel && sel.item) {
+    const why = !can ? '自分の番のみ使えます' : itemBlock('p', sel);
+    if (why) label = why; else { label = 'アイテムを使う（CP 0）'; dis = false; }
+  } else if (sel) {
     if (!can) label = '自分の番のみ出せます';
     else if (!room) label = 'ベンチがいっぱいです';
     else if (P.cp < sel.cost) label = 'CPが足りません（必要 ' + sel.cost + '）';
     else { label = '場に出す（CP ' + sel.cost + '）'; dis = false; }
   }
-  const det = sel ? '<div class="bs-cardface' + (sel.rare ? ' rare' : '') + '"><div class="chead">' + costBadge(sel.cost) + '<span class="cname">' + sel.name + '</span>' + hpBadge(sel.hp) + '</div>' +
-    '<div class="art"><span class="tag">' + sel.attr + '</span><span class="ic">' + sel.ic + '</span></div>' + matchChip(sel) +
-    '<div class="dim sm">' + sel.desc + '</div>' + sel.moves.map(moveBox).join('') + '</div>' : '';
+  const det = sel ? '<div class="bs-cardface' + (sel.rare ? ' rare' : '') + (sel.item ? ' item' : '') + '"><div class="chead">' + costBadge(sel.cost) + '<span class="cname">' + sel.name + '</span>' + (sel.item ? '' : hpBadge(sel.hp)) + '</div>' +
+    '<div class="art"><span class="tag">' + attrLbl(sel.attr) + '</span><span class="ic">' + sel.ic + '</span></div>' + (sel.item ? '' : matchChip(sel)) +
+    '<div class="' + (sel.item ? 'bs-eff' : 'dim sm') + '">' + (sel.item ? '<b>効果</b>　' : '') + sel.desc + '</div>' + (sel.item ? '<div class="dim sm">CP0・属性なし・1ターンに1回</div>' : sel.moves.map(moveBox).join('')) + '</div>' : '';
   return '<div class="bs-drawer' + fr() + '">' + winHead('手札', P.hand.length + '枚 · CP ' + P.cp + '/' + P.max, true) +
     '<div class="bs-list" id="bsl">' + rows + '</div>' + det +
-    '<button class="bs-play" data-act="summon"' + (dis ? ' disabled' : '') + '>' + label + '</button></div>';
+    '<button class="bs-play" data-act="' + (sel && sel.item ? 'useitem' : 'summon') + '"' + (dis ? ' disabled' : '') + '>' + label + '</button></div>';
+}
+function targetWin(can) {
+  const x = UI.tgi !== null && UI.tgi !== undefined ? G.p.hand[UI.tgi] : null;
+  if (!x || !x.item) return '';
+  const tg = itemTargets('p', x) || [];
+  const rows = tg.map(r => {
+    const k = r.card;
+    return '<div class="bs-row' + (k.rare ? ' rare' : '') + '"><span class="ic">' + k.ic + '</span><span class="grow col"><b class="rn">' + k.name + '</b><span class="row"><span class="dim sm">' + (r.s === 'p' ? 'あなた' : '相手') + (r.z === 'a' ? '・前衛' : '・ベンチ') + '</span><b class="sm">HP' + k.hp + '/' + k.max + '</b><span class="tag">' + k.attr + '</span></span></span>' +
+      '<button class="bs-go" data-act="tgtpick" data-s="' + r.s + '" data-z="' + r.z + '" data-i="' + r.i + '"' + (can ? '' : ' disabled') + '>えらぶ</button></div>';
+  }).join('') || '<p class="dim">対象がいません。</p>';
+  return '<div class="bs-pop' + fr() + '">' + winHead(x.ic + ' ' + x.name, '対象をえらぶ', true) + '<p class="dim sm" style="margin:0">' + x.desc + '</p>' + rows + '</div>';
+}
+function itemFxHTML() {
+  const f = G.itemFx;
+  if (!f) return '';
+  return '<div class="bs-itemfx ' + (f.s === 'p' ? 'mine' : 'foe') + '"><span class="ifi">' + f.ic + '</span><b>' + LBL[f.s] + '：' + f.name + '</b><small>' + f.desc + '</small></div>';
+}
+function fxChips() {
+  const c = [];
+  if (G.bcp) c.push('⚡BCP中');
+  if (G.nodmg) c.push('💬ダメージ無効');
+  if (G.p.evi) c.push('🦐あなた:相性無視');
+  if (G.e.evi) c.push('🦐相手:相性無視');
+  if (G.p.noSwap) c.push('🔏あなた:交代不可');
+  if (G.e.noSwap) c.push('🔏相手:交代不可');
+  return c.length ? '<div class="bs-chips">' + c.map(x => '<span>' + x + '</span>').join('') + '</div>' : '';
 }
 function infoWin() {
   const x = selCard();
@@ -1602,15 +2030,16 @@ function logWin() {
 }
 function renderBattle() {
   const P = G.p, E = G.e;
-  const can = G.turn === 'p' && !G.busy && !G.over && !G.mustPromote;
+  const can = G.turn === 'p' && !G.busy && !G.over && !G.mustPromote && !UI.auto;
   const a = P.active, ea = E.active;
   const win = G.mustPromote ? 'swap' : UI.win;
   const over = G.over ? '<div class="overlay"><div class="box"><h2>' + (G.over.winner === 'p' ? '勝利' : '敗北') + '</h2><p>' + G.over.reason + '</p>' +
     '<div class="row"><button class="btn" data-act="retry">もう一度</button><button class="btn ghost" data-act="toDeck">デッキ編成へ</button></div></div></div>' : '';
   let pop = '';
-  if (win === 'hand') pop = '<div class="bs-back' + fr() + '" data-act="closewin"></div>' + handWin(can);
+  if (UI.coin) pop = coinWin();
+  else if (win === 'hand') pop = '<div class="bs-back' + fr() + '" data-act="closewin"></div>' + handWin(can);
   else if (win) {
-    const body = win === 'moves' ? movesWin(can) : win === 'swap' ? swapWin(can) : win === 'log' ? logWin() : win === 'info' ? infoWin() : '';
+    const body = win === 'target' ? targetWin(can) : win === 'moves' ? movesWin(can) : win === 'swap' ? swapWin(can) : win === 'log' ? logWin() : win === 'info' ? infoWin() : '';
     if (body) pop = '<div class="bs-back' + fr() + '"' + (G.mustPromote ? '' : ' data-act="closewin"') + '></div>' + body;
   }
   const stage = '<div class="bs-wrap"><div class="bs" id="bs">' +
@@ -1619,7 +2048,7 @@ function renderBattle() {
     bsPlate(ea, 'e', a) + bsCard(ea, 'ea') +
     bsCard(a, 'pa') + bsPlate(a, 'p', ea) +
     '<div class="bs-bench mine">' + P.bench.map((x, i) => bsTok(x, 'pb', i)).join('') + '</div>' +
-    animLayer() +
+    animLayer() + fxChips() + itemFxHTML() +
     '<div class="bs-msg" data-act="win" data-v="log" role="button" tabindex="0" aria-label="ログを開く">' + msgText(can) + '</div>' +
     '<div class="bs-cmd">' +
     '<button class="main" data-act="win" data-v="moves"' + (can && a ? '' : ' disabled') + '>わざ</button>' +
@@ -1628,7 +2057,7 @@ function renderBattle() {
     '<button data-act="end"' + (can ? '' : ' disabled') + '>ターン終了</button></div>' +
     pop + '</div></div>';
   return '<div class="wrap">' +
-    navHTML('<span class="dim turn">ターン' + G[G.turn].t + ' · ' + (G.turn === 'p' ? 'あなたの番' : '相手の番') + '</span>') +
+    navHTML('<span class="dim turn">' + recText() + '</span><button class="autob' + (UI.auto ? ' on' : '') + '" data-act="auto" aria-pressed="' + !!UI.auto + '">Auto' + (UI.auto === 2 ? '×3' : '') + '</button>') +
     stage + over + '</div>';
 }
 function applyScale() {
@@ -1640,7 +2069,7 @@ function applyScale() {
 async function animMove(s, mi) {
   const S = G[s], a = S.active, m = a ? a.moves[mi] : null;
   if (!m || G.attacked || !canAttack(s) || S.cp < m.c) return false;
-  const tgt = G[opp(s)].active, k = tgt ? mult(a.attr, tgt.attr) : 1, ic = a.ic;
+  const tgt = G[opp(s)].active, k = tgt ? atkK(s, a, tgt) : 1, ic = a.ic;
   UI.anim = { s, ph: 'wind', bp: m.n + '！', ic, msg: LBL[s] + 'の' + a.name + '「' + m.n + '」！' };
   render(); await sleep(560);
   const ok = useMove(s, mi);
@@ -1655,11 +2084,22 @@ async function animMove(s, mi) {
   UI.anim = { s, ph: 'hit', bp: m.n + '！', ic, be: lines.join('<br>'), msg: dm !== undefined ? tgt.name + 'に' + dm + 'ダメージ！' : fx(m.e) };
   render(); await sleep(1100);
   UI.anim = null;
+  if (G.cq.length && !G.over) {
+    const q = G.cq.slice(); G.cq = [];
+    for (const o of q) {
+      if (G.over || !o.a || o.a.hp <= 0) continue;
+      UI.anim = { s: o.s, ph: 'hit', bp: '👑 役職者の反撃！', ic, be: o.a.name + 'に10ダメージ', msg: '役職者の反撃！' + o.a.name + 'に10ダメージ。' };
+      hit(o.s, o.a, 10); after();
+      render(); await sleep(1000);
+      UI.anim = null;
+    }
+  }
+  G.cq = [];
   return true;
 }
 /* ---------- ヘルプ（？ボタンのポップアップ） ---------- */
 const ATTR_IC = { '介護': '🤝', '医療': '💉', '相談': '💬', '栄養': '🥗', '訓練': '🦵', '環境': '🧹' };
-const ATTR_COL = { '介護': '#ff8f8f', '医療': '#74d0ff', '相談': '#ffd36e', '栄養': '#8fe27d', '訓練': '#c69bff', '環境': '#5fe0c4' };
+const ATTR_COL = { 'なし': '#f3f3f3', '介護': '#ff8f8f', '医療': '#74d0ff', '相談': '#ffd36e', '栄養': '#8fe27d', '訓練': '#c69bff', '環境': '#5fe0c4' };
 function hpMini(ic, label, cls) {
   return '<span class="hp-mini ' + (cls || '') + '"><span class="ic">' + ic + '</span>' + (label ? '<small>' + label + '</small>' : '') + '</span>';
 }
@@ -1681,10 +2121,14 @@ function helpRule() {
     hpSec(2, 'CPと手番', '<div class="hp-cps"><div><span>ターン1</span>' + hpPips(3, 9) + '<b>3</b></div><div><span>ターン2</span>' + hpPips(4, 9) + '<b>4</b></div><div><span>ターン3</span>' + hpPips(5, 9) + '<b>5</b></div><div><span>…</span>' + hpPips(9, 9) + '<b>最大9</b></div></div>' +
       '<p class="hp-t">CPは毎ターン<b>全回復</b>して、1ずつ増えていきます。</p>') +
     hpSec(3, 'ターンの流れ', '<div class="hp-flow">' + flow.map((f, i) => (i ? '<span class="hp-arr">›</span>' : '') + '<div class="hp-step"><span class="ic">' + f[0] + '</span><b>' + f[1] + '</b><small>' + f[2] + '</small></div>').join('') + '</div>' +
-      '<p class="hp-t">わざは<b>前衛だけ</b>が1ターンに1回。交代はCP1で1ターンに1回です。<b>先攻（あなた）は最初のターン、わざを使えません。</b></p>') +
+      '<p class="hp-t">わざは<b>前衛だけ</b>が1ターンに1回。交代はCP1で1ターンに1回です。<b>先攻は最初のターン、わざを使えません。</b>先攻・後攻は、対戦のはじめのコイントス（表ならあなた）で決まります。</p>') +
     hpSec(4, 'シールドと弱体', '<div class="hp-two"><div class="hp-card g"><span class="ic">🛡️</span><b>シールド</b><small>次の相手ターンまで、ダメージを吸収</small></div><div class="hp-card w"><span class="ic">⬇️</span><b>弱体</b><small>相手の次のわざのダメージを減らす</small></div></div>') +
     hpSec(5, 'デッキとガチャ', '<div class="hp-tiles"><div><b>' + DECK_SIZE + '</b><small>枚で1デッキ</small></div><div><b>' + MAX_COPY + '</b><small>同じカードは最大</small></div><div><b>' + COST_MAX + '</b><small>CP合計の上限</small></div><div><b>' + GACHA_MAX + '</b><small>ガチャは1日 / 回</small></div></div>' +
-      '<p class="hp-t">ガチャは1回で<b>' + GACHA_PULL + '枚</b>。手に入れたカードだけがデッキに入れられます。<b>レアカード</b>（CP5・強力なわざ）はガチャでだけ手に入り、出る確率は約' + Math.round(RARE_RATE * 100) + '%です。デッキ画面で、手持ちカードの「＋」やドラッグ＆ドロップ、ダブルクリックで入れましょう。</p>');
+      '<p class="hp-t">ガチャは1回で<b>' + GACHA_PULL + '枚</b>。手に入れたカードだけがデッキに入れられます。<b>アイテムカード</b>は同じカードを' + ITEM_COPY + '枚まで入れられます。<b>レアカード</b>（CP5・強力なわざ）はガチャでだけ手に入ります。デッキ画面で、手持ちカードの「＋」やドラッグ＆ドロップ、ダブルクリックで入れましょう。</p>') + helpItem();
+}
+function helpItem() {
+  const rows = CARDS.filter(x => x.item).map(x => '<div class="hp-fxr"><span class="ic">' + x.ic + '</span><b class="hp-itn">' + x.name + (x.only ? '<i>ガチャ限定</i>' : '') + '</b><span class="hp-fd">' + x.desc + '</span></div>').join('');
+  return hpSec(6, 'アイテムカード', '<p class="hp-t">CPを使わず、<b>1ターンに1回</b>だけ使えるカード（属性なし）。手札の「アイテムを使う」で発動します。デッキには同じカードを<b>' + ITEM_COPY + '枚</b>まで入れられます。</p><div class="hp-fx">' + rows + '</div>');
 }
 function helpMove() {
   const fxs = [['d', '⚔️', '攻撃 25', '前衛にダメージ'], ['s', '💥', '全体 10', '相手のベンチ全体にダメージ'], ['h', '💚', '回復 15', '自分や味方のHPを回復'], ['g', '🛡️', '盾 10', '次の相手ターンまでダメージを吸収'],
@@ -1744,12 +2188,15 @@ function render() {
   const hb = document.getElementById('hbody');
   const hbx = hb ? hb.scrollTop : 0;
   const sy = typeof window !== 'undefined' ? window.scrollY : 0;
-  app.innerHTML = renderScreen() + helpHTML();
+  if (UI.screen === 'battle') recordResult();
+  app.innerHTML = renderScreen() + modeDlgHTML() + helpHTML();
   if (G) G.fx = { dmg: {}, heal: {}, ghost: {} };
   UI.lastAdd = -1;
   UI.fresh = false;
   hideTip();
   if (UI.screen === 'deck') syncCar();
+  if (UI.saveDlg) { const di = document.getElementById('dname'); if (di) { di.focus(); di.select(); } }
+  if (UI.modeDlg) { const mb = document.querySelector('.md-dlg .md-btn.main'); if (mb && mb.focus) mb.focus({ preventScroll: true }); }
   const h2 = document.getElementById('bsl');
   if (h2) h2.scrollTop = hx;
   const hb2 = document.getElementById('hbody');
@@ -1760,6 +2207,8 @@ function render() {
 
 /* ---------- 操作 ---------- */
 function act(a, d) {
+  if (a === 'gamestart') { UI.screen = 'gacha'; UI.welcome = !welcomeDone(); render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0); return; }
+  if (a === 'auto') { UI.auto = ((UI.auto || 0) + 1) % 3; if (UI.auto) UI.win = null; render(); return; }
   if (a === 'help') { UI.help = UI.help ? null : 'rule'; render(); return; }
   if (a === 'helpclose') { UI.help = null; render(); return; }
   if (a === 'htab') { UI.help = d.v; render(); const b = document.getElementById('hbody'); if (b) b.scrollTop = 0; return; }
@@ -1768,7 +2217,7 @@ function act(a, d) {
     const id = +d.id, n = DECK.filter(i => i === id).length;
     UI.msg = '';
     if (a === 'dec') { const i = DECK.indexOf(id); if (i >= 0) DECK.splice(i, 1); }
-    else if (n >= Math.min(MAX_COPY, OWN[id] || 0)) DECK = DECK.filter(i => i !== id);
+    else if (n >= Math.min(maxCopy(id), OWN[id] || 0)) DECK = DECK.filter(i => i !== id);
     else if (DECK.length >= DECK_SIZE) UI.msg = 'デッキは' + DECK_SIZE + '枚までです。カードを減らしてください。';
     else if (deckCost() + CARDS[id].cost > COST_MAX) UI.msg = 'CPの合計が' + COST_MAX + 'を超えるため、追加できません。';
     else DECK.push(id);
@@ -1778,23 +2227,38 @@ function act(a, d) {
     if (G && G.over) G.dismissed = true;
     UI.msg = ''; UI.dwin = null;
     if (d.v === 'battle' && (!G || G.dismissed)) {
-      if (DECK.length === DECK_SIZE && deckCost() <= COST_MAX) { act('start', {}); return; }
-      UI.screen = 'deck';
-      say('対戦するには、デッキを' + DECK_SIZE + '枚（CP合計' + COST_MAX + '以内）にそろえてください。');
-      render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
+      UI.modeDlg = true; UI.modeMsg = ''; render();
       return;
     }
     UI.screen = d.v; render();
     if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
     return;
   }
+  if (a === 'modeopen') { UI.modeDlg = true; UI.modeMsg = ''; render(); return; }
+  if (a === 'modeclose') { UI.modeDlg = false; UI.modeMsg = ''; render(); return; }
+  if (a === 'modecpu') {
+    UI.modeDlg = false; UI.modeMsg = '';
+    if (deckReady()) { act('start', {}); return; }
+    needDeck(); return;
+  }
+  if (a === 'modeneed') { UI.modeDlg = false; UI.modeMsg = ''; needDeck(); return; }
+  if (a === 'modedeck') {
+    if (G && G.over) G.dismissed = true;
+    UI.modeDlg = false; UI.modeMsg = ''; UI.msg = ''; UI.dwin = null; UI.screen = 'deck';
+    render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
+    return;
+  }
   if (a === 'gacha') {
     if (UI.gAnim && !UI.gAnim.done) return;
-    if (gachaLeft() <= 0) { UI.msg = '本日のガチャは終了です。日付が変わるとまた回せます。'; render(); return; }
-    const ids = pullIds(GACHA_PULL), fresh = [];
+    const wel = !!UI.welcome;
+    if (!wel && gachaLeft() <= 0) { UI.msg = '本日のガチャは終了です。日付が変わるとまた回せます。'; render(); return; }
+    const ids = pullIds(wel ? 20 : GACHA_PULL), fresh = [];
     ids.forEach(id => { if (!OWN[id] && !fresh.includes(id)) fresh.push(id); OWN[id] = (OWN[id] || 0) + 1; });
-    if (GACHA.date !== today()) GACHA = { date: today(), used: 0 };
-    GACHA.used++;
+    if (wel) { UI.welcome = false; try { localStorage.setItem('kaigo-welcome', '1'); } catch (e) { /* ignore */ } }
+    else {
+      if (GACHA.date !== today()) GACHA = { date: today(), used: 0 };
+      GACHA.used++;
+    }
     saveOwn();
     UI.msg = '';
     const hasRare = ids.some(id => CARDS[id].rare), A = { ids, fresh, hasRare, ms: hasRare ? GACHA_MS_RARE : GACHA_MS, t0: Date.now(), done: false };
@@ -1815,21 +2279,33 @@ function act(a, d) {
     UI.dsel = UI.dsel === i ? -1 : i; UI.msg = ''; render(); return;
   }
   if (a === 'del') { removeFromDeck(UI.dsel); return; }
-  if (a === 'save') { saveDeckFile(); return; }
+  if (a === 'save') {
+    if (!DECK.length) { say('デッキが空です。カードを入れてから保存してください。'); render(); return; }
+    UI.saveDlg = true; render(); return;
+  }
+  if (a === 'saveclose') { UI.saveDlg = false; render(); return; }
+  if (a === 'savego') { const el = document.getElementById('dname'); const nm = el ? el.value : ''; UI.saveDlg = false; render(); saveDeckFile(nm); return; }
   if (a === 'reset') { DECK = []; UI.dsel = -1; say('すべて解除しました。'); saveDeck(); render(); return; }
   if (a === 'random') { DECK = randomDeck(ownedPool()); UI.dsel = -1; say('ランダムに' + DECK.length + '枚を編成しました。'); saveDeck(); render(); return; }
-  if (a === 'start' || a === 'retry') {
+  if (a === 'start' || a === 'retry' || a === 'startopp') {
     if (DECK.length !== DECK_SIZE) return;
-    newGame(DECK.slice()); UI.screen = 'battle'; startTurn('p');
-    log('対戦開始！先に' + WIN_PTS + '体を戦闘不能にしよう。');
-    render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0); return;
+    if (a === 'start') UI.opp = null;
+    newGame(DECK.slice(), UI.opp ? UI.opp.ids.slice() : null); UI.screen = 'battle'; UI.win = null; UI.sel = null;
+    const heads = Math.random() < 0.5;
+    G.first = heads ? 'p' : 'e';
+    log('対戦開始！' + (UI.opp ? '相手は「' + UI.opp.name + '」のデッキ。' : '') + '先に' + WIN_PTS + '体を戦闘不能にしよう。');
+    G.busy = true; UI.coin = { heads, t0: Date.now() };
+    render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
+    runCoin(UI.coin); return;
   }
+  if (a === 'coinskip') { if (UI.coin && Date.now() - UI.coin.t0 > 2400) UI.coin.skip = true; return; }
   if (a === 'toDeck') { if (G && G.over) G.dismissed = true; UI.screen = 'deck'; render(); return; }
   if (!G || G.over) return;
   if (a === 'closewin') { if (!G.mustPromote) { UI.win = null; render(); } return; }
   if (a === 'win') {
     if (G.mustPromote) return;
     UI.win = UI.win === d.v ? null : d.v; UI.fresh = true;
+    if (UI.win === 'hand') UI.tgi = null;
     if (UI.win === 'hand' && !(UI.sel && UI.sel.zone === 'hand' && G.p.hand[UI.sel.idx])) UI.sel = G.p.hand.length ? { zone: 'hand', idx: 0 } : null;
     render(); return;
   }
@@ -1849,6 +2325,13 @@ function act(a, d) {
   if (G.turn !== 'p' || G.mustPromote) return;
   if (a === 'swapopen') { UI.sel = { zone: 'pb', idx: +d.idx }; UI.win = 'swap'; UI.fresh = true; render(); return; }
   if (a === 'swapto') { swap('p', +d.idx); UI.sel = null; UI.win = null; render(); return; }
+  if (a === 'useitem' && UI.sel && UI.sel.zone === 'hand') {
+    const x = G.p.hand[UI.sel.idx];
+    if (!x || !x.item || itemBlock('p', x)) return;
+    if (itemTargets('p', x)) { UI.tgi = UI.sel.idx; UI.win = 'target'; UI.fresh = true; render(); return; }
+    doItem(UI.sel.idx, null); return;
+  }
+  if (a === 'tgtpick') { if (UI.tgi === null || UI.tgi === undefined) return; doItem(UI.tgi, { s: d.s, z: d.z, i: +d.i }); return; }
   if (a === 'summon' && UI.sel && UI.sel.zone === 'hand') { summon('p', UI.sel.idx); UI.sel = null; UI.win = null; after(); render(); return; }
   if (a === 'swap' && UI.sel && UI.sel.zone === 'pb') { swap('p', UI.sel.idx); UI.sel = null; render(); return; }
   if (a === 'move') { UI.sel = null; UI.win = null; G.busy = true; animMove('p', +d.i).then(() => { G.busy = false; render(); }); return; }
@@ -1886,6 +2369,7 @@ function doDrop(kind, idx, target) {
   UI.sel = null; UI.win = null; render();
 }
 function init() {
+  loadRec();
   loadOwn();
   DECK = loadDeck();
   const app = document.getElementById('app');
@@ -1977,6 +2461,7 @@ function init() {
     app.addEventListener('scroll', e => { const car = e.target; if (car && car.id === 'car') UI.carX = car.scrollLeft; }, true);
     app.addEventListener('change', e => {
       const f = e.target;
+      if (f && f.id === 'ofile' && f.files && f.files[0]) { const of = f.files[0]; f.value = ''; loadOppFile(of); return; }
       if (!f || f.id !== 'dfile' || !f.files || !f.files[0]) return;
       const file = f.files[0];
       if (file.size > 200000) { say('ファイルが大きすぎます。デッキファイルを選んでください。'); render(); return; }
@@ -1998,7 +2483,12 @@ function init() {
     });
   }
   if (typeof window !== 'undefined' && window.addEventListener) window.addEventListener('resize', applyScale);
-  if (typeof document !== 'undefined') document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.help) { UI.help = null; render(); } });
+  if (typeof document !== 'undefined') document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && UI.modeDlg) { UI.modeDlg = false; UI.modeMsg = ''; render(); return; }
+    if (e.key === 'Escape' && UI.saveDlg) { UI.saveDlg = false; render(); return; }
+    if (e.key === 'Enter' && UI.saveDlg && e.target && e.target.id === 'dname') { act('savego', {}); return; }
+    if (e.key === 'Escape' && UI.help) { UI.help = null; render(); }
+  });
   render();
 }
 init();
