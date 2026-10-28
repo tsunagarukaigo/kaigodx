@@ -722,6 +722,12 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
 
 .nav .autob { margin-left: auto; height: 42px; padding: 0 14px; border-radius: 21px; border: 1px solid var(--line); background: transparent; color: #fff; font: inherit; font-size: 14px; font-weight: 700; letter-spacing: .06em; cursor: pointer; }
 .nav .autob + .helpb { margin-left: 0; }
+.sndb { flex: none; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: #fff; font: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
+.sndb:hover { border-color: #fff; }
+.sndb.off { opacity: .55; }
+.ttl .tsnd { position: absolute; top: 12px; right: 12px; z-index: 6; background: rgba(0, 0, 0, .55); }
+.thint { margin: 12px 0 0; font-size: 12px; letter-spacing: .08em; opacity: .65; animation: bsfade .6s ease-out both; }
+.nav .sndb + .helpb { margin-left: 0; }
 .nav .autob.on { background: #fff; color: #000; border-color: #fff; box-shadow: 0 0 12px rgba(255, 255, 255, .35); }
 
 /* ===== オープニング ===== */
@@ -1303,6 +1309,7 @@ function useItem(s, hi, tg) {
     case 'tsuru': G.nodmg = s; log('次の' + LBL[s] + 'のターンまで、だれもダメージを受けない。'); break;
   }
   S.hand.splice(hi, 1); S.disc.push(x); G.itemUsed = true;
+  sfx('item');
   G.itemFx = { s, ic: x.ic, name: x.name, desc: x.desc };
   after();
   return true;
@@ -1443,6 +1450,7 @@ function recText() { return '対戦成績　' + (REC.w + REC.l) + '戦 ' + REC.w
 function recordResult() {
   if (!G || !G.over || G.recorded) return;
   G.recorded = true;
+  sfx(G.over.winner === 'p' ? 'win' : 'lose');
   if (G.over.winner === 'p') REC.w++; else REC.l++;
   saveRec();
 }
@@ -1507,9 +1515,12 @@ function cardAt(z, i) {
   return null;
 }
 const GACHA_MS = 5000, GACHA_MS_RARE = 7000;
+function sndBtnHTML(cls) {
+  return '<button class="sndb' + (SND.on ? '' : ' off') + (cls ? ' ' + cls : '') + '" data-act="sound" aria-pressed="' + SND.on + '" aria-label="BGM・効果音' + (SND.on ? 'をオフにする' : 'をオンにする') + '">' + (SND.on ? '🔊' : '🔇') + '</button>';
+}
 function navHTML(extra) {
   const items = [['gacha', 'ガチャ'], ['deck', 'デッキ'], ['battle', '対戦']];
-  return '<div class="nav">' + items.map(x => '<button class="navb" data-act="nav" data-v="' + x[0] + '"' + (UI.screen === x[0] ? ' aria-current="page"' : '') + '>' + x[1] + '</button>').join('') + (extra || '') + '<button class="helpb" data-act="help" aria-label="あそびかた・ヘルプ">？</button></div>';
+  return '<div class="nav">' + items.map(x => '<button class="navb" data-act="nav" data-v="' + x[0] + '"' + (UI.screen === x[0] ? ' aria-current="page"' : '') + '>' + x[1] + '</button>').join('') + (extra || '') + sndBtnHTML() + '<button class="helpb" data-act="help" aria-label="あそびかた・ヘルプ">？</button></div>';
 }
 function facilitySVG(rr) {
   const win = (x, y, w, h, i) => '<rect class="win" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" style="--d:' + (i * 0.11).toFixed(2) + 's"/>';
@@ -1627,7 +1638,8 @@ function renderTitle() {
     '<div class="trow top"><div class="ttrack r">' + tcRow(UI.titleRows[0]) + '</div></div>' + sp +
     '<div class="tmid"><div class="tsub">つながる</div><h1 class="tmain" aria-label="つながる介護カードバトラーズ">介護カード<br>バトラーズ</h1>' +
     '<div class="tline"></div><div class="tic">🤝 💉 💬 🥗 🦵 🧹</div>' +
-    '<button class="tstart" data-act="gamestart">ゲームスタート</button></div>' +
+    '<button class="tstart" data-act="gamestart">ゲームスタート</button>' +
+    (SND.on && !(SND.ctx && SND.ctx.state === 'running') ? '<p class="thint">♪ 画面をタップするとBGMが流れます</p>' : '') + '</div>' + sndBtnHTML('tsnd') +
     '<div class="trow bot"><div class="ttrack l">' + tcRow(UI.titleRows[1]) + '</div></div>' +
     '</div></div>';
 }
@@ -1643,6 +1655,7 @@ function fold(k, title, body) {
 function carList() { return CARDS.filter(x => OWN[x.id] > 0 && (UI.filter === 'all' || x.attr === UI.filter)); }
 const FAILRE = /できません|を超える|までです|これ以上|が空です|選んでから|キャンセル|読み込めません|所持していない|大きすぎ|ありません/;
 function say(m) {
+  if (/保存しました|復元しました/.test(m)) sfx('save');
   UI.msg = m; clearTimeout(UI.msgTimer);
   if (m) UI.msgTimer = setTimeout(() => { UI.msg = ''; if (UI.screen === 'deck') render(); }, 3400);
 }
@@ -1697,13 +1710,13 @@ function addToDeck(id) {
   else if (n >= max) m = CARDS[id].name + 'は、これ以上入れられません（最大' + max + '枚）。';
   else if (DECK.length >= DECK_SIZE) m = 'デッキは' + DECK_SIZE + '枚までです。';
   else if (deckCost() + CARDS[id].cost > COST_MAX) m = 'CPの合計が' + COST_MAX + 'を超えるため、追加できません。';
-  if (m) say(m);
-  else { DECK.push(id); UI.lastAdd = DECK.length - 1; say(CARDS[id].name + 'を採用！（' + (n + 1) + '/' + max + '枚）'); }
+  if (m) { say(m); sfx('ng'); }
+  else { sfx('add'); DECK.push(id); UI.lastAdd = DECK.length - 1; say(CARDS[id].name + 'を採用！（' + (n + 1) + '/' + max + '枚）'); }
   saveDeck(); render();
 }
 function removeFromDeck(idx) {
-  if (!(idx >= 0 && idx < DECK.length)) say('デッキ内のカードを選んでから「外す」を押すか、ダブルクリックしてください。');
-  else { const nm = CARDS[DECK[idx]].name; DECK.splice(idx, 1); UI.dsel = -1; say(nm + 'を外しました。'); }
+  if (!(idx >= 0 && idx < DECK.length)) { say('デッキ内のカードを選んでから「外す」を押すか、ダブルクリックしてください。'); sfx('ng'); }
+  else { sfx('remove'); const nm = CARDS[DECK[idx]].name; DECK.splice(idx, 1); UI.dsel = -1; say(nm + 'を外しました。'); }
   saveDeck(); render();
 }
 function deckFileText(nm) {
@@ -2152,6 +2165,7 @@ async function animMove(s, mi) {
   if (!m || G.attacked || !canAttack(s) || S.cp < m.c) return false;
   const tgt = G[opp(s)].active, k = tgt ? atkK(s, a, tgt) : 1, ic = a.ic;
   UI.anim = { s, ph: 'wind', bp: m.n + '！', ic, msg: LBL[s] + 'の' + a.name + '「' + m.n + '」！' };
+  sfx('swing');
   render(); await sleep(560);
   const ok = useMove(s, mi);
   if (!ok) { UI.anim = null; return false; }
@@ -2163,6 +2177,7 @@ async function animMove(s, mi) {
     if (k < 1) lines.push('相性いまひとつ…');
   }
   UI.anim = { s, ph: 'hit', bp: m.n + '！', ic, be: lines.join('<br>'), msg: dm !== undefined ? tgt.name + 'に' + dm + 'ダメージ！' : fx(m.e) };
+  moveSfx(m, dm, k);
   render(); await sleep(1100);
   UI.anim = null;
   if (G.cq.length && !G.over) {
@@ -2171,6 +2186,7 @@ async function animMove(s, mi) {
       if (G.over || !o.a || o.a.hp <= 0) continue;
       UI.anim = { s: o.s, ph: 'hit', bp: '👑 役職者の反撃！', ic, be: o.a.name + 'に10ダメージ', msg: '役職者の反撃！' + o.a.name + 'に10ダメージ。' };
       hit(o.s, o.a, 10); after();
+      sfx('hit', 1);
       render(); await sleep(1000);
       UI.anim = null;
     }
@@ -2284,12 +2300,386 @@ function render() {
   if (hb2) hb2.scrollTop = hbx;
   if (UI.screen === 'battle' || UI.screen === 'deck') applyScale();
   if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, sy);
+  syncBGM();
+}
+
+/* ---------- サウンド（Web Audio：外部ファイルなしで合成） ---------- */
+const SND = { ctx: null, master: null, sfxG: null, on: true, noise: null };
+const BGM = { run: false, name: '', duck: false, timer: null, step: 0, t: 0, gain: null };
+function sndCtx() {
+  if (SND.ctx) return SND.ctx;
+  try {
+    const AC = typeof window !== 'undefined' ? (window.AudioContext || window.webkitAudioContext) : null;
+    if (!AC) return null;
+    const ctx = new AC();
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -14; comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.2;
+    SND.master = ctx.createGain(); SND.master.gain.value = 0.8;
+    SND.master.connect(comp); comp.connect(ctx.destination);
+    SND.sfxG = ctx.createGain(); SND.sfxG.gain.value = 1; SND.sfxG.connect(SND.master);
+    const n = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate), d = n.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    SND.noise = n; SND.ctx = ctx;
+    return ctx;
+  } catch (e) { return null; }
+}
+function sndLoad() { try { SND.on = localStorage.getItem('kaigo-sound') !== 'off'; } catch (e) { /* ignore */ } }
+function sndSave() { try { localStorage.setItem('kaigo-sound', SND.on ? 'on' : 'off'); } catch (e) { /* ignore */ } }
+function mtof(n) { return 440 * Math.pow(2, (n - 69) / 12); }
+/* 単音：o = { a:立ち上がり, lp:ローパス, det:デチューン, f2:終端周波数, hold:持続(パッド用), rel:余韻 } */
+function tone(dest, type, f, t, dur, vol, o) {
+  const ctx = SND.ctx, osc = ctx.createOscillator(), g = ctx.createGain();
+  o = o || {};
+  osc.type = type; osc.frequency.setValueAtTime(f, t);
+  if (o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2, t + dur);
+  if (o.det) osc.detune.value = o.det;
+  const a = o.a || 0.005;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(vol, t + a);
+  if (o.hold) { const r = o.rel || 0.2; g.gain.setValueAtTime(vol, Math.max(t + a, t + dur - r)); }
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  if (o.lp) { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = o.lp; osc.connect(fl); fl.connect(g); } else osc.connect(g);
+  g.connect(dest); osc.start(t); osc.stop(t + dur + 0.05);
+}
+/* ノイズ：type = 'bandpass' | 'highpass' | 'lowpass'、f2 を指定すると周波数がスイープ */
+function noiseHit(dest, t, dur, vol, type, f, q, f2) {
+  const ctx = SND.ctx, src = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), g = ctx.createGain();
+  src.buffer = SND.noise; fl.type = type; fl.frequency.setValueAtTime(f, t); fl.Q.value = q || 0.7;
+  if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(fl); fl.connect(g); g.connect(dest);
+  src.start(t, Math.random() * 0.5); src.stop(t + dur + 0.03);
+}
+function kick(dest, t, vol) { tone(dest, 'sine', 150, t, 0.2, vol, { f2: 42, a: 0.002 }); }
+function snare(dest, t, vol) { noiseHit(dest, t, 0.16, vol, 'bandpass', 1900, 0.7); tone(dest, 'triangle', 200, t, 0.1, vol * 0.7, { f2: 120, a: 0.002 }); }
+function hat(dest, t, vol, open) { noiseHit(dest, t, open ? 0.14 : 0.04, vol, 'highpass', 8000, 0.7); }
+
+/* ---- BGM（画面ごとに曲が変わる。どれも8小節のループ） ---- */
+function bell(dest, n, t, dur, vol) {
+  tone(dest, 'sine', mtof(n), t, dur, vol, { a: 0.006 });
+  tone(dest, 'triangle', mtof(n + 12), t, dur * 0.6, vol * 0.35, { a: 0.006 });
+}
+function leadTable(dest, table, bar, s, t, SP, fn) {
+  const row = table[bar];
+  if (row) row.forEach(l => { if (l[0] === s) fn(dest, l[1], t, SP * l[2]); });
+}
+/* 対戦：148BPM・イ短調（Am - F - G - E） */
+const BGM_ROOT = [45, 41, 43, 40];
+const BGM_CHORD = [[57, 60, 64], [53, 57, 60], [55, 59, 62], [52, 56, 59]];
+const BGM_LEAD = [
+  [[0, 81, 4], [4, 79, 2], [6, 76, 2], [8, 79, 4], [12, 76, 4]],
+  [[0, 77, 4], [4, 76, 2], [6, 77, 2], [8, 81, 4], [12, 77, 4]],
+  [[0, 79, 4], [4, 74, 4], [8, 79, 2], [10, 81, 2], [12, 83, 4]],
+  [[0, 80, 4], [4, 83, 4], [8, 81, 4], [12, 80, 2], [14, 76, 2]]
+];
+function bgmBattle(step, t, SP) {
+  const dest = BGM.gain, bar = Math.floor(step / 16) % 8, s = step % 16, ci = bar % 4;
+  if (s % 2 === 0) {
+    const n = BGM_ROOT[ci] + (s === 6 || s === 14 ? 12 : 0);
+    tone(dest, 'sawtooth', mtof(n), t, SP * 1.7, 0.34, { lp: 520, a: 0.004 });
+  }
+  if (s % 4 === 0 || (s === 10 && bar % 2 === 1)) kick(dest, t, 0.75);
+  if (s === 4 || s === 12) snare(dest, t, 0.3);
+  if (s % 2 === 0) hat(dest, t, s === 14 ? 0.1 : 0.07, s === 14);
+  const tn = BGM_CHORD[ci].map(x => x + 12);
+  tone(dest, 'square', mtof(tn[[0, 1, 2, 1][s % 4]]), t, SP * 0.9, 0.05, { lp: 3200, a: 0.002 });
+  if (s === 0) BGM_CHORD[ci].forEach((n, i) => {
+    tone(dest, 'sawtooth', mtof(n), t, SP * 16, 0.035, { lp: 1100, a: 0.18, hold: true, rel: 0.3, det: i % 2 ? -7 : 7 });
+  });
+  if (bar >= 4) leadTable(dest, BGM_LEAD, bar - 4, s, t, SP, (d, n, tt, du) => {
+    tone(d, 'sawtooth', mtof(n), tt, du, 0.075, { lp: 2600, a: 0.01 });
+    tone(d, 'square', mtof(n - 12), tt, du, 0.04, { lp: 1800, a: 0.01 });
+  });
+}
+/* タイトル：104BPM・ハ長調（C - G - Am - F）。希望に満ちた行進曲 */
+const TT_ROOT = [48, 43, 45, 41];
+const TT_CHORD = [[55, 60, 64], [55, 59, 62], [57, 60, 64], [53, 57, 60]];
+const TT_MEL = [
+  [[0, 76, 4], [4, 79, 4], [8, 84, 6], [14, 83, 2]],
+  [[0, 79, 4], [4, 74, 4], [8, 83, 6], [14, 81, 2]],
+  [[0, 81, 4], [4, 79, 2], [6, 76, 2], [8, 81, 4], [12, 84, 4]],
+  [[0, 84, 4], [4, 81, 4], [8, 77, 4], [12, 79, 4]],
+  [[0, 84, 6], [6, 83, 2], [8, 79, 4], [12, 76, 4]],
+  [[0, 74, 4], [4, 79, 4], [8, 83, 4], [12, 86, 4]],
+  [[0, 84, 4], [4, 81, 4], [8, 76, 4], [12, 81, 4]],
+  [[0, 77, 4], [4, 81, 4], [8, 84, 8]]
+];
+function bgmTitle(step, t, SP) {
+  const dest = BGM.gain, bar = Math.floor(step / 16) % 8, s = step % 16, ci = bar % 4;
+  if (s === 0 || s === 8) tone(dest, 'triangle', mtof(TT_ROOT[ci]), t, SP * 7, 0.3, { lp: 600, a: 0.01 });
+  if (s === 12) tone(dest, 'triangle', mtof(TT_ROOT[ci] + 7), t, SP * 3, 0.2, { lp: 600, a: 0.01 });
+  if (s === 0 || s === 8) kick(dest, t, bar >= 4 ? 0.5 : 0.35);
+  if (bar >= 4 && (s === 4 || s === 12)) snare(dest, t, 0.14);
+  if (s % 2 === 0) hat(dest, t, 0.035, false);
+  if (s % 2 === 0) {
+    const tn = TT_CHORD[ci].map(x => x + 12);
+    tone(dest, 'triangle', mtof(tn[[0, 1, 2, 1, 2, 1, 0, 1][(s / 2) % 8]]), t, SP * 1.6, 0.07, { a: 0.003 });
+  }
+  if (s === 0) TT_CHORD[ci].forEach((n, i) => {
+    tone(dest, 'sawtooth', mtof(n), t, SP * 16, 0.03, { lp: 900, a: 0.3, hold: true, rel: 0.4, det: i % 2 ? -6 : 6 });
+  });
+  leadTable(dest, TT_MEL, bar, s, t, SP, (d, n, tt, du) => bell(d, n, tt, Math.min(du * 1.3, 1.4), 0.1));
+}
+/* デッキ：92BPM・ハ長調のジャジーなコード進行（Dm7 - G7 - Cmaj7 - Am7）。落ち着いた編成タイム */
+const DK_ROOT = [50, 43, 48, 45];
+const DK_CHORD = [[62, 65, 69, 72], [59, 62, 65, 67], [60, 64, 67, 71], [57, 60, 64, 67]];
+const DK_MEL = [null, null, null, null,
+  [[0, 74, 3], [4, 77, 3], [8, 81, 6]],
+  [[0, 79, 3], [4, 77, 3], [8, 74, 6]],
+  [[0, 76, 3], [4, 79, 3], [8, 83, 3], [12, 79, 3]],
+  [[0, 81, 6], [8, 79, 3], [12, 76, 4]]];
+function bgmDeck(step, t, SP) {
+  const dest = BGM.gain, bar = Math.floor(step / 16) % 8, s = step % 16, ci = bar % 4;
+  if (s === 0 || s === 6 || s === 10) tone(dest, 'sine', mtof(DK_ROOT[ci]), t, SP * (s === 0 ? 5 : 3), 0.38, { a: 0.01 });
+  if (s === 0 || s === 10) kick(dest, t, 0.4);
+  if (s === 8) noiseHit(dest, t, 0.06, 0.1, 'bandpass', 2500, 1);
+  if (s % 4 === 2) hat(dest, t, 0.045, false);
+  if (s === 0 || s === 6 || s === 10) DK_CHORD[ci].forEach(n => {
+    tone(dest, 'triangle', mtof(n), t, SP * 4, 0.045, { a: 0.006 });
+    tone(dest, 'sine', mtof(n + 12), t, SP * 2.5, 0.02, { a: 0.006 });
+  });
+  leadTable(dest, DK_MEL, bar, s, t, SP, (d, n, tt, du) => bell(d, n, tt, Math.min(du * 1.4, 1.2), 0.08));
+}
+/* ガチャ：126BPM・ハ長調（C - Am - F - G）。ワクワクするはずむ曲 */
+const GC_ROOT = [48, 45, 41, 43];
+const GC_CHORD = [[60, 64, 67, 72], [57, 60, 64, 69], [53, 57, 60, 65], [55, 59, 62, 67]];
+const GC_MEL = [null, null, null, null,
+  [[0, 79, 2], [2, 84, 2], [4, 83, 2], [6, 79, 2], [8, 84, 4], [12, 79, 4]],
+  [[0, 81, 2], [2, 84, 2], [4, 81, 2], [6, 76, 2], [8, 81, 4], [12, 84, 4]],
+  [[0, 81, 2], [2, 84, 2], [4, 81, 2], [6, 77, 2], [8, 81, 4], [12, 77, 4]],
+  [[0, 79, 2], [2, 83, 2], [4, 86, 2], [6, 83, 2], [8, 79, 8]]];
+function bgmGacha(step, t, SP) {
+  const dest = BGM.gain, bar = Math.floor(step / 16) % 8, s = step % 16, ci = bar % 4;
+  if ([0, 3, 6, 8, 11, 14].includes(s)) tone(dest, 'square', mtof(GC_ROOT[ci] + (s === 6 || s === 14 ? 12 : 0)), t, SP * 1.6, 0.2, { lp: 700, a: 0.004 });
+  if (s % 4 === 0) kick(dest, t, 0.55);
+  if (s === 4 || s === 12) noiseHit(dest, t, 0.12, 0.2, 'bandpass', 1300, 0.8);
+  if (s % 4 === 2) hat(dest, t, 0.08, true);
+  if (s % 2 === 0) tone(dest, 'triangle', mtof(GC_CHORD[ci][[0, 1, 2, 3, 2, 1, 0, 2][(s / 2) % 8]] + 12), t, SP * 1.5, 0.06, { a: 0.003 });
+  if (s === 0 || s === 6 || s === 10) GC_CHORD[ci].slice(0, 3).forEach(n => tone(dest, 'sawtooth', mtof(n), t, SP * 1.5, 0.03, { lp: 1800, a: 0.004 }));
+  leadTable(dest, GC_MEL, bar, s, t, SP, (d, n, tt, du) => bell(d, n, tt, Math.min(du * 1.3, 0.6), 0.09));
+}
+const TRACKS = {
+  battle: { bpm: 148, vol: 0.75, step: bgmBattle },
+  title: { bpm: 104, vol: 1.0, step: bgmTitle },
+  deck: { bpm: 92, vol: 0.9, step: bgmDeck },
+  gacha: { bpm: 126, vol: 0.95, step: bgmGacha }
+};
+function bgmTick() {
+  const ctx = SND.ctx, tr = TRACKS[BGM.name];
+  if (!ctx || !BGM.run || !BGM.gain || !tr) return;
+  const SP = 60 / tr.bpm / 4;
+  if (BGM.t < ctx.currentTime - 0.1) BGM.t = ctx.currentTime + 0.05;
+  while (BGM.t < ctx.currentTime + 0.25) {
+    try { tr.step(BGM.step, BGM.t, SP); } catch (e) { /* ignore */ }
+    BGM.t += SP; BGM.step = (BGM.step + 1) % 128;
+  }
+}
+function startBGM(name) {
+  const ctx = sndCtx(), tr = TRACKS[name];
+  if (!ctx || !tr || BGM.run) return;
+  if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) { /* ignore */ } }
+  BGM.run = true; BGM.name = name; BGM.duck = false; BGM.step = 0; BGM.t = ctx.currentTime + 0.12;
+  BGM.gain = ctx.createGain();
+  BGM.gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+  BGM.gain.gain.linearRampToValueAtTime(tr.vol, ctx.currentTime + 0.6);
+  BGM.gain.connect(SND.master);
+  BGM.timer = setInterval(bgmTick, 40);
+  bgmTick();
+}
+function stopBGM() {
+  if (!BGM.run) return;
+  BGM.run = false; BGM.name = ''; clearInterval(BGM.timer); BGM.timer = null;
+  const ctx = SND.ctx, g = BGM.gain; BGM.gain = null;
+  if (ctx && g) {
+    try {
+      g.gain.cancelScheduledValues(ctx.currentTime);
+      g.gain.setValueAtTime(Math.max(g.gain.value, 0.0001), ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+    } catch (e) { /* ignore */ }
+    setTimeout(() => { try { g.disconnect(); } catch (e) { /* ignore */ } }, 800);
+  }
+}
+function bgmWanted() {
+  if (!SND.on || (typeof document !== 'undefined' && document.hidden)) return '';
+  if (UI.screen === 'title') return 'title';
+  if (UI.screen === 'gacha') return 'gacha';
+  if (UI.screen === 'battle') {
+    if (G && !G.over) return 'battle';
+    return G && !G.dismissed ? '' : 'deck';
+  }
+  return 'deck';
+}
+function syncBGM() {
+  const want = bgmWanted();
+  if (BGM.run && BGM.name !== want) stopBGM();
+  if (want && !BGM.run) startBGM(want);
+  if (BGM.run && BGM.gain && SND.ctx) {
+    /* ガチャの演出中は BGM を小さくして効果音を聞かせる */
+    const duck = UI.screen === 'gacha' && !!UI.gAnim && !UI.gAnim.done;
+    if (BGM.duck !== duck) {
+      BGM.duck = duck;
+      try {
+        const g = BGM.gain.gain, tt = SND.ctx.currentTime;
+        g.cancelScheduledValues(tt); g.setValueAtTime(Math.max(g.value, 0.0001), tt);
+        g.linearRampToValueAtTime((duck ? 0.3 : 1) * TRACKS[BGM.name].vol, tt + 0.4);
+      } catch (e) { /* ignore */ }
+    }
+  }
+}
+
+/* ---- 効果音 ---- */
+function purun(t) {
+  const ctx = SND.ctx, d = SND.sfxG;
+  const bl = (f0, f1, st, dur, vol, vib) => {
+    const o = ctx.createOscillator(), g = ctx.createGain(), l = ctx.createOscillator(), lg = ctx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(f0, st); o.frequency.exponentialRampToValueAtTime(f1, st + dur);
+    l.type = 'sine'; l.frequency.value = 26; lg.gain.value = vib; l.connect(lg); lg.connect(o.frequency);
+    g.gain.setValueAtTime(0.0001, st); g.gain.exponentialRampToValueAtTime(vol, st + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, st + dur);
+    o.connect(g); g.connect(d); o.start(st); l.start(st); o.stop(st + dur + 0.03); l.stop(st + dur + 0.03);
+  };
+  bl(420, 560, t, 0.09, 0.5, 18);          /* プ */
+  bl(640, 760, t + 0.10, 0.07, 0.45, 40);   /* ル */
+  bl(700, 820, t + 0.18, 0.07, 0.45, 40);   /* ル */
+  bl(760, 1180, t + 0.27, 0.22, 0.5, 55);   /* ン（上がりながら震える） */
+  [1568, 2093, 2637].forEach((f, i) => tone(d, 'sine', f, t + 0.45 + i * 0.07, 0.35, 0.18));
+}
+const NOTAP = new Set(['gamestart', 'gacha', 'dadd', 'ddec', 'random', 'reset', 'sound']);
+function sfx(name, k) {
+  const ctx = SND.ctx;
+  if (!ctx || !SND.on) return;
+  try {
+    if (ctx.state === 'suspended') ctx.resume();
+    const t = ctx.currentTime + 0.01, d = SND.sfxG;
+    switch (name) {
+      case 'swing':
+        noiseHit(d, t, 0.22, 1.3, 'bandpass', 500, 0.9, 3500);
+        tone(d, 'triangle', 300, t, 0.2, 0.16, { f2: 900 });
+        break;
+      case 'hit':
+        if (k > 1) {
+          tone(d, 'sine', 230, t, 0.3, 0.8, { f2: 48, a: 0.002 });
+          noiseHit(d, t, 0.14, 0.5, 'highpass', 2500, 0.7);
+          tone(d, 'square', 1318, t + 0.02, 0.28, 0.07, { a: 0.002 });
+          tone(d, 'square', 1760, t + 0.06, 0.26, 0.07, { a: 0.002 });
+        } else if (k < 1) {
+          tone(d, 'sine', 160, t, 0.2, 0.55, { f2: 50, a: 0.002 });
+          noiseHit(d, t, 0.1, 0.3, 'lowpass', 1200, 0.7);
+        } else {
+          tone(d, 'sine', 210, t, 0.22, 0.9, { f2: 50, a: 0.002 });
+          noiseHit(d, t, 0.11, 0.5, 'highpass', 2500, 0.7);
+        }
+        break;
+      case 'block':
+        tone(d, 'triangle', 880, t, 0.2, 0.25, { f2: 620 });
+        noiseHit(d, t, 0.06, 0.15, 'highpass', 4000, 0.7);
+        break;
+      case 'heal':
+        [784, 988, 1175, 1568].forEach((f, i) => tone(d, 'sine', f, t + i * 0.08, 0.35, 0.28));
+        break;
+      case 'buff':
+        tone(d, 'sine', 523, t, 0.28, 0.22, { f2: 784 });
+        tone(d, 'triangle', 784, t + 0.12, 0.3, 0.14, { f2: 1046 });
+        break;
+      case 'item': purun(t); break;
+      case 'tap':
+        tone(d, 'triangle', 760, t, 0.06, 0.24, { f2: 520, a: 0.002 });
+        break;
+      case 'start':
+        noiseHit(d, t, 0.3, 0.6, 'bandpass', 600, 0.9, 4000);
+        [523, 659, 784, 1046].forEach((f, i) => {
+          tone(d, 'square', f, t + 0.1 + i * 0.1, 0.4, 0.09, { lp: 2400, a: 0.004 });
+          tone(d, 'triangle', f, t + 0.1 + i * 0.1, 0.4, 0.16, { a: 0.004 });
+        });
+        [1046, 1318, 1568].forEach((f, i) => tone(d, 'sine', f, t + 0.55 + i * 0.07, 0.5, 0.12));
+        break;
+      case 'add':
+        tone(d, 'sine', 520, t, 0.12, 0.28, { f2: 880 });
+        tone(d, 'triangle', 1318, t + 0.05, 0.18, 0.12);
+        break;
+      case 'remove':
+        tone(d, 'sine', 560, t, 0.14, 0.26, { f2: 300 });
+        break;
+      case 'ng':
+        tone(d, 'square', 233, t, 0.1, 0.16, { lp: 1200 });
+        tone(d, 'square', 196, t + 0.11, 0.14, 0.16, { lp: 1200 });
+        break;
+      case 'save':
+        [659, 784, 1046].forEach((f, i) => tone(d, 'sine', f, t + i * 0.09, 0.4, 0.22));
+        break;
+      case 'shuffle':
+        for (let i = 0; i < 7; i++) noiseHit(d, t + i * 0.045, 0.05, 0.28, 'bandpass', 2200 + i * 150, 1.5);
+        tone(d, 'sine', 880, t + 0.34, 0.2, 0.14);
+        break;
+      case 'reset':
+        tone(d, 'triangle', 700, t, 0.25, 0.2, { f2: 180 });
+        noiseHit(d, t, 0.2, 0.25, 'lowpass', 1800, 0.7, 300);
+        break;
+      case 'win':
+        [523, 659, 784, 1046].forEach((f, i) => tone(d, 'triangle', f, t + i * 0.12, 0.45, 0.25));
+        [523, 659, 784].forEach(f => tone(d, 'triangle', f, t + 0.5, 0.9, 0.18, { a: 0.02 }));
+        break;
+      case 'lose':
+        [392, 330, 262, 196].forEach((f, i) => tone(d, 'triangle', f, t + i * 0.22, 0.5, 0.25, { lp: 1400 }));
+        break;
+    }
+  } catch (e) { /* ignore */ }
+}
+/* ---- ガチャの演出音（ガラガラ → カプセル落下 → ぱかっ → 結果） ---- */
+function gachaRoll(hasRare) {
+  const ctx = SND.ctx;
+  if (!ctx || !SND.on) return;
+  try {
+    if (ctx.state === 'suspended') ctx.resume();
+    const t = ctx.currentTime + 0.02, d = SND.sfxG, T = hasRare ? 4.4 : 2.2, P = hasRare ? 6.1 : 4.1;
+    for (let i = 0, x = 0; x < T; i++) {
+      noiseHit(d, t + x, 0.05, 0.3, 'bandpass', 1500 + (i % 3) * 400, 2);
+      x += Math.max(0.045, 0.2 - i * 0.004);
+    }
+    tone(d, 'sawtooth', 110, t, T, 0.06, { f2: 330, a: 0.3, lp: 700 });
+    if (hasRare) tone(d, 'sawtooth', 220, t + 2.2, 3.9, 0.05, { f2: 1760, a: 1.5, lp: 3000 });
+    for (let k = 0; k < 5; k++) {
+      const ts = t + T + k * 0.25;
+      tone(d, 'sine', 200, ts, 0.14, 0.5, { f2: 70, a: 0.002 });
+      noiseHit(d, ts, 0.05, 0.25, 'highpass', 3000, 0.7);
+      tone(d, 'triangle', 1200, ts + 0.02, 0.1, 0.08, { f2: 900 });
+    }
+    for (let k = 0; k < 5; k++) tone(d, 'sine', 600 + k * 80, t + P + k * 0.06, 0.28, 0.16, { f2: 1800 + k * 120 });
+  } catch (e) { /* ignore */ }
+}
+function gachaReveal(ids) {
+  const ctx = SND.ctx;
+  if (!ctx || !SND.on) return;
+  try {
+    const t = ctx.currentTime + 0.02, d = SND.sfxG, pent = [0, 2, 4, 7, 9];
+    ids.slice(0, 10).forEach((id, k) => {
+      const c = CARDS[id], n = 72 + pent[k % 5] + 12 * Math.floor(k / 5), ts = t + k * 0.12;
+      tone(d, 'sine', mtof(n), ts, 0.4, 0.2);
+      tone(d, 'triangle', mtof(n + 12), ts, 0.25, 0.07);
+      if (c.rare && c.variant) [1568, 1976, 2349, 2637].forEach((f, i) => tone(d, 'sine', f, ts + 0.05 + i * 0.06, 0.3, 0.1));
+    });
+    if (ids.some(id => CARDS[id].rare && !CARDS[id].variant)) {
+      const tr = t + Math.min(ids.length, 10) * 0.12 + 0.1;
+      [523, 659, 784, 1046, 1318].forEach((f, i) => {
+        tone(d, 'triangle', f, tr + i * 0.1, 0.5, 0.2, { a: 0.004 });
+        tone(d, 'square', f, tr + i * 0.1, 0.4, 0.06, { lp: 2600, a: 0.004 });
+      });
+      [523, 659, 784, 1046].forEach(f => tone(d, 'triangle', f, tr + 0.55, 1.1, 0.16, { a: 0.02 }));
+      noiseHit(d, tr + 0.55, 0.9, 0.2, 'highpass', 6000, 0.7);
+    }
+  } catch (e) { /* ignore */ }
+}
+function moveSfx(m, dm, k) {
+  if (dm > 0 || m.e.s) sfx('hit', k);
+  else if (m.e.h || m.e.ha) sfx('heal');
+  else if (dm === 0) sfx('block');
+  else sfx('buff');
 }
 
 /* ---------- 操作 ---------- */
 function act(a, d) {
-  if (a === 'gamestart') { UI.screen = 'gacha'; UI.welcome = !welcomeDone(); render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0); return; }
+  if (a === 'gamestart') { sfx('start'); UI.screen = 'gacha'; UI.welcome = !welcomeDone(); render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0); return; }
   if (a === 'auto') { UI.auto = ((UI.auto || 0) + 1) % 3; if (UI.auto) UI.win = null; render(); return; }
+  if (a === 'sound') { SND.on = !SND.on; sndSave(); if (SND.on) sndCtx(); render(); return; }
   if (a === 'help') { UI.help = UI.help ? null : 'rule'; render(); return; }
   if (a === 'helpclose') { UI.help = null; render(); return; }
   if (a === 'htab') { UI.help = d.v; render(); const b = document.getElementById('hbody'); if (b) b.scrollTop = 0; return; }
@@ -2344,6 +2734,8 @@ function act(a, d) {
     UI.msg = '';
     const hasRare = ids.some(id => CARDS[id].rare && !CARDS[id].variant), A = { ids, fresh, hasRare, ms: hasRare ? GACHA_MS_RARE : GACHA_MS, t0: Date.now(), done: false };
     UI.gAnim = A;
+    gachaRoll(hasRare);
+    setTimeout(() => { if (UI.gAnim === A && UI.screen === 'gacha') gachaReveal(A.ids); }, A.ms);
     setTimeout(() => { if (UI.gAnim === A && !A.done) { A.done = true; render(); } }, A.ms);
     render(); return;
   }
@@ -2352,7 +2744,7 @@ function act(a, d) {
   if (a === 'cmove') { scrollCar(+d.dir); return; }
   if (a === 'dclose') { UI.dwin = null; render(); return; }
   if (a === 'dadd') { addToDeck(+d.id); return; }
-  if (a === 'ddec') { const i = DECK.lastIndexOf(+d.id); if (i < 0) { say('このカードは採用されていません。'); render(); } else removeFromDeck(i); return; }
+  if (a === 'ddec') { const i = DECK.lastIndexOf(+d.id); if (i < 0) { say('このカードは採用されていません。'); sfx('ng'); render(); } else removeFromDeck(i); return; }
   if (a === 'dslot') {
     const now = Date.now(), i = +d.idx;
     if (UI.lastSlot === i && now - (UI.lastSlotT || 0) < 400) { UI.lastSlot = -1; removeFromDeck(i); return; }
@@ -2366,8 +2758,8 @@ function act(a, d) {
   }
   if (a === 'saveclose') { UI.saveDlg = false; render(); return; }
   if (a === 'savego') { const el = document.getElementById('dname'); const nm = el ? el.value : ''; UI.saveDlg = false; render(); saveDeckFile(nm); return; }
-  if (a === 'reset') { DECK = []; UI.dsel = -1; say('すべて解除しました。'); saveDeck(); render(); return; }
-  if (a === 'random') { DECK = randomDeck(ownedPool()); UI.dsel = -1; say('ランダムに' + DECK.length + '枚を編成しました。'); saveDeck(); render(); return; }
+  if (a === 'reset') { sfx('reset'); DECK = []; UI.dsel = -1; say('すべて解除しました。'); saveDeck(); render(); return; }
+  if (a === 'random') { sfx('shuffle'); DECK = randomDeck(ownedPool()); UI.dsel = -1; say('ランダムに' + DECK.length + '枚を編成しました。'); saveDeck(); render(); return; }
   if (a === 'start' || a === 'retry' || a === 'startopp') {
     if (DECK.length !== DECK_SIZE) return;
     if (a === 'start') UI.opp = null;
@@ -2450,6 +2842,19 @@ function doDrop(kind, idx, target) {
   UI.sel = null; UI.win = null; render();
 }
 function init() {
+  sndLoad();
+  if (typeof document !== 'undefined') {
+    const unlock = () => {
+      const c = sndCtx();
+      if (!c) return;
+      const hint = UI.screen === 'title' && c.state !== 'running';
+      const done = () => { syncBGM(); if (hint && UI.screen === 'title') render(); };
+      if (c.state === 'suspended') { try { c.resume().then(done, done); } catch (e) { /* ignore */ } } else syncBGM();
+    };
+    sndCtx();
+    ['pointerdown', 'touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, unlock, true));
+    document.addEventListener('visibilitychange', syncBGM);
+  }
   loadRec();
   loadOwn();
   DECK = loadDeck();
@@ -2457,7 +2862,7 @@ function init() {
   if (app && app.addEventListener) {
     app.addEventListener('click', e => {
       const t = e.target.closest('[data-act]');
-      if (t) act(t.dataset.act, t.dataset);
+      if (t) { if (!NOTAP.has(t.dataset.act)) sfx('tap'); act(t.dataset.act, t.dataset); }
     });
     if (typeof document.createElement === 'function' && document.body) {
       tipEl = document.createElement('div'); tipEl.className = 'tip'; tipEl.style.display = 'none';
