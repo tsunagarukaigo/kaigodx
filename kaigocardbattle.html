@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>つながる介護カードバトル</title>
+<title>介護カードバトル</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -120,6 +120,17 @@ details ul { margin: 8px 0 0; padding-left: 1.2em; display: flex; flex-direction
   padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px));
 }
 .overlay .box { background: var(--panel); border: 1px solid var(--hi); padding: 24px; max-width: 420px; width: 100%; display: flex; flex-direction: column; gap: 14px; text-align: center; }
+.cw-intr { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 12px; margin-bottom: 4px; border: 1px solid #ff5a5a; border-radius: 10px; background: rgba(255, 60, 60, .12); animation: intrshake .5s ease-out both; }
+.cw-intr b { color: #ff7a7a; font-size: 18px; letter-spacing: .12em; }
+.cw-intr span { font-size: 14px; font-weight: 700; }
+@keyframes intrshake { 0% { transform: translateX(-14px); opacity: 0; } 30% { transform: translateX(10px); opacity: 1; } 55% { transform: translateX(-6px); } 80% { transform: translateX(3px); } 100% { transform: none; } }
+.overlay .box { max-height: calc(100vh - 32px); overflow-y: auto; }
+.mvp { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.mvp .bs-card.mvp-card { position: relative; left: auto; top: auto; flex: none; width: 152px; height: 200px; cursor: default; border-color: #ffd37a; box-shadow: 0 0 18px rgba(255, 211, 122, .45); background: linear-gradient(180deg, #2a2417, #14110a); animation: mvpin .6s cubic-bezier(.2, 1.3, .4, 1) both; }
+.mvp .bs-card.mvp-card .ic { font-size: 58px; }
+.mvp-t { font-size: 15px; font-weight: 700; letter-spacing: .06em; color: #ffd37a; }
+.mvp-s { font-size: 11px; opacity: .8; letter-spacing: .04em; }
+@keyframes mvpin { 0% { transform: scale(.4) rotate(-8deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
 .overlay .box h2 { font-family: var(--font-display); font-weight: 400; font-size: 30px; letter-spacing: .1em; }
 .overlay .box .row { justify-content: center; }
 /* card frame */
@@ -1016,6 +1027,61 @@ function cpuDeck() {
   });
   return randomDeck(null, DECK_SIZE - items.length).concat(items);
 }
+/* ---------- 乱入（CPU対戦の開始時に6％） ---------- */
+const INTRUDE_RATE = 0.06;
+const INTRUDERS = [
+  { key: 'rainbow', name: 'レインボー', icon: '🌈', attrs: ['介護', '環境'] },
+  { key: 'green', name: 'グリーン', icon: '🍀', attrs: ['医療', '訓練'] },
+  { key: 'rich', name: 'リッチマン', icon: '💰', rich: true }
+];
+function randInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+function pickItems(n) {
+  const all = CARDS.filter(x => x.item).map(x => x.id), out = [], cnt = {};
+  shuffle(all.concat(all)).forEach(id => { if (out.length < n && (cnt[id] || 0) < ITEM_COPY) { cnt[id] = (cnt[id] || 0) + 1; out.push(id); } });
+  return out;
+}
+/* 属性をなるべく均等に、ランダムに n 枚選ぶ（同じカードは maxCopy まで・CP合計は上限内） */
+function pickBalanced(pool, n, cost0) {
+  const out = [], cnt = {}, byAttr = {};
+  let cost = cost0 || 0;
+  pool.forEach(id => { (byAttr[CARDS[id].attr] = byAttr[CARDS[id].attr] || []).push(id); });
+  const num = {};
+  while (out.length < n) {
+    const attrs = shuffle(Object.keys(byAttr)).filter(a => byAttr[a].some(id => (cnt[id] || 0) < maxCopy(id) && cost + CARDS[id].cost <= COST_MAX));
+    if (!attrs.length) break;
+    attrs.sort((x, y) => (num[x] || 0) - (num[y] || 0));
+    const a = attrs[0];
+    let c = shuffle(byAttr[a].filter(id => (cnt[id] || 0) < maxCopy(id) && cost + CARDS[id].cost <= COST_MAX));
+    c.sort((x, y) => (cnt[x] || 0) - (cnt[y] || 0));
+    const id = c[0];
+    cnt[id] = (cnt[id] || 0) + 1; num[a] = (num[a] || 0) + 1; cost += CARDS[id].cost; out.push(id);
+  }
+  return { ids: out, cost };
+}
+function intruderDeck(it) {
+  for (let k = 0; k < 60; k++) {
+    let ids;
+    if (it.rich) {
+      /* レアカード中心（9〜11枚）＋ ふつうのカードを属性バランスよく ＋ アイテム2〜3枚 */
+      const nR = randInt(9, 11), nI = randInt(2, 3);
+      const r = pickBalanced(CARDS.filter(x => x.rare && !x.item).map(x => x.id), nR, 0);
+      const n = pickBalanced(CARDS.filter(x => !x.rare && !x.item).map(x => x.id), DECK_SIZE - nR - nI, r.cost);
+      ids = r.ids.concat(n.ids, pickItems(nI));
+    } else {
+      /* 指定の属性（レア役を含む）＋ アイテム4〜7枚 */
+      const nI = randInt(4, 7);
+      ids = randomDeck(CARDS.filter(x => !x.item && it.attrs.includes(x.attr)).map(x => x.id), DECK_SIZE - nI).concat(pickItems(nI));
+    }
+    if (ids.length === DECK_SIZE && deckCostOf(ids) <= COST_MAX) return ids;
+  }
+  return cpuDeck();
+}
+function deckCostOf(ids) { return ids.reduce((t, i) => t + CARDS[i].cost, 0); }
+function makeIntruder(it) { return { ids: intruderDeck(it), name: it.name, icon: it.icon, key: it.key, intruder: true }; }
+function rollIntruder() {
+  if (Math.random() >= INTRUDE_RATE) return null;
+  return makeIntruder(INTRUDERS[Math.floor(Math.random() * INTRUDERS.length)]);
+}
 function today() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
 function ownedPool() {
   const a = [];
@@ -1080,7 +1146,7 @@ function newSide(ids) {
   return { deck: deck.slice(4), hand, active: null, bench: [null, null, null], disc: [], pts: 0, cp: 0, max: 0, t: 0, buff: 0, noSwap: false, evi: false };
 }
 function newGame(ids, oppIds) {
-  G = { first: 'p', p: newSide(ids), e: newSide(oppIds || cpuDeck()), itemUsed: false, bcp: null, nodmg: null, cq: [], itemFx: null, turn: 'p', attacked: false, swapped: false, log: [], over: null, mustPromote: false, busy: false, pr: null, fx: { dmg: {}, heal: {}, ghost: {} } };
+  G = { first: 'p', p: newSide(ids), e: newSide(oppIds || cpuDeck()), itemUsed: false, st: { p: {}, e: {} }, bcp: null, nodmg: null, cq: [], itemFx: null, turn: 'p', attacked: false, swapped: false, log: [], over: null, mustPromote: false, busy: false, pr: null, fx: { dmg: {}, heal: {}, ghost: {} } };
   UI.sel = null;
 }
 function log(m) { G.log.push(m); if (G.log.length > 40) G.log.shift(); }
@@ -1138,13 +1204,32 @@ function ko(side, card) {
   else { const i = S.bench.indexOf(card); if (i >= 0) { G.fx.ghost[side + 'b' + i] = card; S.bench[i] = null; } }
   S.disc.push(card);
 }
-function hit(side, card, amt) {
+/* 活躍の記録：by＝ダメージを与えたカード（与えた側は target の反対側） */
+function credit(by, dealer, dmg, killed) {
+  if (!by || !G.st || (!(dmg > 0) && !killed)) return;
+  const e = G.st[dealer][by.uid] || (G.st[dealer][by.uid] = { c: by, dmg: 0, ko: 0 });
+  if (dmg > 0) e.dmg += dmg;
+  if (killed) e.ko++;
+}
+function hit(side, card, amt, by) {
   if (G.nodmg && amt > 0) { log('鶴の一声！ダメージを受けない。'); amt = 0; }
   if (card.sh > 0 && amt > 0) { const a = Math.min(card.sh, amt); card.sh -= a; amt -= a; }
+  const alive = card.hp > 0;
   card.hp = Math.max(0, card.hp - amt);
   G.fx.dmg[card.uid] = (G.fx.dmg[card.uid] || 0) + amt;
   log(card.name + 'に' + amt + 'ダメージ。');
-  if (card.hp <= 0) ko(side, card);
+  const dead = card.hp <= 0;
+  credit(by, opp(side), amt, dead && alive);
+  if (dead) ko(side, card);
+}
+/* 一番活躍したカード（ダメージ＋撃破×50 が最大）。誰もダメージを与えていなければ null */
+function mvpOf(side) {
+  let best = null, bs = 0;
+  Object.keys(G.st[side]).forEach(k => {
+    const e = G.st[side][k], sc = e.dmg + e.ko * 50;
+    if (sc > bs || (sc === bs && best && sc > 0 && e.dmg > best.dmg)) { best = e; bs = sc; }
+  });
+  return bs > 0 ? best : null;
 }
 function heal(card, n) {
   const b = card.hp; card.hp = Math.min(card.max, card.hp + n);
@@ -1229,11 +1314,11 @@ function useMove(s, mi) {
       if (S.evi) log('エビデンス！すべての属性に強い。');
       else if (k > 1) log('相性がよい！（' + a.attr + '→' + O.active.attr + '）');
       else if (k < 1) log('相性がいまひとつ…（' + a.attr + '→' + O.active.attr + '）');
-      hit(opp(s), T, amt);
-      if (T.boss && amt > 0 && !G.nodmg) G.cq.push({ s, a });
+      hit(opp(s), T, amt, a);
+      if (T.boss && amt > 0 && !G.nodmg) G.cq.push({ s, a, by: T });
     } else log('相手の前衛がいない。');
   }
-  if (e.s) O.bench.slice().forEach(x => { if (x) { hit(opp(s), x, e.s); if (x.boss && !G.nodmg) G.cq.push({ s, a }); } });
+  if (e.s) O.bench.slice().forEach(x => { if (x) { hit(opp(s), x, e.s, a); if (x.boss && !G.nodmg) G.cq.push({ s, a, by: x }); } });
   after();
   return true;
 }
@@ -1436,6 +1521,7 @@ async function runCoin(c) {
 function coinWin() {
   const c = UI.coin;
   return '<div class="bs-back"></div><div class="bs-pop coinw" data-act="coinskip" role="dialog" aria-label="コイントス">' +
+    (UI.opp && UI.opp.intruder ? '<div class="cw-intr"><b>⚡ 乱入！</b><span>' + UI.opp.icon + ' ' + UI.opp.name + ' が勝負を挑んできた！</span></div>' : '') +
     '<b class="cw-t">コイントス</b><span class="dim sm">表ならあなたが先攻、裏なら相手が先攻</span>' +
     '<div class="coin-wrap"><div class="coin-toss"><div class="coin" style="--end:' + (c.heads ? 1800 : 1980) + 'deg">' +
     '<div class="cf f"><span>表</span><small>あなた</small></div><div class="cf b"><span>裏</span><small>相手</small></div></div></div><i class="coin-sh"></i></div>' +
@@ -2122,12 +2208,20 @@ function infoWin() {
 function logWin() {
   return '<div class="bs-pop' + fr() + '">' + winHead('ログ', '', true) + '<div class="bs-log">' + G.log.slice(-14).map(l => '<div>' + l + '</div>').join('') + '</div></div>';
 }
+function mvpHTML() {
+  const e = mvpOf('p');
+  if (!e) return '';
+  const x = Object.assign({}, e.c, { hp: e.c.max, sh: 0, db: 0, nd: 0 });
+  return '<div class="mvp"><div class="bs-card mine mvp-card' + (x.rare ? ' rare' : '') + '">' + cardInner(x) + '</div>' +
+    '<div class="mvp-t">今日のMVP：' + x.name + '</div>' +
+    '<div class="mvp-s">倒した数 ' + e.ko + '体 ／ 与えたダメージ累計 ' + e.dmg + '</div></div>';
+}
 function renderBattle() {
   const P = G.p, E = G.e;
   const can = G.turn === 'p' && !G.busy && !G.over && !G.mustPromote && !UI.auto;
   const a = P.active, ea = E.active;
   const win = G.mustPromote ? 'swap' : UI.win;
-  const over = G.over ? '<div class="overlay"><div class="box"><h2>' + (G.over.winner === 'p' ? '勝利' : '敗北') + '</h2><p>' + G.over.reason + '</p>' +
+  const over = G.over ? '<div class="overlay"><div class="box"><h2>' + (G.over.winner === 'p' ? '勝利' : '敗北') + '</h2><p>' + G.over.reason + '</p>' + mvpHTML() +
     '<div class="row"><button class="btn" data-act="retry">もう一度</button><button class="btn ghost" data-act="toDeck">デッキ編成へ</button></div></div></div>' : '';
   let pop = '';
   if (UI.coin) pop = coinWin();
@@ -2185,7 +2279,7 @@ async function animMove(s, mi) {
     for (const o of q) {
       if (G.over || !o.a || o.a.hp <= 0) continue;
       UI.anim = { s: o.s, ph: 'hit', bp: '👑 役職者の反撃！', ic, be: o.a.name + 'に10ダメージ', msg: '役職者の反撃！' + o.a.name + 'に10ダメージ。' };
-      hit(o.s, o.a, 10); after();
+      hit(o.s, o.a, 10, o.by); after();
       sfx('hit', 1);
       render(); await sleep(1000);
       UI.anim = null;
@@ -2581,6 +2675,12 @@ function sfx(name, k) {
         tone(d, 'triangle', 784, t + 0.12, 0.3, 0.14, { f2: 1046 });
         break;
       case 'item': purun(t); break;
+      case 'intrude':
+        for (let i = 0; i < 4; i++) tone(d, 'sawtooth', 440, t + i * 0.28, 0.26, 0.12, { f2: 880, lp: 2500, a: 0.01 });
+        tone(d, 'sine', 90, t + 0.05, 0.9, 0.7, { f2: 45, a: 0.005 });
+        noiseHit(d, t + 0.05, 0.5, 0.5, 'lowpass', 1500, 0.7, 200);
+        [196, 233, 277].forEach(f => tone(d, 'square', f, t + 1.15, 0.7, 0.07, { lp: 1200, a: 0.02 }));
+        break;
       case 'tap':
         tone(d, 'triangle', 760, t, 0.06, 0.24, { f2: 520, a: 0.002 });
         break;
@@ -2762,11 +2862,14 @@ function act(a, d) {
   if (a === 'random') { sfx('shuffle'); DECK = randomDeck(ownedPool()); UI.dsel = -1; say('ランダムに' + DECK.length + '枚を編成しました。'); saveDeck(); render(); return; }
   if (a === 'start' || a === 'retry' || a === 'startopp') {
     if (DECK.length !== DECK_SIZE) return;
-    if (a === 'start') UI.opp = null;
+    /* CPU対戦（「もう一度」を含む）は、そのたびに乱入の抽選をやり直す。デッキデータ対戦の再戦は同じ相手のまま */
+    if (a === 'start' || (a === 'retry' && (!UI.opp || UI.opp.intruder))) UI.opp = rollIntruder();
+    LBL.e = UI.opp && UI.opp.intruder ? UI.opp.name : '相手';
     newGame(DECK.slice(), UI.opp ? UI.opp.ids.slice() : null); UI.screen = 'battle'; UI.win = null; UI.sel = null;
     const heads = Math.random() < 0.5;
     G.first = heads ? 'p' : 'e';
-    log('対戦開始！' + (UI.opp ? '相手は「' + UI.opp.name + '」のデッキ。' : '') + '先に' + WIN_PTS + '体を戦闘不能にしよう。');
+    if (UI.opp && UI.opp.intruder) { sfx('intrude'); log('乱入！' + UI.opp.icon + UI.opp.name + 'が現れた！'); }
+    log('対戦開始！' + (UI.opp && !UI.opp.intruder ? '相手は「' + UI.opp.name + '」のデッキ。' : '') + '先に' + WIN_PTS + '体を戦闘不能にしよう。');
     G.busy = true; UI.coin = { heads, t0: Date.now() };
     render(); if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
     runCoin(UI.coin); return;
