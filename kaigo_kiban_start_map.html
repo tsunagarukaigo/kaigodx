@@ -159,7 +159,11 @@ details p{margin:6px 0 0}
 @keyframes liveColor{50%{fill:var(--c-live)}}
 #gLive path,#map circle.m.live{animation:liveColor 3.6s ease-in-out infinite}
 .legend i.blink{background:var(--c-live)}
-@media (prefers-reduced-motion:reduce){#gLive path,#map circle.m.live{animation:none}}
+@media (prefers-reduced-motion:reduce){   /* 動きを減らす設定の環境では、点滅の代わりに黄色の枠線で示す */
+  #gLive path,#map circle.m.live{animation:none}
+  #gLive path.r{stroke:var(--c-live);stroke-width:1.6}
+  #map circle.m.live{fill:var(--c-live) !important}
+}
 </style>
 </head>
 <body>
