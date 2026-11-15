@@ -142,6 +142,17 @@ details p{margin:6px 0 0}
   .map-wrap{height:clamp(380px,62vh,620px)}
 }
 @media (prefers-reduced-motion:reduce){.cell .sw{transition:none}}
+
+/* ---- prefecture zoom buttons ---- */
+.prefs{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:13px}
+.prefs-head{color:var(--muted);font-size:12px}
+.prow{display:flex;align-items:baseline;gap:6px 10px}
+.prow .rl{flex:none;width:6.5em;color:var(--muted);font-size:12px}
+.pbtns{display:flex;flex-wrap:wrap;gap:4px}
+.pb{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:2px 9px;cursor:pointer;font-size:13px;line-height:1.6}
+.pb:hover{border-color:var(--muted)}
+.pb[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--panel));font-weight:600}
+@media (max-width:600px){.prow{flex-direction:column;gap:3px}.prow .rl{width:auto}}
 </style>
 </head>
 <body>
@@ -170,6 +181,7 @@ details p{margin:6px 0 0}
       <button class="btn" id="btnAll" type="button">全期間に戻す</button>
       <span style="color:var(--muted);font-size:12px">年・月をクリックすると、その年月以降に開始する市区町村すべてに色が付きます</span>
     </div>
+    <div class="prefs" id="prefs" role="group" aria-label="都道府県へズーム"></div>
   </section>
 
   <main class="grid">
@@ -510,7 +522,7 @@ function zoomAt(cx, cy, factor) {
   vb.w = nw; vb.h = nw * VB0[3] / VB0[2];
   applyVB();
 }
-function resetView() { vb.x = VB0[0]; vb.y = VB0[1]; vb.w = VB0[2]; vb.h = VB0[3]; applyVB(); }
+function resetView() { vb.x = VB0[0]; vb.y = VB0[1]; vb.w = VB0[2]; vb.h = VB0[3]; applyVB(); setPrefActive(null); }
 
 function locate(ex) {
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, d = '';
@@ -530,9 +542,100 @@ function locate(ex) {
   w = Math.min(w, VB0[2]);
   vb.w = w; vb.h = w / aspect; vb.x = (x0 + x1)/2 - vb.w/2; vb.y = (y0 + y1)/2 - vb.h/2;
   applyVB();
+  setPrefActive(null);
   hl.setAttribute('d', d);
   try { wrap.scrollIntoView({behavior:'smooth', block:'nearest'}); } catch (e) {}
 }
+
+/* ---- prefecture zoom ---- */
+function subBoxes(d) {   // bounding box of every sub-path (island) of a region
+  const out = [];
+  d.split('M').slice(1).forEach(part => {
+    const n = part.match(/-?\d+(?:\.\d+)?/g); if (!n || n.length < 2) return;
+    let x = +n[0], y = +n[1], x0 = x, x1 = x, y0 = y, y1 = y;
+    for (let i = 2; i + 1 < n.length; i += 2) {
+      x += +n[i]; y += +n[i+1];
+      if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+    out.push({x0, y0, x1, y1});
+  });
+  return out;
+}
+/* 遠く離れた離島は、ズーム範囲の計算から除外する（地図上には表示されたまま） */
+const PREF_FILTER = {
+  '東京都':  b => b.y0 < 5400,   // 小笠原諸島・伊豆諸島を除く（本土部分に寄せる）
+  '鹿児島県': b => b.y1 < 8000,   // 奄美・トカラ以南を除く
+  '沖縄県':  b => b.x1 < 3000    // 大東諸島を除く
+};
+const prefBoxCache = {};
+function prefBox(pref) {
+  if (prefBoxCache[pref]) return prefBoxCache[pref];
+  const ok = PREF_FILTER[pref] || (() => true);
+  let box = null;
+  const add = b => {
+    if (!box) box = {x0:b.x0, y0:b.y0, x1:b.x1, y1:b.y1};
+    else { box.x0 = Math.min(box.x0, b.x0); box.y0 = Math.min(box.y0, b.y0); box.x1 = Math.max(box.x1, b.x1); box.y1 = Math.max(box.y1, b.y1); }
+  };
+  const collect = keyedOnly => REG.forEach(r => {   // 北方領土など、一覧にない地域は最初は除く
+    if (r.pref !== pref || (keyedOnly && !r.key)) return;
+    subBoxes(r.d).forEach(b => { if (ok(b)) add(b); });
+  });
+  collect(true); if (!box) collect(false);
+  MK.forEach(m => {
+    if (m.pref !== pref) return;
+    const b = {x0:m.x - 100, y0:m.y - 100, x1:m.x + 100, y1:m.y + 100};
+    if (ok(b)) add(b);
+  });
+  return (prefBoxCache[pref] = box);
+}
+
+const PREF_GROUPS = [
+  ['北海道・東北', ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県']],
+  ['関東', ['茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県']],
+  ['中部', ['新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県']],
+  ['近畿', ['三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県']],
+  ['中国', ['鳥取県','島根県','岡山県','広島県','山口県']],
+  ['四国', ['徳島県','香川県','愛媛県','高知県']],
+  ['九州・沖縄', ['福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県']]
+];
+const prefsEl = $('prefs');
+let prefBtns = [], activePref = null;
+function setPrefActive(p) {
+  activePref = p;
+  prefBtns.forEach(([n, b]) => b.setAttribute('aria-pressed', n === p ? 'true' : 'false'));
+}
+function zoomToPref(pref) {
+  const bx = prefBox(pref); if (!bx) return;
+  const aspect = VB0[2] / VB0[3], pad = 1.12;
+  let w = Math.max((bx.x1 - bx.x0) * pad, (bx.y1 - bx.y0) * pad * aspect, VB0[2] / MAXZ);
+  w = Math.min(w, VB0[2]);
+  vb.w = w; vb.h = w / aspect;
+  vb.x = (bx.x0 + bx.x1) / 2 - vb.w / 2; vb.y = (bx.y0 + bx.y1) / 2 - vb.h / 2;
+  applyVB();
+  hl.setAttribute('d', ''); hideTip();
+  setPrefActive(pref);
+  try { wrap.scrollIntoView({behavior:'smooth', block:'nearest'}); } catch (e) {}
+}
+(function buildPrefs() {
+  const head = document.createElement('div');
+  head.className = 'prefs-head';
+  head.textContent = '都道府県へズーム（ボタンを押すと、その都道府県に地図が寄ります）';
+  prefsEl.appendChild(head);
+  PREF_GROUPS.forEach(([label, list]) => {
+    const row = document.createElement('div'); row.className = 'prow';
+    const rl = document.createElement('span'); rl.className = 'rl'; rl.textContent = label;
+    const box = document.createElement('div'); box.className = 'pbtns';
+    list.forEach(p => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'pb';
+      b.textContent = p === '北海道' ? p : p.replace(/[都府県]$/, '');
+      b.title = p + 'に地図を寄せる'; b.setAttribute('aria-label', p + 'にズーム'); b.setAttribute('aria-pressed', 'false');
+      b.addEventListener('click', () => zoomToPref(p));
+      prefBtns.push([p, b]); box.appendChild(b);
+    });
+    row.appendChild(rl); row.appendChild(box); prefsEl.appendChild(row);
+  });
+})();
 
 svg.addEventListener('wheel', ev => {
   ev.preventDefault();
