@@ -217,7 +217,7 @@ details p{margin:6px 0 0}
         <li><i style="background:var(--c-none)"></i>未定・記載なし（日程調整中を含む）</li>
         <li><i style="background:var(--c-out)"></i>選択期間の外に開始</li>
         <li><i style="background:var(--c-avail)"></i>利用可能※（開始済みとして集計）</li>
-        <li><i class="blink"></i>点滅：稼働中</li>
+        <li><i class="blink"></i>点滅：本日時点で利用可能</li>
         <li><i class="dot"></i>地図に図形がない町村（海上に小さな丸で表示）</li>
       </ul>
       <hr>
@@ -456,7 +456,7 @@ lgrid.addEventListener('click', ev => {
 });
 
 function setSel(f, t) {
-  refreshToday();
+  refreshToday(); refreshLive();
   sel.f = f; sel.t = t;
   paint(); count(); renderLists();
   $('periodText').textContent = periodLabel();
@@ -753,12 +753,12 @@ window.addEventListener('resize', applyVB);
 /* ---- today: 初期の表示期間 & 点滅 ---- */
 function todayK() { const d = new Date(); return d.getFullYear()*12 + d.getMonth() - base; }   // 今月の月インデックス
 function startSel() { return Math.min(Math.max(todayK(), 0), N-1); }                            // 表示期間の開始 = 今月
-function isLiveRow(ex) {   // すでに開始済み（利用可能※を含む）／今月に開始
+function isLiveRow(ex) {   // 本日時点で利用可能（開始日が今日以前、利用可能※を含む）
   if (ex < 0) return false;
   const r = ROWS[ex];
   if (r[3] === 2) return true;
   if (r[3] === 1) return false;
-  return rowK[ex] <= todayK();
+  return r[2] <= TODAY;
 }
 function refreshLive() {
   regEls.forEach((p, i) => { const g = isLiveRow(regEx[i]) ? gLive : gReg; if (p.parentNode !== g) g.appendChild(p); });
