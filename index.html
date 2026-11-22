@@ -55,6 +55,16 @@
     align-items: center;
     text-align: center;
     padding: 20px;
+    overflow: hidden;
+  }
+
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transform-origin: center center;
+    will-change: transform, opacity;
   }
 
   .pixel-logo-wrapper {
@@ -402,19 +412,21 @@
 
   <!-- タイトル画面 -->
   <header class="hero" id="heroSection">
-    <div class="pixel-chain">
-      <div class="dot-box"></div>
-      <div class="dot-box"></div>
-      <div class="dot-box"></div>
-    </div>
+    <div class="hero-inner" id="heroInner">
+      <div class="pixel-chain">
+        <div class="dot-box"></div>
+        <div class="dot-box"></div>
+        <div class="dot-box"></div>
+      </div>
 
-    <div class="pixel-logo-wrapper">
-      <h1 class="title-jp">つながるGAMES</h1>
-      <div class="title-en">TSUNAGARU GAMES</div>
-    </div>
+      <div class="pixel-logo-wrapper">
+        <h1 class="title-jp">つながるGAMES</h1>
+        <div class="title-en">TSUNAGARU GAMES</div>
+      </div>
 
-    <div class="press-start">▼ SCROLL TO START ▼</div>
-    <p class="scroll-guide">上下スクロールでGAME 01〜04を固定切り替え！</p>
+      <div class="press-start">▼ SCROLL TO START ▼</div>
+      <p class="scroll-guide">上下スクロールでGAME 01〜04を固定切り替え！</p>
+    </div>
   </header>
 
   <!-- ブロック固定：上下スクロールでGAME 01〜04を切り替え -->
@@ -693,7 +705,9 @@
       el.appendChild(frag);
     });
 
-    // 固定トラック内の上下スクロールでGAME 01〜04を切り替え
+    // タイトル ↔ GAME 01 ズーム演出＆固定トラック内の切り替え
+    const heroSection = document.getElementById('heroSection');
+    const heroInner = document.getElementById('heroInner');
     const gameScrollTrack = document.getElementById('gameScrollTrack');
     const windows = Array.from(document.querySelectorAll('.game-window'));
     const pips = Array.from(document.querySelectorAll('.step-pip'));
@@ -720,7 +734,21 @@
       });
     }
 
+    function updateHeroZoom() {
+      const heroHeight = heroSection.offsetHeight || window.innerHeight;
+      // スクロールダウンで 0.0 -> 1.0、スクロールアップで 1.0 -> 0.0
+      const zoomProgress = Math.max(0, Math.min(1, window.scrollY / heroHeight));
+      // 1.0 (100%) <-> 4.0 (400%)
+      const scale = 1 + zoomProgress * 3;
+      const opacity = Math.max(0, 1 - zoomProgress * 1.15);
+
+      heroInner.style.transform = `translate3d(0, 0, 0) scale(${scale})`;
+      heroInner.style.opacity = opacity;
+    }
+
     function syncByScroll() {
+      updateHeroZoom();
+
       const rect = gameScrollTrack.getBoundingClientRect();
       const scrollableDistance = rect.height - window.innerHeight;
       if (scrollableDistance <= 0) return;
