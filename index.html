@@ -128,7 +128,6 @@
   /* ブロック固定：上下スクロールでGAME 01〜04を切り替えるトラック */
   .game-scroll-track {
     position: relative;
-    /* 4つのGAMEを上下スクロールで順に表示するための高さ */
     height: 360vh;
     width: 100%;
   }
@@ -293,13 +292,8 @@
 
   .window-footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-  }
-
-  .next-hint {
-    font-size: 0.9rem;
-    color: var(--accent-cyan);
   }
 
   .play-btn {
@@ -401,10 +395,6 @@
     .windows-container {
       height: 460px;
     }
-    .window-footer {
-      flex-direction: column;
-      gap: 12px;
-    }
   }
 </style>
 </head>
@@ -452,11 +442,10 @@
             </div>
             <div class="game-info">
               <h2>ドキメマ</h2>
-              <p>老後生活を満喫しよう！ドキドキ★R65シミレーションゲーム。</p>
+              <p>選択肢と会話で心を動かすミニゲーム。テンポよく好感度を上げてハッピーを目指そう！</p>
             </div>
           </div>
           <div class="window-footer">
-            <span class="next-hint">▲ 上でタイトル / ▼ 下でGAME 02</span>
             <a class="play-btn" href="https://tsunagarukaigo.github.io/kaigodx/dokimema.html" target="_blank" rel="noopener noreferrer">▶ PLAY</a>
           </div>
         </article>
@@ -477,7 +466,6 @@
             </div>
           </div>
           <div class="window-footer">
-            <span class="next-hint">▲ 上でGAME 01 / ▼ 下でGAME 03</span>
             <a class="play-btn" href="https://tsunagarukaigo.github.io/kaigodx/kaigocardbattle.html" target="_blank" rel="noopener noreferrer">▶ PLAY</a>
           </div>
         </article>
@@ -493,12 +481,11 @@
               <div class="pixel-art" data-sprite="moon"></div>
             </div>
             <div class="game-info">
-              <h2>ツナガラナイト</h2>
-              <p>静かな夜の時間帯を舞台にしたサスペンス推理ゲーム。犯人を捜そう。</p>
+              <h2>ミッドナイト</h2>
+              <p>静かな夜の時間帯を舞台にしたシチュエーションゲーム。落ち着いて状況を乗り切ろう。</p>
             </div>
           </div>
           <div class="window-footer">
-            <span class="next-hint">▲ 上でGAME 02 / ▼ 下でGAME 04</span>
             <a class="play-btn" href="https://tsunagarukaigo.github.io/kaigodx/midnight.html" target="_blank" rel="noopener noreferrer">▶ PLAY</a>
           </div>
         </article>
@@ -519,7 +506,6 @@
             </div>
           </div>
           <div class="window-footer">
-            <span class="next-hint">▲ 上でGAME 03 / ▼ 下で次へ</span>
             <a class="play-btn" href="https://tsunagarukaigo.github.io/kaigodx/x_battle_arena.html" target="_blank" rel="noopener noreferrer">▶ PLAY</a>
           </div>
         </article>
@@ -551,7 +537,6 @@
           </div>
         </div>
         <div class="window-footer">
-          <span class="next-hint">EXTERNAL TOOL</span>
           <a class="play-btn" href="https://tsunagarukaigo.github.io/kaigodx/zenkokukaigojigyosho.html" target="_blank" rel="noopener noreferrer">▶ OPEN</a>
         </div>
       </article>
@@ -572,7 +557,6 @@
           </div>
         </div>
         <div class="window-footer">
-          <span class="next-hint">EXTERNAL TOOL</span>
           <a class="play-btn" href="https://tsunagarukaigo.github.io/kaigodx/kaigo_kiban_start_map.html" target="_blank" rel="noopener noreferrer">▶ OPEN</a>
         </div>
       </article>
@@ -593,7 +577,6 @@
           </div>
         </div>
         <div class="window-footer">
-          <span class="next-hint">EXTERNAL TOOL</span>
           <a class="play-btn" href="https://tsunagarukaigo.github.io/kaigodx/zaseki_setting.html" target="_blank" rel="noopener noreferrer">▶ OPEN</a>
         </div>
       </article>
@@ -742,14 +725,12 @@
       const scrollableDistance = rect.height - window.innerHeight;
       if (scrollableDistance <= 0) return;
 
-      // トラック内の進行度 (0.0 〜 1.0)
       const rawProgress = -rect.top / scrollableDistance;
       const progress = Math.max(0, Math.min(0.9999, rawProgress));
       const index = Math.floor(progress * totalWindows);
       setActiveWindow(index);
     }
 
-    // 01〜04のインジケータークリックで該当スクロール位置へ移動
     pips.forEach((pip) => {
       pip.addEventListener('click', () => {
         const targetIndex = Number(pip.dataset.step);
