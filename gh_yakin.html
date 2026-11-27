@@ -35,7 +35,7 @@ body{box-sizing:border-box;padding:4px 6px;max-width:480px;margin:auto;user-sele
 .ov div{background:var(--card);border-radius:12px;padding:14px;max-width:340px;font-size:13px;line-height:1.5;max-height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .ov div.jw{width:100%;max-width:350px;box-sizing:border-box;padding:10px 12px}
 .ov h3{margin:0 0 6px;font-size:15px}
-.sub{background:#8a6a3a}
+.sub{background:#8a6a3a}.x{background:#000}#rest.dis{background:#888;color:#ccc;opacity:.55}
 .jbox{border:1px solid var(--bd);border-radius:8px;padding:6px 8px;margin-top:8px;font-size:11px;line-height:1.5;text-align:left}
 .jbox.ac{border-color:var(--bad)}
 .jbox h5{margin:0 0 3px;font-size:12px}
@@ -102,7 +102,7 @@ moodOf=i=>{const o=S.mood[i];return o.a<25&&o.u<25?"標準":o.a>=o.u?"怒り":"�
 const END=1020,$=id=>document.getElementById(id);
 let S,timer,carry={stage:1,st:0,total:0};
 function init(){if(!carry.ratio)carry.ratio=.3+Math.random()*.1;if(!carry.mood)carry.mood=Array.from({length:18},()=>({a:0,u:0}));if(!carry.lv)carry.lv=Array.from({length:18},()=>Math.floor(Math.random()*7));
- S={m:0,ev:Array(18).fill(null),busy:null,st:carry.st,rest:false,nr:.02+Math.random()*.17,lv:carry.lv,mood:carry.mood,mod:Array(18).fill(0),bd:Array.from({length:18},()=>Math.floor(Math.random()*8)),pm:Array(18).fill(0),inc:carry.inc||0,sched:[],rec:{},restMin:0,acclog:[],log:[],done:0,miss:0,over:false};
+ S={no:carry.stage,m:0,ev:Array(18).fill(null),busy:null,st:carry.st,rest:false,nr:.02+Math.random()*.17,lv:carry.lv,mood:carry.mood,mod:Array(18).fill(0),bd:Array.from({length:18},()=>Math.floor(Math.random()*8)),pm:Array(18).fill(0),inc:carry.inc||0,sched:[],rec:{},restMin:0,acclog:[],log:[],done:0,miss:0,over:false};
  for(let k=0;k<18;k++){[{t:60+k*6.5,i:k,type:"meal"},{t:240+k*3.5,i:k,type:"med"},{t:840+k*5,i:k,type:"meal"}].forEach(s=>{if(Math.random()<carry.ratio*(.6+.133*S.lv[k]))S.sched.push(s)})}
  $("grid").innerHTML=names.map((n,i)=>`<div class="c" data-i="${i}"><span class="bd"></span><div class="h"><span class="f">${i%2?"👴":"👵"}</span>${n}</div><div class="lv">認知症度${LVN[S.lv[i]]}</div><div class="e"></div><div class="bar"><i></i></div></div>`).join("");
  document.querySelectorAll(".c").forEach(c=>c.onclick=()=>tap(+c.dataset.i));
@@ -122,7 +122,7 @@ function pick(ri){const m=S.m,night=m>=360&&m<840,L=S.lv[ri];const hr=hrOf(m);
 function pickRes(){const b=S.lv.map(v=>1+(v-3)*.0417),B=b.reduce((a,c)=>a+c);let r=Math.random()*B;for(let i=0;i<18;i++){if((r-=b[i]*ACT[S.bd[i]]*[1,.2,3][S.mod[i]]*(1+(S.mood[i].a+S.mood[i].u)/60))<0)return i}return -1}
 function tap(i){if(S.over||!S.ev[i]||S.ev[i].doing)return;
  if(S.busy){say("いま別の方に対応中です！");return}
- S.ev[i].doing=true;const ty=S.ev[i].type,d=(ty==="patrol"?.25:1)*Math.max(.2,T[ty].d*(["meal","med","toilet"].includes(ty)?1+.1*Math.max(0,S.lv[i]-2):1)+Math.random()*1.75-.5);S.busy={i,left:d,tot:d}}
+ rs(false);S.ev[i].doing=true;const ty=S.ev[i].type,d=(ty==="patrol"?.25:1)*Math.max(.2,T[ty].d*(["meal","med","toilet"].includes(ty)?1+.1*Math.max(0,S.lv[i]-2):1)+Math.random()*1.75-.5);S.busy={i,left:d,tot:d}}
 /* 事故報告：事故(S.inc)が増えた見逃しを「いつ・誰が・どんな事故か」で記録 */
 const ACCT={escape:"施設外へ脱走（重大事故）",wander:"徘徊中に転倒",med:"服薬漏れ",intrude:"他の利用者の居室に侵入しトラブル",pica:"異物を誤飲し緊急受診",delir:"せん妄が悪化し夜間救急対応",patrol:"巡回が滞り、褥瘡・状態変化の発見が遅れた",fall:"立ち上がろうとして転倒"};
 const clk=m=>String((16+Math.floor(m/60))%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
@@ -169,6 +169,7 @@ function draw(){const m=S.m,h=(16+Math.floor(m/60))%24,mm=String(m%60).padStart(
  $("pg").firstChild.style.width=m/END*100+"%";$("stg").textContent="第"+carry.stage+"夜勤の進行";
  $("st").firstChild.style.width=Math.min(100,S.st)+"%";
  const BC=["#2e9d5c","#2f9fa0","#2f6fd0","#7fa070","#d9c12e","#e68a2e","#d33a3a"];$("inc").style.background=BC[Math.min(6,S.inc)];$("inc").innerHTML="🏢<small>運営状況</small>";
+ rb.classList.toggle("dis",!!S.busy);
  const w=$("work");
  if(S.busy){const e=S.ev[S.busy.i];w.innerHTML=`${T[e.type].i} ${T[e.type].n.replace("!","")}対応中…<div class="bar"><i style="width:${(1-S.busy.left/S.busy.tot)*100}%"></i></div>`}
  else w.textContent=S.rest?"☕️ 休憩中…（回復はごくわずか）":"待機中（サインの出た利用者をタップ）";
@@ -179,23 +180,25 @@ function draw(){const m=S.m,h=(16+Math.floor(m/60))%24,mm=String(m%60).padStart(
 function end(r,msg){S.over=true;clearInterval(timer);draw();
  let t,b;const pay=r==="win"?20000:Math.floor(20000/17*(S.m/60));carry.total+=pay;const tot=`<br>累計報酬：<b>${carry.total.toLocaleString()}円</b>`;const ps=`<br>💴 報酬：<b>${pay.toLocaleString()}円</b>`;
  if(r==="win"){const g=S.inc===0&&S.st<50?"S":S.inc<=1&&S.st<70?"A":S.inc<=3?"B":"C";
-  t=`🌅 第${carry.stage}夜勤 明け！`;const rd=.15+Math.random()*.15;carry.st=S.st*(1-rd);carry.inc=S.inc;carry.stage++;carry.ratio=Math.min(1,carry.ratio+.05+Math.random()*.05);b=`評価：<b style="font-size:28px">${g}</b><br>対応完了 ${S.done}件／見逃し ${S.miss}件<br>事故 ${S.inc}件／ストレス ${Math.floor(S.st)}%<br>🛌 明けの休息で疲労ストレスが${Math.round(rd*100)}%軽減（次の夜勤は${Math.floor(carry.st)}%から）${ps}${tot}`}
- else{t="💀 第"+carry.stage+"夜勤でゲームオーバー";b=`${msg}<br>（${$("clock").textContent} 時点／対応 ${S.done}件）<br>勤務 ${(S.m/60).toFixed(1)}時間${ps}${tot}`}
+  t=`🌅 第${carry.stage}夜勤 明け！`;const rd=.15+Math.random()*.15;carry.st=S.st*(1-rd);carry.inc=S.inc;(carry.ranks=carry.ranks||[]).push(g);carry.stage++;carry.ratio=Math.min(1,carry.ratio+.05+Math.random()*.05);b=`評価：<b style="font-size:28px">${g}</b><br>対応完了 ${S.done}件／見逃し ${S.miss}件<br>事故 ${S.inc}件／ストレス ${Math.floor(S.st)}%<br>🛌 明けの休息で疲労ストレスが${Math.round(rd*100)}%軽減（次の夜勤は${Math.floor(carry.st)}%から）${ps}${tot}`}
+ else{t="💀 第"+carry.stage+"夜勤でゲームオーバー";b=`${msg}<br>（${$("clock").textContent} 時点／対応 ${S.done}件）<br>勤務 ${(S.m/60).toFixed(1)}時間${ps}${tot}<br>ランク平均：<b>${avgRank()}</b>`}
  const o=$("ov");o.className="ov";
- const card=`<div><h2>${t}</h2>${b}${r==="win"?'<button id="jn" class="sub">📋 勤務日誌</button>':""}<button id="rt">${r==="win"?"第"+carry.stage+"夜勤へ":"最初から"}</button></div>`;
- const wire=()=>{$("rt").onclick=()=>{if(r!=="win")carry={stage:1,st:0,total:0};start()};const j=$("jn");if(j)j.onclick=()=>{o.innerHTML=journal();$("jb").onclick=()=>{o.innerHTML=card;wire()}}};
+ const card=`<div><h2>${t}</h2>${b}<button id="jn" class="sub">📋 勤務日誌</button>${r==="win"?"":'<button id="tw" class="x">𝕏 にツイートする</button>'}<button id="rt">${r==="win"?"第"+carry.stage+"夜勤へ":"最初から"}</button></div>`;
+ const wire=()=>{$("rt").onclick=()=>{if(r!=="win")carry={stage:1,st:0,total:0};start()};const tw=$("tw");if(tw)tw.onclick=()=>{const tx=`【グループホーム夜勤ワンオペ物語 〜認知症利用者18名をおひとりで〜】\n第${S.no}夜勤でゲームオーバー💀\n累計報酬：${carry.total.toLocaleString()}円／ランク平均：${avgRank()}\nhttps://tsunagarukaigo.github.io/kaigodx/gh_yakin.html`;window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(tx),"_blank","noopener")};const j=$("jn");if(j)j.onclick=()=>{o.innerHTML=journal();$("jb").onclick=()=>{o.innerHTML=card;wire()}}};
  o.innerHTML=card;o.classList.remove("hide");wire()}
 /* 勤務日誌：項目ごとの対応時間・休息時間の一覧表(ゲーム内の分)と、別枠の事故報告 */
+/* ランク平均：S=4 A=3 B=2 C=1 の平均を最も近い評価に丸めて表示。クリア実績なしは「-」 */
+function avgRank(){const a=carry.ranks||[];if(!a.length)return"-（クリアなし）";const P={S:4,A:3,B:2,C:1},v=a.reduce((x,g)=>x+P[g],0)/a.length,L=["C","B","A","S"][Math.min(3,Math.max(0,Math.round(v)-1))];return L+"（"+v.toFixed(1)+"/4.0）"}
 function journal(){const fm=x=>x>=60?Math.floor(x/60)+"時間"+Math.round(x%60)+"分":Math.round(x)+"分";
  const ks=Object.keys(T).filter(k=>S.rec[k]&&(S.rec[k].n||S.rec[k].miss));let sn=0,sm=0,sx=0;
  const rows=ks.map(k=>{const r=S.rec[k];sn+=r.n;sm+=r.min;sx+=r.miss;return`<tr><td>${T[k].i}${T[k].n.replace("!","")}</td><td>${r.n}</td><td>${fm(r.min)}</td><td>${r.n?(r.min/r.n).toFixed(1)+"分":"-"}</td><td>${r.miss}</td></tr>`}).join("");
  const idle=Math.max(0,S.m-sm-S.restMin);
  const ac=S.acclog.length?S.acclog.map(x=>`・${clk(x.m)}　${x.who}様：${x.what}`).join("<br>"):"この夜勤の事故報告はありません。";
- return`<div class="jw"><h3>📋 勤務日誌（第${carry.stage-1}夜勤）</h3><table class="jt"><tr><th>項目</th><th>対応</th><th>対応時間</th><th>平均</th><th>見逃し</th></tr>${rows}<tr class="tt"><td>対応 合計</td><td>${sn}</td><td>${fm(sm)}</td><td>${sn?(sm/sn).toFixed(1)+"分":"-"}</td><td>${sx}</td></tr><tr><td>☕ 休息</td><td></td><td>${fm(S.restMin)}</td><td></td><td></td></tr><tr><td>⏳ 待機・その他</td><td></td><td>${fm(idle)}</td><td></td><td></td></tr></table>
+ return`<div class="jw"><h3>📋 勤務日誌（第${S.no}夜勤）</h3><table class="jt"><tr><th>項目</th><th>対応</th><th>対応時間</th><th>平均</th><th>見逃し</th></tr>${rows}<tr class="tt"><td>対応 合計</td><td>${sn}</td><td>${fm(sm)}</td><td>${sn?(sm/sn).toFixed(1)+"分":"-"}</td><td>${sx}</td></tr><tr><td>☕ 休息</td><td></td><td>${fm(S.restMin)}</td><td></td><td></td></tr><tr><td>🏃移動・見守り・その他</td><td></td><td>${fm(idle)}</td><td></td><td></td></tr></table>
 <section class="jbox ac"><h5>🚨 事故報告</h5>${ac}</section><button id="jb">もどる</button></div>`}
 function start(){$("ov").classList.add("hide");init();draw();clearInterval(timer);timer=setInterval(tick,100)}
 const rb=$("rest");const rs=v=>{if(S){S.rest=v;if(v)S.rh=1}rb.textContent=v?"☕️ 休憩中…":"☕️ 休憩（押している間）"};
-rb.onpointerdown=e=>{e.preventDefault();rs(true)};
+rb.onpointerdown=e=>{e.preventDefault();if(S&&S.busy)return;rs(true)};
 ["onpointerup","onpointerleave","onpointercancel"].forEach(k=>rb[k]=()=>rs(false));
 rb.oncontextmenu=e=>e.preventDefault();
 (function(){const c=$("cv"),x=c.getContext("2d"),W=c.width,H=c.height,G=H-6;
