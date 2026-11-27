@@ -6,43 +6,47 @@
 :root{--bg:#f3efe6;--fg:#222;--card:#fff;--bd:#d6cfbf;--acc:#2a5db0;--bad:#d33a3a;--warn:#e69a00;--ok:#2a9d5c;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141b;--fg:#eee;--card:#1e222d;--bd:#363c4c;--acc:#6aa0ff;--bad:#ff6b6b;--warn:#ffb938;--ok:#4cd08a;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#12141b;--fg:#eee;--card:#1e222d;--bd:#363c4c;--acc:#6aa0ff;--bad:#ff6b6b;--warn:#ffb938;--ok:#4cd08a;color-scheme:dark}
-html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
-body{padding:8px;max-width:640px;margin:auto;user-select:none;-webkit-user-select:none}
-#top{display:flex;gap:8px;align-items:center}
-#clock{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;min-width:96px}
-.bars{flex:1;font-size:11px}
-.bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin:2px 0 5px}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;overscroll-behavior:none}
+/* 375x550 の枠に全部収める：縦いっぱいに伸縮するレイアウト */
+body{box-sizing:border-box;padding:4px 6px;max-width:480px;margin:auto;user-select:none;-webkit-user-select:none;touch-action:manipulation;
+ height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));max-height:760px;display:flex;flex-direction:column;overflow:hidden}
+#top{display:flex;gap:6px;align-items:center;flex:none}
+#clock{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;min-width:66px;line-height:1}
+.bars{flex:1;font-size:9px;line-height:1.2;min-width:0}
+.bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin:1px 0 3px}
 .bar i{display:block;height:100%;width:0;background:var(--acc)}
 #st i{background:var(--warn)}
-#inc{font-size:26px;line-height:1;text-align:center;padding:4px 10px;border-radius:10px;background:#2e9d5c;transition:background .4s;display:flex;flex-direction:column;align-items:center;justify-content:center;align-self:stretch;color:#fff}#inc small{display:block;font-size:9px;color:#fff;font-weight:700;margin-top:3px;white-space:nowrap}
-#work{margin:6px 0;padding:6px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);font-size:13px;min-height:34px}
-#work .bar{margin:4px 0 0}
-#grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
-.c{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:4px;text-align:center;font-size:11px;cursor:pointer;min-height:68px;position:relative}
-.c .f{font-size:20px;line-height:1.1}
-.c .e{font-size:12px;font-weight:700;min-height:16px}
+#inc{font-size:18px;line-height:1;text-align:center;padding:2px 8px;border-radius:8px;background:#2e9d5c;transition:background .4s;display:flex;flex-direction:column;align-items:center;justify-content:center;align-self:stretch;color:#fff}#inc small{display:block;font-size:8px;color:#fff;font-weight:700;margin-top:2px;white-space:nowrap}
+#work{flex:none;box-sizing:border-box;height:32px;margin:4px 0;padding:2px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);font-size:12px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;white-space:nowrap}
+#work .bar{margin:3px 0 0;height:4px}
+#grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:3px}
+.c{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:2px 3px;text-align:center;font-size:10px;line-height:1.15;cursor:pointer;min-height:0;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.c .h{font-size:11px;font-weight:700;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.c .f{font-size:14px;line-height:1}
+.c .e{font-size:10px;font-weight:700;height:13px;line-height:13px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .c.on{border-color:var(--warn)}
 .c.hot{border-color:var(--bad);animation:sh .25s infinite}
 .c.doing{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 15%,var(--card))}
-.c .bar{height:5px;margin:2px 0 0}
+.c .bar{height:4px;margin:1px 0 0;width:100%;flex:none}
 .c .bar i{background:var(--warn)}.c.hot .bar i{background:var(--bad)}
 @keyframes sh{50%{transform:translateX(1.5px)}}
 #log{display:none}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:20px;z-index:5}
-.ov div{background:var(--card);border-radius:14px;padding:18px;max-width:360px;font-size:14px;line-height:1.6}
-.ov h2{margin:0 0 8px;font-size:20px}
-button{font:inherit;font-size:16px;padding:10px 20px;border:0;border-radius:8px;background:var(--acc);color:#fff;margin-top:10px;width:100%}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:12px;z-index:5}
+.ov div{background:var(--card);border-radius:12px;padding:14px;max-width:340px;font-size:13px;line-height:1.5}
+.ov h2{margin:0 0 6px;font-size:18px}
+button{font:inherit;font-size:15px;padding:8px 16px;border:0;border-radius:8px;background:var(--acc);color:#fff;margin-top:8px;width:100%}
 .hide{display:none}
 .ov.op{background:#fff}
 .ov.op>div{background:transparent;color:#111;text-align:center;max-width:420px;width:100%;padding:0}
-.ov.op h2{font-size:28px;margin:8px 0 14px}
-.ov.op canvas{width:100%;display:block;image-rendering:pixelated}
+.ov.op h2{font-size:20px;margin:4px 0 6px}
+.ov.op h4{font-size:13px;margin:0 0 8px}
+.ov.op canvas{width:min(100%,240px);display:block;margin:0 auto;image-rendering:pixelated}
 .ov.op button{background:#111;color:#fff;border-radius:0}
-.bd{position:absolute;top:1px;right:3px;font-size:16px}
+.bd{position:absolute;top:0;right:2px;font-size:11px;line-height:1.2}
 .b1{animation:bl 1s infinite}.b2{animation:bl .45s infinite}
 @keyframes bl{50%{opacity:.15}}
-.lv{font-size:10px;font-weight:700;opacity:.75;line-height:1.2}
-#rest{margin-top:8px;background:#8a6a3a;touch-action:none;-webkit-touch-callout:none}
+.lv{font-size:9px;font-weight:700;opacity:.75;line-height:1.2}
+#rest{flex:none;margin-top:4px;height:36px;padding:0;font-size:14px;background:#8a6a3a;touch-action:none;-webkit-touch-callout:none}
 </style></head><body>
 <div id="top"><div id="clock">16:00</div>
 <div class="bars"><div id="stg">夜勤の進行</div><div class="bar" id="pg"><i></i></div><div>疲労・ストレス</div><div class="bar" id="st"><i></i></div></div>
@@ -53,34 +57,51 @@ button{font:inherit;font-size:16px;padding:10px 20px;border:0;border-radius:8px;
 <button id="rest">☕️ 休憩（押している間）</button>
 <div class="ov op" id="ov"><div>
 <canvas id="cv" width="168" height="96"></canvas>
-<h2>🌙 夜勤ワンオペ</h2>
+<h2>グループホーム夜勤ワンオペ物語</h2>
+<h4>〜認知症利用者18名をおひとりで〜</h4>
 認知症の利用者<b>18名</b>を、あなた<b>ひとり</b>で見守る夜。<br>
 16:00〜翌9:00（1秒＝10分）を乗り切ればクリア。
 <button id="go">夜勤開始</button></div></div>
 <script>
 const names=["山田 ハナ","佐藤 正男","鈴木 トメ","高橋 茂","田中 キヨ","伊藤 勇","渡辺 サチ","中村 昭","小林 フミ","加藤 実","吉田 ヨネ","山本 清","松本 ツル","井上 武","木村 スミ","林 孝","斎藤 ミツ","清水 進"];
-const T={meal:{i:"🍚",n:"食事介助",d:.7,dl:9},med:{i:"💊",n:"服薬",d:.5,dl:9},toilet:{i:"🚽",n:"トイレ誘導",d:.9,dl:6},wander:{i:"🚶",n:"徘徊",d:1,dl:6},listen:{i:"👂",n:"傾聴",d:1.6,dl:9},escape:{i:"🏃",n:"脱走!",d:2,dl:4},viol:{i:"😡",n:"暴力・罵倒",d:1.4,dl:6},intrude:{i:"🚪",n:"他人の部屋に侵入",d:1.4,dl:6},victim:{i:"😨",n:"侵入被害対応",d:1.2,dl:6},pica:{i:"😮",n:"異食",d:.8,dl:5},delus:{i:"👛",n:"物取られ妄想",d:3.5,dl:9},delir:{i:"🌀",n:"せん妄",d:1.8,dl:6},nurse:{i:"🔔",n:"ナースコール",d:.5,dl:8},odd:{i:"🤪",n:"奇行",d:1.2,dl:6}};
+/* 対応時間 d は「実秒」(1秒=ゲーム内10分)。参考値のあるものは文献の分数÷10を基準にした。
+   ・トイレ介助 7分8秒(トイレまでの往復込み・排泄時間除く／静岡県工業技術研究所 2024、別報告は6分22秒) → .7
+   ・BPSDへの対応 平均6.8分(夜勤帯1分間タイムスタディ・特養96名／科研費21730454) → BPSD系の基準を約.7とし種類で増減
+   ・脱走は徘徊より1秒長い(従来仕様)。食事・服薬・巡回・ナースコール等は適切な参考値が見つからず従来値 */
+const T={meal:{i:"🍚",n:"食事介助",d:.7,dl:9},med:{i:"💊",n:"服薬",d:.5,dl:9},toilet:{i:"🚽",n:"トイレ誘導",d:.7,dl:6},wander:{i:"🚶",n:"徘徊",d:.6,dl:6},listen:{i:"👂",n:"傾聴",d:.8,dl:9},escape:{i:"🏃",n:"脱走!",d:1.6,dl:4},viol:{i:"😡",n:"暴力・罵倒",d:.7,dl:6},intrude:{i:"🚪",n:"他人の部屋に侵入",d:.7,dl:6},victim:{i:"😨",n:"侵入被害対応",d:.6,dl:6},pica:{i:"😮",n:"異食",d:.8,dl:5},delus:{i:"👛",n:"物取られ妄想",d:1.2,dl:9},delir:{i:"🌀",n:"せん妄",d:.9,dl:6},nurse:{i:"🔔",n:"ナースコール",d:.5,dl:8},odd:{i:"🤪",n:"奇行",d:.6,dl:6},patrol:{i:"👀",n:"巡回",d:1,dl:10},fall:{i:"🧎",n:"転倒リスク",d:.8,dl:4},sleepless:{i:"🌙",n:"不眠・覚醒",d:1.2,dl:8},pain:{i:"😣",n:"痛みの訴え",d:1,dl:8}};
 const LVN=["Ⅰ","Ⅱa","Ⅱb","Ⅲa","Ⅲb","Ⅳ","M"],K=["toilet","wander","listen","escape","viol","intrude","pica","delus","delir"],
 LD=[[.4,.2,1.6,0,.1,0,0,.3,0],[.6,1,1.4,.3,.4,0,0,.8,0],[.9,.9,1.2,.5,.6,.2,0,1.2,0],[1.4,1.2,.9,.9,1,1,1.4,.8,0],[1,.5,.7,.3,.5,.5,.5,.5,0],[1.6,1.4,.8,1.2,1.4,1.2,1.4,.8,.3],[1,.8,.6,1,1.5,.8,.3,1.8,1.6]],
 LN=[[.4,.2,1.4,0,.1,0,0,.3,0],[.7,1,1.2,.3,.4,0,0,.8,0],[1,1,1.1,.5,.6,.1,0,1.2,0],[1.2,.7,.8,.5,.8,.5,.8,.5,0],[1.4,1.8,1,1.5,1.4,1.8,.8,.8,.3],[1.6,1.4,.8,1.2,1.4,1.2,1.2,.8,.5],[1,1,.6,1.2,1.6,1,.3,1.8,1.8]];
+/* 寝たきり度(裏設定): 0=J1 1=J2 2=A1 3=A2 4=B1 5=B2 6=C1 7=C2
+   ACT=活動イベント全般の発生倍率(J=1が従来値) / MOB=徘徊・脱走・侵入・立ち上がり等「動ける人のみ」のイベント倍率
+   SD=夕暮れ症候群の認知症度別係数(中等度で最大) / FL=転倒 / SL=睡眠障害の認知症度別係数 */
+const ACT=[1,1,.6,.35,.12,.06,.02,.005],MOB=[1,1,.4,.15,.02,0,0,0],SD=[1,1.1,1.25,1.5,1.5,1.3,.9],FL=[.6,.8,1,1.2,1.2,1.3,1],SL=[.4,.6,.9,1.2,1.4,1.5,1.2];
+/* 夜勤帯の時間帯別の傾向(科研費21730454 夜勤1分間タイムスタディ)：
+   排泄は22時が最多で以後1・3・5時と約2時間おきに山、巡視・観察は2時に最多(58%)、4時台はケア発生が最少、5〜6時は多種のケアが集中。
+   キーは時刻(h)。TH=トイレ誘導の重み / PH=巡回の発生倍率 / HF=全体の発生率倍率 */
+const TH={22:1.4,23:1.3,0:.8,1:1.3,2:.6,3:1.3,4:.6,5:1.5,6:1.3},PH={22:1.25,0:1.4,2:2.5,5:1.6},HF={4:.8,5:1.15},hrOf=m=>(16+Math.floor(m/60))%24;
 const END=1020,$=id=>document.getElementById(id);
 let S,timer,carry={stage:1,st:0,total:0};
 function init(){if(!carry.ratio)carry.ratio=.3+Math.random()*.1;if(!carry.lv)carry.lv=Array.from({length:18},()=>Math.floor(Math.random()*7));
- S={m:0,ev:Array(18).fill(null),busy:null,st:carry.st,rest:false,nr:.02+Math.random()*.17,lv:carry.lv,mod:Array(18).fill(0),inc:carry.inc||0,sched:[],log:[],done:0,miss:0,over:false};
+ S={m:0,ev:Array(18).fill(null),busy:null,st:carry.st,rest:false,nr:.02+Math.random()*.17,lv:carry.lv,mod:Array(18).fill(0),bd:Array.from({length:18},()=>Math.floor(Math.random()*8)),pm:Array(18).fill(0),inc:carry.inc||0,sched:[],log:[],done:0,miss:0,over:false};
  for(let k=0;k<18;k++){[{t:60+k*6.5,i:k,type:"meal"},{t:240+k*3.5,i:k,type:"med"},{t:840+k*5,i:k,type:"meal"}].forEach(s=>{if(Math.random()<carry.ratio*(.6+.133*S.lv[k]))S.sched.push(s)})}
- $("grid").innerHTML=names.map((n,i)=>`<div class="c" data-i="${i}"><div class="f">${i%2?"👴":"👵"}</div><span class="bd"></span><div>${n}</div><div class="lv">認知症度${LVN[S.lv[i]]}</div><div class="e"></div><div class="bar"><i></i></div></div>`).join("");
+ $("grid").innerHTML=names.map((n,i)=>`<div class="c" data-i="${i}"><span class="bd"></span><div class="h"><span class="f">${i%2?"👴":"👵"}</span>${n}</div><div class="lv">認知症度${LVN[S.lv[i]]}</div><div class="e"></div><div class="bar"><i></i></div></div>`).join("");
  document.querySelectorAll(".c").forEach(c=>c.onclick=()=>tap(+c.dataset.i));
  say(`第${carry.stage}夜勤 開始。食事・服薬の対象は約${Math.round(carry.ratio*100)}%の方。`);
 }
 function say(s){S.log.unshift(s);S.log=S.log.slice(0,4);$("log").innerHTML=S.log.map(x=>"・"+x).join("<br>")}
 function give(i,type){if(S.ev[i])return false;S.ev[i]={type,left:T[type].dl};return true}
-function pick(ri){const m=S.m,night=m>=360&&m<840,L=S.lv[ri];
+function pick(ri){const m=S.m,night=m>=360&&m<840,L=S.lv[ri];const hr=hrOf(m);
  const w=night?{toilet:28,wander:26,listen:16,escape:8,viol:12}:{toilet:20,wander:12,listen:25,escape:5,viol:12};
- w.intrude=w.pica=w.delus=w.delir=8;w.nurse=10;w.odd=3;K.forEach((q,j)=>w[q]*=(night?LN:LD)[L][j]);let r=Math.random()*Object.values(w).reduce((a,b)=>a+b),k;for(k in w){if((r-=w[k])<0)break}return k}
-function pickRes(){const w=S.lv.map((v,i)=>(1+(v-3)*.0417)*[1,.2,3][S.mod[i]]),s=w.reduce((a,b)=>a+b);let r=Math.random()*s;for(let i=0;i<18;i++){if((r-=w[i])<0)return i}return 17}
+ w.intrude=w.pica=w.delus=w.delir=8;w.nurse=10;w.odd=3;K.forEach((q,j)=>w[q]*=(night?LN:LD)[L][j]);w.toilet*=TH[hr]||1;
+ w.fall=(night?5:12)*FL[L];w.sleepless=(night?16:1.5)*SL[L];w.pain=8;
+ if(m<240)["viol","wander","escape","delus","listen","intrude"].forEach(q=>w[q]*=SD[L]);
+ ["wander","escape","intrude","fall"].forEach(q=>w[q]*=MOB[S.bd[ri]]);
+ let r=Math.random()*Object.values(w).reduce((a,b)=>a+b),k;for(k in w){if((r-=w[k])<0)break}return k}
+function pickRes(){const b=S.lv.map(v=>1+(v-3)*.0417),B=b.reduce((a,c)=>a+c);let r=Math.random()*B;for(let i=0;i<18;i++){if((r-=b[i]*ACT[S.bd[i]]*[1,.2,3][S.mod[i]])<0)return i}return -1}
 function tap(i){if(S.over||!S.ev[i]||S.ev[i].doing)return;
  if(S.busy){say("いま別の方に対応中です！");return}
- S.ev[i].doing=true;const ty=S.ev[i].type,d=Math.max(.2,T[ty].d*(["meal","med","toilet"].includes(ty)?1+.1*Math.max(0,S.lv[i]-2):1)+Math.random()*1.75-.5);S.busy={i,left:d,tot:d}}
+ S.ev[i].doing=true;const ty=S.ev[i].type,d=(ty==="patrol"?.25:1)*Math.max(.2,T[ty].d*(["meal","med","toilet"].includes(ty)?1+.1*Math.max(0,S.lv[i]-2):1)+Math.random()*1.75-.5);S.busy={i,left:d,tot:d}}
 function fail(i){const e=S.ev[i],t=e.type;S.ev[i]=null;S.miss++;
  const nm=names[i];
  if(t==="escape"){S.inc+=2;say(`🚨 ${nm}様が施設外へ脱走…重大事故`)}
@@ -89,21 +110,28 @@ function fail(i){const e=S.ev[i],t=e.type;S.ev[i]=null;S.miss++;
  else if(t==="toilet"){S.st+=8;say(`${nm}様、トイレに間に合わず失禁…更衣と清掃`)}
  else if(t==="viol"){S.st+=15;say(`${nm}様の暴力・罵倒で心が削られる…`)}
  else if(t==="listen"){S.st+=8;say(`${nm}様が不安で泣き出してしまった`)}else if(t==="intrude"){S.inc++;say(`🚪 ${nm}様が他の方の部屋に侵入、トラブルに`)}else if(t==="victim"){S.st+=10;say(`😨 ${nm}様が部屋に入られて怯えている…`)}else if(t==="pica"){S.inc++;S.st+=3;say(`⚠ ${nm}様が異物を誤飲、緊急受診`)}else if(t==="delus"){S.st+=10;say(`${nm}様「財布を盗ったでしょう」責められ続けた…`)}else if(t==="delir"){S.inc++;S.st+=6;say(`⚠ ${nm}様のせん妄が悪化、夜間救急対応`)}else if(t==="odd"){S.st+=6;say(`🤪 ${nm}様の奇行で周囲が騒然…`)}else if(t==="nurse"){S.st+=3;say(`🔔 ${nm}様のナースコールが鳴り続ける…`)}
+ else if(t==="patrol"){S.pm[i]++;S.st+=3;if(S.pm[i]>=2){S.pm[i]=0;S.inc++;say(`⚠ ${nm}様の巡回が滞り、褥瘡・状態変化の発見が遅れた`)}else say(`${nm}様の巡回ができなかった…`)}
+ else if(t==="fall"){S.inc++;S.st+=5;say(`⚠ ${nm}様が立ち上がろうとして転倒`)}
+ else if(t==="sleepless"){S.st+=4;say(`${nm}様が眠れず落ち着かない…`);if(Math.random()<.3*MOB[S.bd[i]])give(i,"wander")}
+ else if(t==="pain"){S.st+=4;say(`${nm}様の痛みに気づけず不穏になった`);if(Math.random()<.4)give(i,"viol")}
  else{S.st+=5;say(`${nm}様の食事が進まず、摂取量が低下`)}}
 function okMsg(i,t){const nm=names[i];S.done++;if(t==="nurse"&&Math.random()<.5)S.st+=1;
- if(t==="med"&&!S.mod[i]){const r=Math.random();if(r<.18){S.mod[i]=1;say(`💤 ${nm}様、薬が効いて落ち着いた`)}else if(r<.25){S.mod[i]=2;say(`🌀 ${nm}様が服薬後にせん妄状態に…`)}}
+ if(t==="med"&&!S.mod[i]){const r=Math.random();if(r<.18){S.mod[i]=1;say(`✨ ${nm}様、薬が効いて落ち着いた`)}else if(r<.25){S.mod[i]=2;say(`🌀 ${nm}様が服薬後にせん妄状態に…`)}}
  if(t==="listen"){S.st=Math.max(0,S.st-3)}
  else if(t==="viol")say(`${nm}様が落ち着いてくれた`);
  else if(t==="escape")say(`${nm}様を玄関で保護、危なかった…`);else if(t==="delus")say(`${nm}様と一緒に探して見つかった`);
+ else if(t==="patrol"){S.pm[i]=0;S.st=Math.max(0,S.st-.3);if(Math.random()<.05)say(`👀 ${nm}様の体位を整え、早期に発赤に気づけた`)}
+ else if(t==="fall"){S.st=Math.max(0,S.st-.3);if(Math.random()<.4)say(`${nm}様の立ち上がりを支え、転倒を防いだ`)}
  else S.st=Math.max(0,S.st-.3);if(t==="viol"&&Math.random()<.5){S.st+=20;say(`💔 ${nm}様の暴言・暴力で大きな精神ダメージ…`)}}
 function tick(){if(S.over)return;
  S.m+=1;const m=S.m,dt=.1;
  S.sched.forEach(s=>{if(!s.d&&s.t<=m&&give(s.i,s.type))s.d=1});
- const p=(m>=360&&m<840?.04:.022)*(1+.4*(carry.stage-1))*(m>=420&&m<600?1-S.nr:1);
- if(Math.random()<p){const ri=pickRes(),ty=pick(ri);if(ty==="odd"){if(give(ri,"odd")){const c=ri%3;[ri-3,ri+3,c>0?ri-1:-1,c<2?ri+1:-1].filter(j=>j>=0&&j<18).forEach(j=>give(j,"nurse"))}}else if(ty!=="intrude")give(ri,ty);else if(!S.ev[ri]){const fr=[...Array(18).keys()].filter(j=>j!==ri&&!S.ev[j]);if(fr.length){give(ri,"intrude");give(fr[Math.floor(Math.random()*fr.length)],"victim")}}}
+ const hr=hrOf(m),p=(m>=360&&m<840?.04:.022*(m<240?1.15:1))*(1+.4*(carry.stage-1))*(m>=420&&m<600?1-S.nr:1)*(HF[hr]||1);
+ if(Math.random()<p){const ri=pickRes(),ty=ri<0?null:pick(ri);if(!ty){}else if(ty==="odd"){if(give(ri,"odd")){const c=ri%3;[ri-3,ri+3,c>0?ri-1:-1,c<2?ri+1:-1].filter(j=>j>=0&&j<18).forEach(j=>{if(Math.random()<ACT[S.bd[j]])give(j,"nurse")})}}else if(ty!=="intrude")give(ri,ty);else if(!S.ev[ri]){const fr=[...Array(18).keys()].filter(j=>j!==ri&&!S.ev[j]);if(fr.length){give(ri,"intrude");give(fr[Math.floor(Math.random()*fr.length)],"victim")}}}
+ {const pp=(m>=360&&m<840?.0034:.0026)*(PH[hr]||1)*.2;/* 巡回の発生頻度：従来比80%減 */for(let i=0;i<18;i++)if(S.bd[i]>=4&&Math.random()<pp)give(i,"patrol")}
  let act=0;
  for(let i=0;i<18;i++){const e=S.ev[i];if(!e)continue;act++;if(!e.doing){e.left-=dt;if(e.left<=0)fail(i)}}
- S.st+=.006*act;if(S.rest&&!S.busy)S.st=Math.max(0,S.st-.02);if(m%60===0){if(!S.rh)S.st+=1;S.rh=0}
+ S.st+=.006*act;if(act>=4)S.st+=.1;/* サイン4つ以上の同時発生：ストレス+1/秒(1tick=0.1秒) */if(S.rest&&!S.busy)S.st=Math.max(0,S.st-.02);if(m%60===0){if(!S.rh)S.st+=1;S.rh=0}
  if(S.busy){S.busy.left-=dt;if(S.busy.left<=0){const i=S.busy.i,t=S.ev[i].type;S.ev[i]=null;S.busy=null;okMsg(i,t)}}
  if(S.inc>=7)return end("lose","事故が重なり、施設は大きな問題に…");
  if(S.st>=100)return end("lose","心身が限界。夜勤者が倒れてしまった…");
@@ -113,13 +141,13 @@ function draw(){const m=S.m,h=(16+Math.floor(m/60))%24,mm=String(m%60).padStart(
  $("clock").textContent=String(h).padStart(2,"0")+":"+mm;
  $("pg").firstChild.style.width=m/END*100+"%";$("stg").textContent="第"+carry.stage+"夜勤の進行";
  $("st").firstChild.style.width=Math.min(100,S.st)+"%";
- const BC=["#2e9d5c","#2f9fa0","#2f6fd0","#7fa070","#d9c12e","#e68a2e","#d33a3a"];$("inc").style.background=BC[Math.min(6,S.inc)];$("inc").innerHTML="🏢<small>事故状況</small>";
+ const BC=["#2e9d5c","#2f9fa0","#2f6fd0","#7fa070","#d9c12e","#e68a2e","#d33a3a"];$("inc").style.background=BC[Math.min(6,S.inc)];$("inc").innerHTML="🏢<small>運営状況</small>";
  const w=$("work");
  if(S.busy){const e=S.ev[S.busy.i];w.innerHTML=`${T[e.type].i} ${T[e.type].n.replace("!","")}対応中…<div class="bar"><i style="width:${(1-S.busy.left/S.busy.tot)*100}%"></i></div>`}
  else w.textContent=S.rest?"☕️ 休憩中…（回復はごくわずか）":"待機中（サインの出た利用者をタップ）";
  document.querySelectorAll(".c").forEach((c,i)=>{const e=S.ev[i],r=e?e.left/T[e.type].dl:0;
   c.className="c"+(e?(e.doing?" doing":(r<.4?" hot":" on")):"");
-  c.querySelector(".e").textContent=e?T[e.type].i+T[e.type].n:"";const bd=c.querySelector(".bd");bd.textContent=["","💤","🌀"][S.mod[i]];bd.className="bd b"+S.mod[i];
+  c.querySelector(".e").textContent=e?T[e.type].i+T[e.type].n:"";const bd=c.querySelector(".bd");bd.textContent=["","✨","🌀"][S.mod[i]];bd.className="bd b"+S.mod[i];
   c.querySelector(".bar i").style.width=e&&!e.doing?r*100+"%":"0"})}
 function end(r,msg){S.over=true;clearInterval(timer);draw();
  let t,b;const pay=r==="win"?20000:Math.floor(20000/17*(S.m/60));carry.total+=pay;const tot=`<br>累計報酬：<b>${carry.total.toLocaleString()}円</b>`;const ps=`<br>💴 報酬：<b>${pay.toLocaleString()}円</b>`;
