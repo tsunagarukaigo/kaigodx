@@ -57,29 +57,34 @@ button{font:inherit;font-size:15px;padding:8px 16px;border:0;border-radius:8px;b
 @keyframes bl{50%{opacity:.15}}
 .lv{font-size:9px;font-weight:700;opacity:.75;line-height:1.2}
 #rest{flex:none;margin-top:4px;height:36px;padding:0;font-size:14px;background:#8a6a3a;touch-action:none;-webkit-touch-callout:none}
+#lg{position:absolute;top:calc(8px + env(safe-area-inset-top,0px));right:10px;display:flex;z-index:6}
+.ov.op .lgb{width:auto;margin:0;padding:3px 10px;font-size:13px;font-weight:700;line-height:1.3;border:2px solid #111;border-radius:0;background:#fff;color:#111;cursor:pointer}
+.ov.op .lgb+.lgb{margin-left:-2px}
+.ov.op .lgb.on{background:#111;color:#fff}
 </style></head><body>
 <div id="top"><div id="clock">16:00</div>
-<div class="bars"><div id="stg">夜勤の進行</div><div class="bar" id="pg"><i></i></div><div>疲労・ストレス</div><div class="bar" id="st"><i></i></div></div>
+<div class="bars"><div id="stg">夜勤の進行</div><div class="bar" id="pg"><i></i></div><div id="stl">疲労・ストレス</div><div class="bar" id="st"><i></i></div></div>
 <div id="inc"></div></div>
 <div id="work">待機中</div>
 <div id="gw"><div id="grid"></div></div>
 <div id="log"></div>
 <div id="bub" class="hide">おーい</div><button id="rest">☕️ 休憩（押している間）</button>
-<div class="ov op" id="ov"><div>
+<div class="ov op" id="ov"><span id="lg"><button class="lgb on" id="lgJ">JP</button><button class="lgb" id="lgE">EN</button></span><div>
 <canvas id="cv" width="168" height="96"></canvas>
-<h2>グループホーム夜勤ワンオペ物語</h2>
-<h4>〜認知症利用者<span id="nn">18</span>名をおひとりで〜</h4><h5 id="rtl" class="hide">リアルタイムスタディモード</h5><h5 id="twf" class="hide">2階建てモード</h5>
-認知症の利用者<b id="n18">18名</b>を、あなた<b>ひとり</b>で見守る夜。<br>
-16:00〜翌9:00を乗り切ればクリア。
+<h2 id="ttl">グループホーム夜勤ワンオペ物語</h2>
+<h4 id="stt">〜認知症利用者<span id="nn">18</span>名をおひとりで〜</h4><h5 id="rtl" class="hide">リアルタイムスタディモード</h5><h5 id="twf" class="hide">2階建てモード</h5>
+<span id="i1">認知症の利用者</span><b id="n18">18名</b><span id="i2">を、あなた</span><b id="i3">ひとり</b><span id="i4">で見守る夜。<br>16:00〜翌9:00を乗り切ればクリア。</span>
 <button id="go">夜勤開始</button>
-<h6>登場人物はフィクションですが、論文を参考にゲーム用にパロディしてます。</h6></div></div>
+<h6 id="ft">登場人物はフィクションですが、論文を参考にゲーム用にパロディしてます。</h6></div></div>
 <script>
-const names=["山田 ハナ","佐藤 正男","鈴木 トメ","高橋 茂","田中 キヨ","伊藤 勇","渡辺 サチ","中村 昭","小林 フミ","加藤 実","吉田 ヨネ","山本 清","松本 ツル","井上 武","木村 スミ","林 孝","斎藤 ミツ","清水 進"];
+let LG="ja";const i18=(a,b)=>LG==="en"?b:a;
+const NEN=["Mary","James","Dorothy","Robert","Helen","Harold","Betty","Walter","Margaret","Frank","Ruth","George","Patricia","Charles","Barbara","Eugene","Shirley","Arthur"];let names;const NJA=["山田 ハナ","佐藤 正男","鈴木 トメ","高橋 茂","田中 キヨ","伊藤 勇","渡辺 サチ","中村 昭","小林 フミ","加藤 実","吉田 ヨネ","山本 清","松本 ツル","井上 武","木村 スミ","林 孝","斎藤 ミツ","清水 進"];names=NJA;
 /* 対応時間 d は「実秒」(1秒=ゲーム内10分)。参考値のあるものは文献の分数÷10を基準にした。
    ・トイレ介助 7分8秒(トイレまでの往復込み・排泄時間除く／静岡県工業技術研究所 2024、別報告は6分22秒) → .7
    ・BPSDへの対応 平均6.8分(夜勤帯1分間タイムスタディ・特養96名／科研費21730454) → BPSD系の基準を約.7とし種類で増減
    ・脱走は徘徊より1秒長い(従来仕様)。食事・服薬・巡回・ナースコール等は適切な参考値が見つからず従来値 */
 const T={meal:{i:"🍚",n:"食事介助",d:.7,dl:9},med:{i:"💊",n:"服薬",d:.5,dl:9},toilet:{i:"🚽",n:"トイレ誘導",d:.7,dl:6},wander:{i:"🚶",n:"徘徊",d:.6,dl:6},listen:{i:"👂",n:"傾聴",d:.8,dl:9},escape:{i:"🏃",n:"脱走!",d:1.6,dl:4},viol:{i:"😡",n:"暴力・罵倒",d:.7,dl:6},intrude:{i:"🚪",n:"他人の部屋に侵入",d:.7,dl:6},victim:{i:"😨",n:"侵入被害対応",d:.6,dl:6},pica:{i:"😮",n:"異食",d:.8,dl:5},delus:{i:"👛",n:"物取られ妄想",d:1.2,dl:9},delir:{i:"🌀",n:"せん妄",d:.9,dl:6},nurse:{i:"🔔",n:"ナースコール",d:.5,dl:8},odd:{i:"🤪",n:"奇行",d:.6,dl:6},patrol:{i:"👀",n:"巡回",d:1,dl:10},fall:{i:"🧎",n:"転倒リスク",d:.8,dl:3.3},meshi:{i:"🍽️",n:"メシはまだか",d:.7,dl:8},sleepless:{i:"🌙",n:"不眠・覚醒",d:1.2,dl:8},pain:{i:"😣",n:"痛みの訴え",d:1,dl:8},gohome:{i:"🏠",n:"帰宅願望",d:.8,dl:7}};
+const TN={meal:"Meal Help",med:"Meds",toilet:"Toilet Help",wander:"Wandering",listen:"Listening",escape:"Escape!",viol:"Aggression",intrude:"Entering Room",victim:"Room Entered",pica:"Pica",delus:"Theft Delusion",delir:"Delirium",nurse:"Call Bell",odd:"Odd Behavior",patrol:"Rounds",fall:"Fall Risk",meshi:"Where's Dinner?",sleepless:"Awake",pain:"In Pain",gohome:"Wants Home"};const tn=k=>LG==="en"?TN[k]:T[k]["n"];const LVE=["I","IIa","IIb","IIIa","IIIb","IV","M"];
 const LVN=["Ⅰ","Ⅱa","Ⅱb","Ⅲa","Ⅲb","Ⅳ","M"],K=["toilet","wander","listen","escape","viol","intrude","pica","delus","delir"],
 LD=[[.4,.2,1.6,0,.1,0,0,.3,0],[.6,1,1.4,.3,.4,0,0,.8,0],[.9,.9,1.2,.5,.6,.2,0,1.2,0],[1.4,1.2,.9,.9,1,1,1.4,.8,0],[1,.5,.7,.3,.5,.5,.5,.5,0],[1.6,1.4,.8,1.2,1.4,1.2,1.4,.8,.3],[1,.8,.6,1,1.5,.8,.3,1.8,1.6]],
 LN=[[.4,.2,1.4,0,.1,0,0,.3,0],[.7,1,1.2,.3,.4,0,0,.8,0],[1,1,1.1,.5,.6,.1,0,1.2,0],[1.2,.7,.8,.5,.8,.5,.8,.5,0],[1.4,1.8,1,1.5,1.4,1.8,.8,.8,.3],[1.6,1.4,.8,1.2,1.4,1.2,1.2,.8,.5],[1,1,.6,1.2,1.6,1,.3,1.8,1.8]];
@@ -100,7 +105,7 @@ const ghW=m=>m<60?110:m<240?12:m<480?2:0,GHL=[.1,.8,1.3,1.5,1.2,.5,.1];
 const ANG={meshi:.6,viol:1,delus:.8,pain:.8,listen:.4,toilet:.5,nurse:.5,meal:.4,intrude:.5,gohome:.3,wander:.2},
 UNR={meshi:.5,wander:1,gohome:1,escape:1,sleepless:1,delir:.8,listen:.8,odd:.5,pain:.6,toilet:.4,delus:.4},
 bump=(i,t,x)=>{const o=S.mood[i];o.a=Math.min(100,o.a+x*(ANG[t]??.3));o.u=Math.min(100,o.u+x*(UNR[t]??.3))},
-moodOf=i=>{const o=S.mood[i];return o.a<25&&o.u<25?"標準":o.a>=o.u?"怒り":"不穏"};
+moodOf=i=>{const o=S.mood[i];return o.a<25&&o.u<25?i18("標準","Normal"):o.a>=o.u?i18("怒り","Angry"):i18("不穏","Restless")};
 /* 傾聴・物取られ妄想・侵入/侵入被害は、対応できても心がすり減る：疲労ストレスが基準値×(0.5〜1.5倍)のランダムで、対応完了後に増える */
 const UP={listen:1.25,delus:1.5,victim:1.25,intrude:1};
 /* 「メシはまだか」：22:00〜3:00(m=360〜660)中心。認知症度別の係数(軽度では稀、Ⅲ〜Ⅳで多い) */
@@ -114,17 +119,17 @@ const showFloor=()=>{const g=document.getElementById("grid");g.style.width=TF?"2
  document.querySelectorAll(".c").forEach((c,i)=>{if(TF){const j=i%9;c.style.gridColumn=fl(i)*3+j%3+1;c.style.gridRow=Math.floor(j/3)+1}else{c.style.gridColumn="";c.style.gridRow=""}})};
 const goFloor=nf=>{if(!TF||nf===F)return;F=nf;showFloor();draw()};
 const GHV=[1.9,2.4,1.1,2.2,3.2,3.7,2.7,5.2,7,10.2,11,13.5,13.4,13.8,17.6,15.1,13,9.3,9.1,7.7,5.4,4.6,4.5,2.9],
-sn=n=>n===1?"初出勤":"夜勤"+n+"日目";
+sn=n=>n===1?i18("初出勤","First Night"):i18("夜勤"+n+"日目","Night "+n);
 const END=1020,$=id=>document.getElementById(id);
 let S,timer,carry={stage:1,st:0,total:0};
 function init(){if(!carry.ratio)carry.ratio=.3+Math.random()*.1;if(!carry.mood)carry.mood=Array.from({length:NN},()=>({a:0,u:0}));if(!carry.lv)carry.lv=Array.from({length:NN},()=>Math.floor(Math.random()*7));
  S={no:carry.stage,dbl:Array(NN).fill(1),m:0,ev:Array(NN).fill(null),busy:null,st:carry.st,rest:false,nr:.02+Math.random()*.17,lv:carry.lv,mood:carry.mood,mod:Array(NN).fill(0),bd:Array.from({length:NN},()=>Math.floor(Math.random()*8)),pm:Array(NN).fill(0),inc:carry.inc||0,sched:[],rec:{},restMin:0,acclog:[],log:[],done:0,miss:0,over:false};
  for(let k=0;k<NN;k++){[{t:60+k*6.5,i:k,type:"meal"},{t:240+k*3.5,i:k,type:"med"},{t:840+k*5,i:k,type:"meal"}].forEach(s=>{if(Math.random()<carry.ratio*(.6+.133*S.lv[k]))S.sched.push(s)})}
- F=0;$("grid").style.gridTemplateRows="repeat("+(TF?3:NN/3)+",minmax(0,1fr))";$("grid").innerHTML=names.slice(0,NN).map((n,i)=>`<div class="c" data-i="${i}"><span class="bd"></span><div class="h"><span class="f">${i%2?"👴":"👵"}</span>${n}</div><div class="lv">認知症度${LVN[S.lv[i]]}</div><div class="e"></div><div class="bar"><i></i></div></div>`).join("");
+ F=0;$("grid").style.gridTemplateRows="repeat("+(TF?3:NN/3)+",minmax(0,1fr))";$("grid").innerHTML=names.slice(0,NN).map((n,i)=>`<div class="c" data-i="${i}"><span class="bd"></span><div class="h"><span class="f">${i%2?"👴":"👵"}</span>${n}</div><div class="lv">${LG==="en"?"Dementia Lv. "+LVE[S.lv[i]]:"認知症度"+LVN[S.lv[i]]}</div><div class="e"></div><div class="bar"><i></i></div></div>`).join("");
  document.querySelectorAll(".c").forEach(c=>c.onclick=()=>tap(+c.dataset.i));showFloor();
- say(`${sn(carry.stage)} 開始。食事・服薬の対象は約${Math.round(carry.ratio*100)}%の方。`);
+ say(i18(`${sn(carry.stage)} 開始。食事・服薬の対象は約${Math.round(carry.ratio*100)}%の方。`,`${sn(carry.stage)} begins. About ${Math.round(carry.ratio*100)}% of residents need meal/medication help.`));
 }
-function say(s){S.log.unshift(s);S.log=S.log.slice(0,4);$("log").innerHTML=S.log.map(x=>"・"+x).join("<br>")}
+function say(s){S.log.unshift(s);S.log=S.log.slice(0,4);$("log").innerHTML=S.log.map(x=>"• "+x).join("<br>")}
 function give(i,type){if(S.ev[i])return false;S.ev[i]={type,left:T[type].dl};if(type==="sleepless"){const o=S.mood[i];o.u=Math.min(100,o.u+20);S.dbl[i]=2}return true}
 function pick(ri){const m=S.m,night=m>=360&&m<840,L=S.lv[ri];const hr=hrOf(m);
  const w=night?{toilet:28,wander:26,listen:16,escape:8,viol:12}:{toilet:20,wander:12,listen:25,escape:5,viol:12};
@@ -138,36 +143,36 @@ function pick(ri){const m=S.m,night=m>=360&&m<840,L=S.lv[ri];const hr=hrOf(m);
  let r=Math.random()*Object.values(w).reduce((a,b)=>a+b),k;for(k in w){if((r-=w[k])<0)break}return k}
 function pickRes(){const b=S.lv.map(v=>1+(v-3)*.0417),B=b.reduce((a,c)=>a+c);let r=Math.random()*B;for(let i=0;i<NN;i++){if((r-=b[i]*ACT[S.bd[i]]*[1,.2,6][S.mod[i]]*S.dbl[i]*(1+(S.mood[i].a+S.mood[i].u)/60))<0)return i}return -1}
 function tap(i){if(Date.now()-lastSw<350)return;if(S.over||!S.ev[i]||S.ev[i].doing)return;
- if(S.busy){say("いま別の方に対応中です！");return}
+ if(S.busy){say(i18("いま別の方に対応中です！","You're already helping someone else!"));return}
  rs(false);S.ev[i].doing=true;const ty=S.ev[i].type,d=(ty==="patrol"?.25:1)*Math.max(.2,T[ty].d*(["meal","med","toilet"].includes(ty)?1+.1*Math.max(0,S.lv[i]-2):1)+Math.random()*1.75-.5);S.busy={i,left:d,tot:d}}
 /* 事故報告：事故(S.inc)が増えた見逃しを「いつ・誰が・どんな事故か」で記録 */
-const ACCT={escape:"施設外へ脱走（重大事故）",wander:"徘徊中に転倒",med:"服薬漏れ",intrude:"他の利用者の居室に侵入しトラブル",pica:"異物を誤飲し緊急受診",delir:"せん妄が悪化し夜間救急対応",patrol:"巡回が滞り、褥瘡・状態変化の発見が遅れた",fall:"立ち上がろうとして転倒"};
+const ACCT={escape:"施設外へ脱走（重大事故）",wander:"徘徊中に転倒",med:"服薬漏れ",intrude:"他の利用者の居室に侵入しトラブル",pica:"異物を誤飲し緊急受診",delir:"せん妄が悪化し夜間救急対応",patrol:"巡回が滞り、褥瘡・状態変化の発見が遅れた",fall:"立ち上がろうとして転倒"};const ACCE={escape:"Left the facility (major incident)",wander:"Fell while wandering",med:"Missed medication",intrude:"Entered another resident's room, causing a conflict",pica:"Swallowed a foreign object; emergency hospital visit",delir:"Delirium worsened; night emergency response",patrol:"Rounds lapsed; pressure sore / change in condition found late",fall:"Fell while trying to stand up"};
 const clk=m=>String((16+Math.floor(m/60))%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
-function fail(i){const t=S.ev[i].type,i0=S.inc;const r=S.rec[t]||(S.rec[t]={n:0,min:0,miss:0});r.miss++;fail0(i);if(S.inc>i0)S.acclog.push({m:S.m,who:names[i],what:ACCT[t]||T[t].n})}
+function fail(i){const t=S.ev[i].type,i0=S.inc;const r=S.rec[t]||(S.rec[t]={n:0,min:0,miss:0});r.miss++;fail0(i);if(S.inc>i0)S.acclog.push({m:S.m,who:names[i],what:(LG==="en"?ACCE:ACCT)[t]||tn(t)})}
 function fail0(i){const e=S.ev[i],t=e.type;S.ev[i]=null;S.miss++;bump(i,t,6);
  const nm=names[i];
- if(t==="gohome"){S.st+=6;say(`🏠 ${nm}様が「家に帰る」と玄関へ向かってしまう…`);if(Math.random()<.4*MOB[S.bd[i]])give(i,"wander")}
- else if(t==="escape"){S.inc+=2;say(`🚨 ${nm}様が施設外へ脱走…重大事故`)}
- else if(t==="wander"){S.inc++;say(`⚠ ${nm}様が徘徊中に転倒`)}
- else if(t==="med"){S.inc++;say(`⚠ ${nm}様の服薬漏れ`);S.st+=4}
- else if(t==="toilet"){S.st+=8;say(`${nm}様、トイレに間に合わず失禁…更衣と清掃`)}
- else if(t==="viol"){S.st+=15;say(`${nm}様の暴力・罵倒で心が削られる…`)}
- else if(t==="listen"){S.st+=8;say(`${nm}様が不安で泣き出してしまった`)}else if(t==="intrude"){S.inc++;say(`🚪 ${nm}様が他の方の部屋に侵入、トラブルに`)}else if(t==="victim"){S.st+=10;say(`😨 ${nm}様が部屋に入られて怯えている…`)}else if(t==="pica"){S.inc++;S.st+=3;say(`⚠ ${nm}様が異物を誤飲、緊急受診`)}else if(t==="delus"){S.st+=10;say(`${nm}様「財布を盗ったでしょう」責められ続けた…`)}else if(t==="delir"){S.inc++;S.st+=6;say(`⚠ ${nm}様のせん妄が悪化、夜間救急対応`)}else if(t==="odd"){S.st+=6;say(`🤪 ${nm}様の奇行で周囲が騒然…`)}else if(t==="nurse"){S.st+=3;say(`🔔 ${nm}様のナースコールが鳴り続ける…`)}
- else if(t==="meshi"){S.st+=7;say(`🍽️ ${nm}様「メシはまだか！」と訴え続けて収まらない…`)}
- else if(t==="patrol"){S.pm[i]++;S.st+=3;if(S.pm[i]>=2){S.pm[i]=0;S.inc++;say(`⚠ ${nm}様の巡回が滞り、褥瘡・状態変化の発見が遅れた`)}else say(`${nm}様の巡回ができなかった…`)}
- else if(t==="fall"){S.inc++;S.st+=5;say(`⚠ ${nm}様が立ち上がろうとして転倒`)}
- else if(t==="sleepless"){S.st+=4;say(`${nm}様が眠れず落ち着かない…`);if(Math.random()<.3*MOB[S.bd[i]])give(i,"wander")}
- else if(t==="pain"){S.st+=4;say(`${nm}様の痛みに気づけず不穏になった`);if(Math.random()<.4)give(i,"viol")}
- else{S.st+=5;say(`${nm}様の食事が進まず、摂取量が低下`)}}
+ if(t==="gohome"){S.st+=6;say(i18(`🏠 ${nm}様が「家に帰る」と玄関へ向かってしまう…`,`🏠 ${nm} says "I'm going home" and heads for the front door…`));if(Math.random()<.4*MOB[S.bd[i]])give(i,"wander")}
+ else if(t==="escape"){S.inc+=2;say(i18(`🚨 ${nm}様が施設外へ脱走…重大事故`,`🚨 ${nm} got out of the facility… major incident`))}
+ else if(t==="wander"){S.inc++;say(i18(`⚠ ${nm}様が徘徊中に転倒`,`⚠ ${nm} fell while wandering`))}
+ else if(t==="med"){S.inc++;say(i18(`⚠ ${nm}様の服薬漏れ`,`⚠ ${nm} missed their medication`));S.st+=4}
+ else if(t==="toilet"){S.st+=8;say(i18(`${nm}様、トイレに間に合わず失禁…更衣と清掃`,`${nm} didn't make it to the toilet… clothes change and cleanup`))}
+ else if(t==="viol"){S.st+=15;say(i18(`${nm}様の暴力・罵倒で心が削られる…`,`${nm}'s verbal and physical outbursts are wearing you down…`))}
+ else if(t==="listen"){S.st+=8;say(i18(`${nm}様が不安で泣き出してしまった`,`${nm} got anxious and started crying`))}else if(t==="intrude"){S.inc++;say(i18(`🚪 ${nm}様が他の方の部屋に侵入、トラブルに`,`🚪 ${nm} walked into another resident's room, causing trouble`))}else if(t==="victim"){S.st+=10;say(i18(`😨 ${nm}様が部屋に入られて怯えている…`,`😨 ${nm} is frightened after someone entered their room…`))}else if(t==="pica"){S.inc++;S.st+=3;say(i18(`⚠ ${nm}様が異物を誤飲、緊急受診`,`⚠ ${nm} swallowed a foreign object — emergency hospital visit`))}else if(t==="delus"){S.st+=10;say(i18(`${nm}様「財布を盗ったでしょう」責められ続けた…`,`${nm}: "You stole my wallet!" You were accused over and over…`))}else if(t==="delir"){S.inc++;S.st+=6;say(i18(`⚠ ${nm}様のせん妄が悪化、夜間救急対応`,`⚠ ${nm}'s delirium worsened — night emergency response`))}else if(t==="odd"){S.st+=6;say(i18(`🤪 ${nm}様の奇行で周囲が騒然…`,`🤪 ${nm}'s odd behavior has everyone in an uproar…`))}else if(t==="nurse"){S.st+=3;say(i18(`🔔 ${nm}様のナースコールが鳴り続ける…`,`🔔 ${nm}'s call bell keeps ringing…`))}
+ else if(t==="meshi"){S.st+=7;say(i18(`🍽️ ${nm}様「メシはまだか！」と訴え続けて収まらない…`,`🍽️ ${nm} keeps demanding "Where's my dinner?!" and won't settle…`))}
+ else if(t==="patrol"){S.pm[i]++;S.st+=3;if(S.pm[i]>=2){S.pm[i]=0;S.inc++;say(i18(`⚠ ${nm}様の巡回が滞り、褥瘡・状態変化の発見が遅れた`,`⚠ Rounds for ${nm} lapsed — pressure sore / change in condition found late`))}else say(i18(`${nm}様の巡回ができなかった…`,`Couldn't make rounds on ${nm}…`))}
+ else if(t==="fall"){S.inc++;S.st+=5;say(i18(`⚠ ${nm}様が立ち上がろうとして転倒`,`⚠ ${nm} fell trying to stand up`))}
+ else if(t==="sleepless"){S.st+=4;say(i18(`${nm}様が眠れず落ち着かない…`,`${nm} can't sleep and is restless…`));if(Math.random()<.3*MOB[S.bd[i]])give(i,"wander")}
+ else if(t==="pain"){S.st+=4;say(i18(`${nm}様の痛みに気づけず不穏になった`,`${nm}'s pain went unnoticed and they became agitated`));if(Math.random()<.4)give(i,"viol")}
+ else{S.st+=5;say(i18(`${nm}様の食事が進まず、摂取量が低下`,`${nm} isn't eating well — intake has dropped`))}}
 function okMsg(i,t){const nm=names[i];S.done++;{const u=UP[t];if(u)S.st+=u*(.5+Math.random())}if(t==="nurse"&&Math.random()<.5)S.st+=1;
- if(t==="med"&&!S.mod[i]){const r=Math.random();if(r<.18){S.mod[i]=1;say(`✨ ${nm}様、薬が効いて落ち着いた`)}else if(r<.25){S.mod[i]=2;say(`🌀 ${nm}様が服薬後にせん妄状態に…`)}}
+ if(t==="med"&&!S.mod[i]){const r=Math.random();if(r<.18){S.mod[i]=1;say(i18(`✨ ${nm}様、薬が効いて落ち着いた`,`✨ ${nm} is calmer now that the medication has kicked in`))}else if(r<.25){S.mod[i]=2;say(i18(`🌀 ${nm}様が服薬後にせん妄状態に…`,`🌀 ${nm} became delirious after taking the medication…`))}}
  if(t==="listen"){const o=S.mood[i];o.a=Math.max(0,o.a-6);o.u=Math.max(0,o.u-6)}
- else if(t==="gohome"){S.st=Math.max(0,S.st-.3);say(`${nm}様「家に帰る」…お話を聞いて落ち着かれた`)}
- else if(t==="viol")say(`${nm}様が落ち着いてくれた`);
- else if(t==="escape")say(`${nm}様を玄関で保護、危なかった…`);else if(t==="delus")say(`${nm}様と一緒に探して見つかった`);
- else if(t==="patrol"){S.pm[i]=0;S.st=Math.max(0,S.st-.3);if(Math.random()<.05)say(`👀 ${nm}様の体位を整え、早期に発赤に気づけた`)}
- else if(t==="fall"){S.st=Math.max(0,S.st-.3);if(Math.random()<.4)say(`${nm}様の立ち上がりを支え、転倒を防いだ`)}
- else if(t==="meshi"){S.st=Math.max(0,S.st-.3);say(`${nm}様「メシはまだか」…お茶とお菓子で落ち着かれた`)}else if(!UP[t])S.st=Math.max(0,S.st-.3);if(t==="viol"&&Math.random()<.5){S.st+=20;say(`💔 ${nm}様の暴言・暴力で大きな精神ダメージ…`)}}
+ else if(t==="gohome"){S.st=Math.max(0,S.st-.3);say(i18(`${nm}様「家に帰る」…お話を聞いて落ち着かれた`,`${nm}: "I'm going home"… calmed down after you talked together`))}
+ else if(t==="viol")say(i18(`${nm}様が落ち着いてくれた`,`${nm} has calmed down`));
+ else if(t==="escape")say(i18(`${nm}様を玄関で保護、危なかった…`,`Caught ${nm} at the front door — that was close…`));else if(t==="delus")say(i18(`${nm}様と一緒に探して見つかった`,`Searched together with ${nm} and found it`));
+ else if(t==="patrol"){S.pm[i]=0;S.st=Math.max(0,S.st-.3);if(Math.random()<.05)say(i18(`👀 ${nm}様の体位を整え、早期に発赤に気づけた`,`👀 Repositioned ${nm} and caught early redness`))}
+ else if(t==="fall"){S.st=Math.max(0,S.st-.3);if(Math.random()<.4)say(i18(`${nm}様の立ち上がりを支え、転倒を防いだ`,`Steadied ${nm} as they stood up and prevented a fall`))}
+ else if(t==="meshi"){S.st=Math.max(0,S.st-.3);say(i18(`${nm}様「メシはまだか」…お茶とお菓子で落ち着かれた`,`${nm}: "Where's dinner?"… settled down with tea and snacks`))}else if(!UP[t])S.st=Math.max(0,S.st-.3);if(t==="viol"&&Math.random()<.5){S.st+=20;say(i18(`💔 ${nm}様の暴言・暴力で大きな精神ダメージ…`,`💔 ${nm}'s abuse and violence took a heavy emotional toll…`))}}
 function tick(){if(S.over)return;
  S.m+=1;const m=S.m,dt=.1;
  S.sched.forEach(s=>{if(!s.d&&s.t<=m&&give(s.i,s.type))s.d=1});
@@ -179,44 +184,44 @@ function tick(){if(S.over)return;
  for(let i=0;i<18;i++){const e=S.ev[i];if(!e)continue;act++;if(!e.doing){e.left-=dt;if(e.left<=0)fail(i);else{const r=e.left/T[e.type].dl;if(r<.5)bump(i,e.type,r<.4?.25:.1)}}}
  S.st+=.006*act;if(act>=4)S.st+=.1;/* サイン4つ以上の同時発生：ストレス+1/秒(1tick=0.1秒) */if(S.rest&&!S.busy){S.st=Math.max(0,S.st-.02);S.restMin++}if(m%60===0){if(!S.rh)S.st+=1;S.rh=0}
  if(S.busy){S.busy.left-=dt;if(S.busy.left<=0){const i=S.busy.i,t=S.ev[i].type;{const r=S.rec[t]||(S.rec[t]={n:0,min:0,miss:0});r.n++;r.min+=S.busy.tot*10}S.ev[i]=null;S.busy=null;okMsg(i,t)}}
- if(S.inc>=5)return end("lose","事故が重なり、施設は大きな問題に…");
- if(S.st>=100)return end("lose","心身が限界。夜勤者が倒れてしまった…");
+ if(S.inc>=5)return end("lose",i18("事故が重なり、施設は大きな問題に…","Incidents piled up and the facility is in serious trouble…"));
+ if(S.st>=100)return end("lose",i18("心身が限界。夜勤者が倒れてしまった…","You've hit your limit. The night-shift caregiver collapsed…"));
  if(m>=END)return end("win");
  draw()}
 function draw(){const m=S.m,h=(16+Math.floor(m/60))%24,mm=String(m%60).padStart(2,"0");
  $("clock").textContent=String(h).padStart(2,"0")+":"+mm;
- $("pg").firstChild.style.width=m/END*100+"%";$("stg").textContent=sn(carry.stage)+"の進行"+(TF?`　【${F+1}階】`:"");$("bub").classList.toggle("hide",!(TF&&S.ev.some((e,i)=>e&&!e.doing&&fl(i)!==F)));
+ $("pg").firstChild.style.width=m/END*100+"%";$("stg").textContent=sn(carry.stage)+i18("の進行"," Progress")+(TF?i18(`　【${F+1}階】`,`  [Floor ${F+1}]`):"");$("bub").classList.toggle("hide",!(TF&&S.ev.some((e,i)=>e&&!e.doing&&fl(i)!==F)));
  $("st").firstChild.style.width=Math.min(100,S.st)+"%";
- const BC=["#2e9d5c","#a3b82e","#d9c12e","#e68a2e","#d33a3a","#8e1c1c"];$("inc").style.background=BC[Math.min(5,S.inc)];$("inc").innerHTML="🏢<small>運営状況</small>";
+ const BC=["#2e9d5c","#a3b82e","#d9c12e","#e68a2e","#d33a3a","#8e1c1c"];$("inc").style.background=BC[Math.min(5,S.inc)];$("inc").innerHTML="🏢<small>"+i18("運営状況","Facility")+"</small>";
  rb.classList.toggle("dis",!!S.busy);
  const w=$("work");
- if(S.busy){const e=S.ev[S.busy.i];w.innerHTML=`${T[e.type].i} ${T[e.type].n.replace("!","")}対応中…<div class="bar"><i style="width:${(1-S.busy.left/S.busy.tot)*100}%"></i></div>`}
- else w.textContent=S.rest?"☕️ 休憩中…（回復はごくわずか）":"待機中（サインの出た利用者をタップ）";
+ if(S.busy){const e=S.ev[S.busy.i];w.innerHTML=`${T[e.type].i} ${i18(tn(e.type).replace("!","")+"対応中…","Handling: "+tn(e.type).replace("!","")+"…")}<div class="bar"><i style="width:${(1-S.busy.left/S.busy.tot)*100}%"></i></div>`}
+ else w.textContent=S.rest?i18("☕️ 休憩中…（回復はごくわずか）","☕️ Resting… (very little recovery)"):i18("待機中（サインの出た利用者をタップ）","Standby (tap a resident who needs help)");
  document.querySelectorAll(".c").forEach((c,i)=>{const e=S.ev[i],r=e?e.left/T[e.type].dl:0;
   c.className="c"+(e?(e.doing?" doing":(r<.4?" hot":" on")):"");
-  c.querySelector(".e").textContent=e?T[e.type].i+T[e.type].n:"";const bd=c.querySelector(".bd");bd.textContent=["","✨","🌀"][S.mod[i]];bd.className="bd b"+S.mod[i];
+  c.querySelector(".e").textContent=e?T[e.type].i+tn(e.type):"";const bd=c.querySelector(".bd");bd.textContent=["","✨","🌀"][S.mod[i]];bd.className="bd b"+S.mod[i];
   c.querySelector(".bar i").style.width=e&&!e.doing?r*100+"%":"0"})}
 function end(r,msg){S.over=true;clearInterval(timer);draw();
- let t,b;const pay=r==="win"?20000:Math.floor(20000/17*(S.m/60));carry.total+=pay;const tot=`<br>累計報酬：<b>${carry.total.toLocaleString()}円</b>`;const ps=`<br>💴 報酬：<b>${pay.toLocaleString()}円</b>`;
+ let t,b;const pay=r==="win"?20000:Math.floor(20000/17*(S.m/60));carry.total+=pay;const tot=i18(`<br>累計報酬：<b>${carry.total.toLocaleString()}円</b>`,`<br>Total pay: <b>¥${carry.total.toLocaleString()}</b>`);const ps=i18(`<br>💴 報酬：<b>${pay.toLocaleString()}円</b>`,`<br>💴 Pay: <b>¥${pay.toLocaleString()}</b>`);
  if(r==="win"){const g=S.inc===0&&S.st<50?"S":S.inc<=1&&S.st<70?"A":S.inc<=3?"B":"C";
-  t=`🌅 ${sn(carry.stage)} 明け！`;const rd=.15+Math.random()*.15;carry.st=S.st*(1-rd);carry.inc=S.inc;(carry.ranks=carry.ranks||[]).push(g);carry.stage++;carry.ratio=Math.min(1,carry.ratio+.05+Math.random()*.05);b=`評価：<b style="font-size:28px">${g}</b><br>対応完了 ${S.done}件／見逃し ${S.miss}件<br>事故 ${S.inc}件／ストレス ${Math.floor(S.st)}%<br>🛌 明けの休息で疲労ストレスが${Math.round(rd*100)}%軽減（次の夜勤は${Math.floor(carry.st)}%から）${ps}${tot}`}
- else{t="💀 "+sn(carry.stage)+"でゲームオーバー";b=`${msg}<br>（${$("clock").textContent} 時点／対応 ${S.done}件）<br>勤務 ${(S.m/60).toFixed(1)}時間${ps}${tot}<br>ランク平均：<b>${avgRank()}</b>`}
+  t=i18(`🌅 ${sn(carry.stage)} 明け！`,`🌅 ${sn(carry.stage)} Complete!`);const rd=.15+Math.random()*.15;carry.st=S.st*(1-rd);carry.inc=S.inc;(carry.ranks=carry.ranks||[]).push(g);carry.stage++;carry.ratio=Math.min(1,carry.ratio+.05+Math.random()*.05);b=i18(`評価：<b style="font-size:28px">${g}</b><br>対応完了 ${S.done}件／見逃し ${S.miss}件<br>事故 ${S.inc}件／ストレス ${Math.floor(S.st)}%<br>🛌 明けの休息で疲労ストレスが${Math.round(rd*100)}%軽減（次の夜勤は${Math.floor(carry.st)}%から）${ps}${tot}`,`Rating: <b style="font-size:28px">${g}</b><br>Handled: ${S.done} / Missed: ${S.miss}<br>Incidents: ${S.inc} / Stress: ${Math.floor(S.st)}%<br>🛌 Resting after the shift cut your fatigue/stress by ${Math.round(rd*100)}% (next night starts at ${Math.floor(carry.st)}%)${ps}${tot}`)}
+ else{t=i18("💀 "+sn(carry.stage)+"でゲームオーバー","💀 Game Over on "+sn(carry.stage));b=i18(`${msg}<br>（${$("clock").textContent} 時点／対応 ${S.done}件）<br>勤務 ${(S.m/60).toFixed(1)}時間${ps}${tot}<br>ランク平均：<b>${avgRank()}</b>`,`${msg}<br>(at ${$("clock").textContent} / ${S.done} handled)<br>Worked ${(S.m/60).toFixed(1)} hours${ps}${tot}<br>Average rank: <b>${avgRank()}</b>`)}
  const o=$("ov");o.className="ov";
- const card=`<div><h2>${t}</h2>${b}<button id="jn" class="sub">📋 勤務日誌</button>${r==="win"?"":'<button id="tw" class="x">𝕏 にツイートする</button>'}<button id="rt">${r==="win"?sn(carry.stage)+"へ":"最初から"}</button></div>`;
- const wire=()=>{$("rt").onclick=()=>{if(r!=="win")carry={stage:1,st:0,total:0};start()};const tw=$("tw");if(tw)tw.onclick=()=>{const tx=`【グループホーム夜勤ワンオペ物語 〜認知症利用者${NN}名をおひとりで〜】\n${sn(S.no)}でゲームオーバー💀\n累計報酬：${carry.total.toLocaleString()}円／ランク平均：${avgRank()}\nhttps://tsunagarukaigo.github.io/kaigodx/gh_yakin.html`;window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(tx),"_blank","noopener")};const j=$("jn");if(j)j.onclick=()=>{o.innerHTML=journal();$("jb").onclick=()=>{o.innerHTML=card;wire()}}};
+ const card=`<div><h2>${t}</h2>${b}<button id="jn" class="sub">${i18("📋 勤務日誌","📋 Shift Log")}</button>${r==="win"?"":'<button id="tw" class="x">'+i18("𝕏 にツイートする","Post on 𝕏")+'</button>'}<button id="rt">${r==="win"?i18(sn(carry.stage)+"へ","Go to "+sn(carry.stage)):i18("最初から","Start Over")}</button></div>`;
+ const wire=()=>{$("rt").onclick=()=>{if(r!=="win")carry={stage:1,st:0,total:0};start()};const tw=$("tw");if(tw)tw.onclick=()=>{const tx=i18(`【グループホーム夜勤ワンオペ物語 〜認知症利用者${NN}名をおひとりで〜】\n${sn(S.no)}でゲームオーバー💀\n累計報酬：${carry.total.toLocaleString()}円／ランク平均：${avgRank()}\nhttps://tsunagarukaigo.github.io/kaigodx/gh_yakin.html`,`【Japanese Night Care】\nGame over on ${sn(S.no)} 💀\nTotal pay: ¥${carry.total.toLocaleString()} / Avg rank: ${avgRank()}\nhttps://tsunagarukaigo.github.io/kaigodx/gh_yakin.html`);window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(tx),"_blank","noopener")};const j=$("jn");if(j)j.onclick=()=>{o.innerHTML=journal();$("jb").onclick=()=>{o.innerHTML=card;wire()}}};
  o.innerHTML=card;o.classList.remove("hide");wire()}
 /* 勤務日誌：項目ごとの対応時間・休息時間の一覧表(ゲーム内の分)と、別枠の事故報告 */
 /* ランク平均：S=4 A=3 B=2 C=1 の平均を最も近い評価に丸めて表示。クリア実績なしは「-」 */
-function avgRank(){const a=carry.ranks||[];if(!a.length)return"-（クリアなし）";const P={S:4,A:3,B:2,C:1},v=a.reduce((x,g)=>x+P[g],0)/a.length,L=["C","B","A","S"][Math.min(3,Math.max(0,Math.round(v)-1))];return L+"（"+v.toFixed(1)+"/4.0）"}
-function journal(){const fm=x=>x>=60?Math.floor(x/60)+"時間"+Math.round(x%60)+"分":Math.round(x)+"分";
+function avgRank(){const a=carry.ranks||[];if(!a.length)return i18("-（クリアなし）","- (no clears)");const P={S:4,A:3,B:2,C:1},v=a.reduce((x,g)=>x+P[g],0)/a.length,L=["C","B","A","S"][Math.min(3,Math.max(0,Math.round(v)-1))];return L+i18("（"+v.toFixed(1)+"/4.0）"," ("+v.toFixed(1)+"/4.0)")}
+function journal(){const fm=x=>x>=60?Math.floor(x/60)+i18("時間","h ")+Math.round(x%60)+i18("分","m"):Math.round(x)+i18("分","m");
  const ks=Object.keys(T).filter(k=>S.rec[k]&&(S.rec[k].n||S.rec[k].miss));let sc=0,sm=0,sx=0;
- const rows=ks.map(k=>{const r=S.rec[k];sc+=r.n;sm+=r.min;sx+=r.miss;return`<tr><td>${T[k].i}${T[k].n.replace("!","")}</td><td>${r.n}</td><td>${fm(r.min)}</td><td>${r.n?(r.min/r.n).toFixed(1)+"分":"-"}</td><td>${r.miss}</td></tr>`}).join("");
+ const rows=ks.map(k=>{const r=S.rec[k];sc+=r.n;sm+=r.min;sx+=r.miss;return`<tr><td>${T[k].i}${tn(k).replace("!","")}</td><td>${r.n}</td><td>${fm(r.min)}</td><td>${r.n?(r.min/r.n).toFixed(1)+i18("分","m"):"-"}</td><td>${r.miss}</td></tr>`}).join("");
  const idle=Math.max(0,S.m-sm-S.restMin);
- const ac=S.acclog.length?S.acclog.map(x=>`・${clk(x.m)}　${x.who}様：${x.what}`).join("<br>"):"この夜勤の事故報告はありません。";
- return`<div class="jw"><h3>📋 勤務日誌（${sn(S.no)}）</h3><table class="jt"><tr><th>項目</th><th>対応</th><th>対応時間</th><th>平均</th><th>見逃し</th></tr>${rows}<tr class="tt"><td>対応 合計</td><td>${sc}</td><td>${fm(sm)}</td><td>${sc?(sm/sc).toFixed(1)+"分":"-"}</td><td>${sx}</td></tr><tr><td>☕ 休息</td><td></td><td>${fm(S.restMin)}</td><td></td><td></td></tr><tr><td>🏃移動・見守り・その他</td><td></td><td>${fm(idle)}</td><td></td><td></td></tr></table>
-<section class="jbox ac"><h5>🚨 事故報告</h5>${ac}</section><button id="jb">もどる</button></div>`}
+ const ac=S.acclog.length?S.acclog.map(x=>i18(`・${clk(x.m)}　${x.who}様：${x.what}`,`• ${clk(x.m)}  ${x.who}: ${x.what}`)).join("<br>"):i18("この夜勤の事故報告はありません。","No incident reports for this shift.");
+ return`<div class="jw"><h3>${i18("📋 勤務日誌（"+sn(S.no)+"）","📋 Shift Log ("+sn(S.no)+")")}</h3><table class="jt">${i18("<tr><th>項目</th><th>対応</th><th>対応時間</th><th>平均</th><th>見逃し</th></tr>","<tr><th>Task</th><th>Done</th><th>Time</th><th>Avg</th><th>Missed</th></tr>")}${rows}<tr class="tt"><td>${i18("対応 合計","Total")}</td><td>${sc}</td><td>${fm(sm)}</td><td>${sc?(sm/sc).toFixed(1)+i18("分","m"):"-"}</td><td>${sx}</td></tr><tr><td>${i18("☕ 休息","☕ Rest")}</td><td></td><td>${fm(S.restMin)}</td><td></td><td></td></tr><tr><td>${i18("🏃移動・見守り・その他","🏃 Moving / Other")}</td><td></td><td>${fm(idle)}</td><td></td><td></td></tr></table>
+<section class="jbox ac"><h5>${i18("🚨 事故報告","🚨 Incident Reports")}</h5>${ac}</section><button id="jb">${i18("もどる","Back")}</button></div>`}
 function start(){$("ov").classList.add("hide");init();draw();clearInterval(timer);timer=setInterval(tick,100)}
-const rb=$("rest");const rs=v=>{if(S){S.rest=v;if(v)S.rh=1}rb.textContent=v?"☕️ 休憩中…":"☕️ 休憩（押している間）"};
+const rb=$("rest");const rs=v=>{if(S){S.rest=v;if(v)S.rh=1}rb.textContent=v?i18("☕️ 休憩中…","☕️ Resting…"):i18("☕️ 休憩（押している間）","☕️ Hold to Rest")};
 rb.onpointerdown=e=>{e.preventDefault();if(S&&S.busy)return;rs(true)};
 ["onpointerup","onpointerleave","onpointercancel"].forEach(k=>rb[k]=()=>rs(false));
 rb.oncontextmenu=e=>e.preventDefault();
@@ -251,8 +256,26 @@ const up=e=>{if(!on)return;on=false;if(!TF||!S||S.over)return;const dx=e.clientX
  if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.5){const nf=dx<0?1:0;lastSw=Date.now();goFloor(nf)}};
 $("bub").onclick=()=>{if(S&&!S.over)goFloor(1-F)};g.addEventListener("pointerup",up);g.addEventListener("pointercancel",()=>{on=false})}
 /* 裏モード：「18名」を9回タップで9名編成(再度で18名に戻る) / 入口を5回タップでリアルタイムスタディモード(ON/OFF) */
-{const setN=n=>{if(n===9){TF=false;$("twf").classList.add("hide")}NN=n;$("nn").textContent=n;$("n18").textContent=n+"名"};let c9=0,t9,cd=0,td,ct=0,tt;
+{const setN=n=>{if(n===9){TF=false;$("twf").classList.add("hide")}NN=n;applyLang()};let c9=0,t9,cd=0,td,ct=0,tt;
 $("n18").onclick=()=>{clearTimeout(t9);t9=setTimeout(()=>c9=0,2000);if(++c9>=9){c9=0;setN(NN===18?9:18)}};
 $("cv").onclick=e=>{const r=e.target.getBoundingClientRect(),x=(e.clientX-r.left)*168/r.width,y=(e.clientY-r.top)*96/r.height;
  if(x>=74&&x<=93&&y>=50&&y<=74){clearTimeout(td);td=setTimeout(()=>cd=0,2000);if(++cd>=5){cd=0;RT=!RT;$("rtl").classList.toggle("hide",!RT)}}else if(x>=108&&x<=122&&y>=31&&y<=46){cd=0;if(NN===9)return;clearTimeout(tt);tt=setTimeout(()=>ct=0,2000);if(++ct>=10){ct=0;TF=!TF;$("twf").classList.toggle("hide",!TF)}}else{cd=0;ct=0}}}
+
+function applyLang(){if(!$("lgJ"))return;const en=LG==="en";names=en?NEN:NJA;
+document.documentElement.lang=en?"en":"ja";
+document.title=en?"Japanese Night Care":"グループホーム夜勤ワンオペ物語 〜認知症利用者18名をおひとりで〜";
+$("stg").textContent=i18("夜勤の進行","Night Progress");$("stl").textContent=i18("疲労・ストレス","Fatigue / Stress");
+$("work").textContent=i18("待機中","Standby");$("bub").textContent=i18("おーい","Hey!");
+rb.textContent=i18("☕️ 休憩（押している間）","☕️ Hold to Rest");
+$("ttl").textContent=i18("グループホーム夜勤ワンオペ物語","Japanese Night Care");
+$("stt").innerHTML=en?`~ Caring for <span id="nn">${NN}</span> residents with dementia, all alone ~`:`〜認知症利用者<span id="nn">${NN}</span>名をおひとりで〜`;
+$("rtl").textContent=i18("リアルタイムスタディモード","Real-Time Study Mode");$("twf").textContent=i18("2階建てモード","Two-Floor Mode");
+$("i1").textContent=i18("認知症の利用者","Tonight, you're watching over ");$("n18").textContent=en?NN+" residents":NN+"名";
+$("i2").textContent=i18("を、あなた"," with dementia ");$("i3").textContent=i18("ひとり","all by yourself");
+$("i4").innerHTML=i18("で見守る夜。<br>16:00〜翌9:00を乗り切ればクリア。",".<br>Survive from 16:00 until 09:00 the next morning to win.");
+$("go").textContent=i18("夜勤開始","Start Shift");
+$("ft").textContent=i18("登場人物はフィクションですが、論文を参考にゲーム用にパロディしてます。","All characters are fictional. Gameplay is a parody loosely based on published research papers.");
+$("lgJ").classList.toggle("on",!en);$("lgE").classList.toggle("on",en)}
+$("lgJ").onclick=()=>{LG="ja";applyLang()};$("lgE").onclick=()=>{LG="en";applyLang()};
+applyLang();
 </script></body></html>
