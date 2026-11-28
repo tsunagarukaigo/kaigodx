@@ -19,7 +19,7 @@ body{box-sizing:border-box;padding:4px 6px;max-width:480px;margin:auto;user-sele
 #inc{font-size:18px;line-height:1;text-align:center;padding:2px 8px;border-radius:8px;background:#2e9d5c;transition:background .4s;display:flex;flex-direction:column;align-items:center;justify-content:center;align-self:stretch;color:#fff}#inc small{display:block;font-size:8px;color:#fff;font-weight:700;margin-top:2px;white-space:nowrap}
 #work{flex:none;box-sizing:border-box;height:32px;margin:4px 0;padding:2px 8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);font-size:12px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;white-space:nowrap}
 #work .bar{margin:3px 0 0;height:4px}
-#grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:3px}
+#gw{flex:1;min-height:0;overflow:hidden}#grid{height:100%;box-sizing:border-box;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:3px}
 .c{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:2px 3px;text-align:center;font-size:10px;line-height:1.15;cursor:pointer;min-height:0;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .c .h{font-size:11px;font-weight:700;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .c .f{font-size:14px;line-height:1}
@@ -48,7 +48,8 @@ button{font:inherit;font-size:15px;padding:8px 16px;border:0;border-radius:8px;b
 .ov.op h2{font-size:20px;margin:4px 0 6px}
 .ov.op h4{font-size:13px;margin:0 0 8px}
 .ov.op canvas{width:min(100%,240px);display:block;margin:0 auto;image-rendering:pixelated}
-#rtl{display:table;margin:-2px auto 8px;padding:3px 10px;border:2px solid #111;font-size:12px}#rtl.hide{display:none}
+#rtl,#twf{display:table;margin:-2px auto 8px;padding:3px 10px;border:2px solid #111;font-size:12px}#rtl.hide,#twf.hide{display:none}#grid{touch-action:pan-y}body{position:relative}
+#bub{position:absolute;right:20px;bottom:24px;cursor:pointer;background:#fff;color:#d33a3a;border:2px solid #d33a3a;border-radius:12px;padding:2px 10px;font-size:13px;font-weight:700;z-index:3;animation:bl .6s infinite}#bub:after{content:"";position:absolute;right:-8px;top:50%;margin-top:-6px;border:6px solid transparent;border-left-color:#d33a3a;border-right:0}#bub.hide{display:none}
 .ov.op h6{font-size:10px;font-weight:400;color:#555;margin:10px 0 0;line-height:1.5}
 .ov.op button{background:#111;color:#fff;border-radius:0}
 .bd{position:absolute;top:0;right:2px;font-size:11px;line-height:1.2}
@@ -61,13 +62,13 @@ button{font:inherit;font-size:15px;padding:8px 16px;border:0;border-radius:8px;b
 <div class="bars"><div id="stg">夜勤の進行</div><div class="bar" id="pg"><i></i></div><div>疲労・ストレス</div><div class="bar" id="st"><i></i></div></div>
 <div id="inc"></div></div>
 <div id="work">待機中</div>
-<div id="grid"></div>
+<div id="gw"><div id="grid"></div></div>
 <div id="log"></div>
-<button id="rest">☕️ 休憩（押している間）</button>
+<div id="bub" class="hide">おーい</div><button id="rest">☕️ 休憩（押している間）</button>
 <div class="ov op" id="ov"><div>
 <canvas id="cv" width="168" height="96"></canvas>
 <h2>グループホーム夜勤ワンオペ物語</h2>
-<h4>〜認知症利用者<span id="nn">18</span>名をおひとりで〜</h4><h5 id="rtl" class="hide">リアルタイムスタディモード</h5>
+<h4>〜認知症利用者<span id="nn">18</span>名をおひとりで〜</h4><h5 id="rtl" class="hide">リアルタイムスタディモード</h5><h5 id="twf" class="hide">2階建てモード</h5>
 認知症の利用者<b id="n18">18名</b>を、あなた<b>ひとり</b>で見守る夜。<br>
 16:00〜翌9:00を乗り切ればクリア。
 <button id="go">夜勤開始</button>
@@ -106,7 +107,12 @@ const UP={listen:1.25,delus:1.5,victim:1.25,intrude:1};
 const MS=[.1,.5,1,1.6,2,2.4,.8];
 /* 裏モード：NN=編成人数(18/9)、RT=リアルタイムスタディモード
    RT：グループホーム調査対象高齢者1人あたりのケア時間(分/時、厚労省 老人保健健康増進等事業 図表3-2-3の読み取り値)に比例して発生率を決める */
-let NN=18,RT=false;
+let NN=18,RT=false,TF=false,F=0,lastSw=0;/* TF=2階建てモード(9名×2フロア、F=表示中の階 0/1) */
+const fl=i=>Math.floor(i/9);
+/* 2階建て：#gridを幅200%にして1階を左半分・2階を右半分に並べ、translateXを0.8秒かけてスライドさせる */
+const showFloor=()=>{const g=document.getElementById("grid");g.style.width=TF?"200%":"100%";g.style.gridTemplateColumns="repeat("+(TF?6:3)+",minmax(0,1fr))";g.style.transition=TF?"transform .8s ease":"none";g.style.transform=TF&&F?"translateX(-50%)":"none";
+ document.querySelectorAll(".c").forEach((c,i)=>{if(TF){const j=i%9;c.style.gridColumn=fl(i)*3+j%3+1;c.style.gridRow=Math.floor(j/3)+1}else{c.style.gridColumn="";c.style.gridRow=""}})};
+const goFloor=nf=>{if(!TF||nf===F)return;F=nf;showFloor();draw()};
 const GHV=[1.9,2.4,1.1,2.2,3.2,3.7,2.7,5.2,7,10.2,11,13.5,13.4,13.8,17.6,15.1,13,9.3,9.1,7.7,5.4,4.6,4.5,2.9],
 sn=n=>n===1?"初出勤":"夜勤"+n+"日目";
 const END=1020,$=id=>document.getElementById(id);
@@ -114,8 +120,8 @@ let S,timer,carry={stage:1,st:0,total:0};
 function init(){if(!carry.ratio)carry.ratio=.3+Math.random()*.1;if(!carry.mood)carry.mood=Array.from({length:NN},()=>({a:0,u:0}));if(!carry.lv)carry.lv=Array.from({length:NN},()=>Math.floor(Math.random()*7));
  S={no:carry.stage,dbl:Array(NN).fill(1),m:0,ev:Array(NN).fill(null),busy:null,st:carry.st,rest:false,nr:.02+Math.random()*.17,lv:carry.lv,mood:carry.mood,mod:Array(NN).fill(0),bd:Array.from({length:NN},()=>Math.floor(Math.random()*8)),pm:Array(NN).fill(0),inc:carry.inc||0,sched:[],rec:{},restMin:0,acclog:[],log:[],done:0,miss:0,over:false};
  for(let k=0;k<NN;k++){[{t:60+k*6.5,i:k,type:"meal"},{t:240+k*3.5,i:k,type:"med"},{t:840+k*5,i:k,type:"meal"}].forEach(s=>{if(Math.random()<carry.ratio*(.6+.133*S.lv[k]))S.sched.push(s)})}
- $("grid").style.gridTemplateRows="repeat("+NN/3+",minmax(0,1fr))";$("grid").innerHTML=names.slice(0,NN).map((n,i)=>`<div class="c" data-i="${i}"><span class="bd"></span><div class="h"><span class="f">${i%2?"👴":"👵"}</span>${n}</div><div class="lv">認知症度${LVN[S.lv[i]]}</div><div class="e"></div><div class="bar"><i></i></div></div>`).join("");
- document.querySelectorAll(".c").forEach(c=>c.onclick=()=>tap(+c.dataset.i));
+ F=0;$("grid").style.gridTemplateRows="repeat("+(TF?3:NN/3)+",minmax(0,1fr))";$("grid").innerHTML=names.slice(0,NN).map((n,i)=>`<div class="c" data-i="${i}"><span class="bd"></span><div class="h"><span class="f">${i%2?"👴":"👵"}</span>${n}</div><div class="lv">認知症度${LVN[S.lv[i]]}</div><div class="e"></div><div class="bar"><i></i></div></div>`).join("");
+ document.querySelectorAll(".c").forEach(c=>c.onclick=()=>tap(+c.dataset.i));showFloor();
  say(`${sn(carry.stage)} 開始。食事・服薬の対象は約${Math.round(carry.ratio*100)}%の方。`);
 }
 function say(s){S.log.unshift(s);S.log=S.log.slice(0,4);$("log").innerHTML=S.log.map(x=>"・"+x).join("<br>")}
@@ -131,7 +137,7 @@ function pick(ri){const m=S.m,night=m>=360&&m<840,L=S.lv[ri];const hr=hrOf(m);
  if(RT){/* 図表3-3-1：GHの個別ケアは排尿・コミュニケーション支援が上位、行動上の問題への対応は相対的に少ない */["wander","escape","viol","intrude","pica","delus","delir","gohome","odd"].forEach(q=>w[q]*=.6);w.toilet*=1.4;w.listen*=1.3}
  let r=Math.random()*Object.values(w).reduce((a,b)=>a+b),k;for(k in w){if((r-=w[k])<0)break}return k}
 function pickRes(){const b=S.lv.map(v=>1+(v-3)*.0417),B=b.reduce((a,c)=>a+c);let r=Math.random()*B;for(let i=0;i<NN;i++){if((r-=b[i]*ACT[S.bd[i]]*[1,.2,6][S.mod[i]]*S.dbl[i]*(1+(S.mood[i].a+S.mood[i].u)/60))<0)return i}return -1}
-function tap(i){if(S.over||!S.ev[i]||S.ev[i].doing)return;
+function tap(i){if(Date.now()-lastSw<350)return;if(S.over||!S.ev[i]||S.ev[i].doing)return;
  if(S.busy){say("いま別の方に対応中です！");return}
  rs(false);S.ev[i].doing=true;const ty=S.ev[i].type,d=(ty==="patrol"?.25:1)*Math.max(.2,T[ty].d*(["meal","med","toilet"].includes(ty)?1+.1*Math.max(0,S.lv[i]-2):1)+Math.random()*1.75-.5);S.busy={i,left:d,tot:d}}
 /* 事故報告：事故(S.inc)が増えた見逃しを「いつ・誰が・どんな事故か」で記録 */
@@ -167,7 +173,7 @@ function tick(){if(S.over)return;
  S.sched.forEach(s=>{if(!s.d&&s.t<=m&&give(s.i,s.type))s.d=1});
  const hr=hrOf(m);let p=RT?.0062*GHV[hr]*(1+.04*(carry.stage-1)):(m>=360&&m<840?.04:.022*(m<240?1.15:1))*(1+.32*(carry.stage-1))*(m>=420&&m<600?1-S.nr:1)*(HF[hr]||1);
  p*=NN/18;/* 1人あたりの発生率は維持し、全体の発生率を人数比で増減 */
- if(Math.random()<p){const ri=pickRes(),ty=ri<0?null:pick(ri);if(!ty){}else if(ty==="odd"){if(give(ri,"odd")){const c=ri%3;[ri-3,ri+3,c>0?ri-1:-1,c<2?ri+1:-1].filter(j=>j>=0&&j<NN).forEach(j=>{if(Math.random()<ACT[S.bd[j]])give(j,"nurse")})}}else if(ty!=="intrude")give(ri,ty);else if(!S.ev[ri]){const fr=[...Array(NN).keys()].filter(j=>j!==ri&&!S.ev[j]);if(fr.length){give(ri,"intrude");give(fr[Math.floor(Math.random()*fr.length)],"victim")}}}
+ if(Math.random()<p){const ri=pickRes(),ty=ri<0?null:pick(ri);if(!ty){}else if(ty==="odd"){if(give(ri,"odd")){const c=ri%3;[ri-3,ri+3,c>0?ri-1:-1,c<2?ri+1:-1].filter(j=>j>=0&&j<NN&&(!TF||fl(j)===fl(ri))).forEach(j=>{if(Math.random()<ACT[S.bd[j]])give(j,"nurse")})}}else if(ty!=="intrude")give(ri,ty);else if(!S.ev[ri]){const fr=[...Array(NN).keys()].filter(j=>j!==ri&&!S.ev[j]&&(!TF||fl(j)===fl(ri)));if(fr.length){give(ri,"intrude");give(fr[Math.floor(Math.random()*fr.length)],"victim")}}}
  {const pp=(m>=360&&m<840?.0034:.0026)*(PH[hr]||1)*.2;/* 巡回の発生頻度：従来比80%減 */for(let i=0;i<NN;i++)if(S.bd[i]>=4&&Math.random()<pp)give(i,"patrol")}
  let act=0;
  for(let i=0;i<18;i++){const e=S.ev[i];if(!e)continue;act++;if(!e.doing){e.left-=dt;if(e.left<=0)fail(i);else{const r=e.left/T[e.type].dl;if(r<.5)bump(i,e.type,r<.4?.25:.1)}}}
@@ -179,7 +185,7 @@ function tick(){if(S.over)return;
  draw()}
 function draw(){const m=S.m,h=(16+Math.floor(m/60))%24,mm=String(m%60).padStart(2,"0");
  $("clock").textContent=String(h).padStart(2,"0")+":"+mm;
- $("pg").firstChild.style.width=m/END*100+"%";$("stg").textContent=sn(carry.stage)+"の進行";
+ $("pg").firstChild.style.width=m/END*100+"%";$("stg").textContent=sn(carry.stage)+"の進行"+(TF?`　【${F+1}階】`:"");$("bub").classList.toggle("hide",!(TF&&S.ev.some((e,i)=>e&&!e.doing&&fl(i)!==F)));
  $("st").firstChild.style.width=Math.min(100,S.st)+"%";
  const BC=["#2e9d5c","#a3b82e","#d9c12e","#e68a2e","#d33a3a","#8e1c1c"];$("inc").style.background=BC[Math.min(5,S.inc)];$("inc").innerHTML="🏢<small>運営状況</small>";
  rb.classList.toggle("dis",!!S.busy);
@@ -238,9 +244,15 @@ const step=()=>{const o=$("ov");if(!/\bop\b/.test(o.className)||/hide/.test(o.cl
  E.filter(e=>e.row).forEach(man);E.filter(e=>!e.row).forEach(man)};
 const id=setInterval(step,70);step()})();
 $("go").onclick=start;
+/* 2階建てモード：グリッドを左右スワイプで1階/2階切替 */
+{let x0=0,y0=0,on=false;const g=$("grid");
+g.addEventListener("pointerdown",e=>{x0=e.clientX;y0=e.clientY;on=true});
+const up=e=>{if(!on)return;on=false;if(!TF||!S||S.over)return;const dx=e.clientX-x0,dy=e.clientY-y0;
+ if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.5){const nf=dx<0?1:0;lastSw=Date.now();goFloor(nf)}};
+$("bub").onclick=()=>{if(S&&!S.over)goFloor(1-F)};g.addEventListener("pointerup",up);g.addEventListener("pointercancel",()=>{on=false})}
 /* 裏モード：「18名」を9回タップで9名編成(再度で18名に戻る) / 入口を5回タップでリアルタイムスタディモード(ON/OFF) */
-{const setN=n=>{NN=n;$("nn").textContent=n;$("n18").textContent=n+"名"};let c9=0,t9,cd=0,td;
+{const setN=n=>{if(n===9){TF=false;$("twf").classList.add("hide")}NN=n;$("nn").textContent=n;$("n18").textContent=n+"名"};let c9=0,t9,cd=0,td,ct=0,tt;
 $("n18").onclick=()=>{clearTimeout(t9);t9=setTimeout(()=>c9=0,2000);if(++c9>=9){c9=0;setN(NN===18?9:18)}};
 $("cv").onclick=e=>{const r=e.target.getBoundingClientRect(),x=(e.clientX-r.left)*168/r.width,y=(e.clientY-r.top)*96/r.height;
- if(x>=74&&x<=93&&y>=50&&y<=74){clearTimeout(td);td=setTimeout(()=>cd=0,2000);if(++cd>=5){cd=0;RT=!RT;$("rtl").classList.toggle("hide",!RT)}}else cd=0}}
+ if(x>=74&&x<=93&&y>=50&&y<=74){clearTimeout(td);td=setTimeout(()=>cd=0,2000);if(++cd>=5){cd=0;RT=!RT;$("rtl").classList.toggle("hide",!RT)}}else if(x>=108&&x<=122&&y>=31&&y<=46){cd=0;if(NN===9)return;clearTimeout(tt);tt=setTimeout(()=>ct=0,2000);if(++ct>=10){ct=0;TF=!TF;$("twf").classList.toggle("hide",!TF)}}else{cd=0;ct=0}}}
 </script></body></html>
