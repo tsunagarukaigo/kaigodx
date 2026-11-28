@@ -203,11 +203,11 @@ function end(r,msg){S.over=true;clearInterval(timer);draw();
 /* ランク平均：S=4 A=3 B=2 C=1 の平均を最も近い評価に丸めて表示。クリア実績なしは「-」 */
 function avgRank(){const a=carry.ranks||[];if(!a.length)return"-（クリアなし）";const P={S:4,A:3,B:2,C:1},v=a.reduce((x,g)=>x+P[g],0)/a.length,L=["C","B","A","S"][Math.min(3,Math.max(0,Math.round(v)-1))];return L+"（"+v.toFixed(1)+"/4.0）"}
 function journal(){const fm=x=>x>=60?Math.floor(x/60)+"時間"+Math.round(x%60)+"分":Math.round(x)+"分";
- const ks=Object.keys(T).filter(k=>S.rec[k]&&(S.rec[k].n||S.rec[k].miss));let sn=0,sm=0,sx=0;
- const rows=ks.map(k=>{const r=S.rec[k];sn+=r.n;sm+=r.min;sx+=r.miss;return`<tr><td>${T[k].i}${T[k].n.replace("!","")}</td><td>${r.n}</td><td>${fm(r.min)}</td><td>${r.n?(r.min/r.n).toFixed(1)+"分":"-"}</td><td>${r.miss}</td></tr>`}).join("");
+ const ks=Object.keys(T).filter(k=>S.rec[k]&&(S.rec[k].n||S.rec[k].miss));let sc=0,sm=0,sx=0;
+ const rows=ks.map(k=>{const r=S.rec[k];sc+=r.n;sm+=r.min;sx+=r.miss;return`<tr><td>${T[k].i}${T[k].n.replace("!","")}</td><td>${r.n}</td><td>${fm(r.min)}</td><td>${r.n?(r.min/r.n).toFixed(1)+"分":"-"}</td><td>${r.miss}</td></tr>`}).join("");
  const idle=Math.max(0,S.m-sm-S.restMin);
  const ac=S.acclog.length?S.acclog.map(x=>`・${clk(x.m)}　${x.who}様：${x.what}`).join("<br>"):"この夜勤の事故報告はありません。";
- return`<div class="jw"><h3>📋 勤務日誌（${sn(S.no)}）</h3><table class="jt"><tr><th>項目</th><th>対応</th><th>対応時間</th><th>平均</th><th>見逃し</th></tr>${rows}<tr class="tt"><td>対応 合計</td><td>${sn}</td><td>${fm(sm)}</td><td>${sn?(sm/sn).toFixed(1)+"分":"-"}</td><td>${sx}</td></tr><tr><td>☕ 休息</td><td></td><td>${fm(S.restMin)}</td><td></td><td></td></tr><tr><td>🏃移動・見守り・その他</td><td></td><td>${fm(idle)}</td><td></td><td></td></tr></table>
+ return`<div class="jw"><h3>📋 勤務日誌（${sn(S.no)}）</h3><table class="jt"><tr><th>項目</th><th>対応</th><th>対応時間</th><th>平均</th><th>見逃し</th></tr>${rows}<tr class="tt"><td>対応 合計</td><td>${sc}</td><td>${fm(sm)}</td><td>${sc?(sm/sc).toFixed(1)+"分":"-"}</td><td>${sx}</td></tr><tr><td>☕ 休息</td><td></td><td>${fm(S.restMin)}</td><td></td><td></td></tr><tr><td>🏃移動・見守り・その他</td><td></td><td>${fm(idle)}</td><td></td><td></td></tr></table>
 <section class="jbox ac"><h5>🚨 事故報告</h5>${ac}</section><button id="jb">もどる</button></div>`}
 function start(){$("ov").classList.add("hide");init();draw();clearInterval(timer);timer=setInterval(tick,100)}
 const rb=$("rest");const rs=v=>{if(S){S.rest=v;if(v)S.rh=1}rb.textContent=v?"☕️ 休憩中…":"☕️ 休憩（押している間）"};
