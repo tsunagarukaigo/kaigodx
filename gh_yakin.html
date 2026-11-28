@@ -106,14 +106,14 @@ const MS=[.1,.5,1,1.6,2,2.4,.8];
 const END=1020,$=id=>document.getElementById(id);
 let S,timer,carry={stage:1,st:0,total:0};
 function init(){if(!carry.ratio)carry.ratio=.3+Math.random()*.1;if(!carry.mood)carry.mood=Array.from({length:18},()=>({a:0,u:0}));if(!carry.lv)carry.lv=Array.from({length:18},()=>Math.floor(Math.random()*7));
- S={no:carry.stage,m:0,ev:Array(18).fill(null),busy:null,st:carry.st,rest:false,nr:.02+Math.random()*.17,lv:carry.lv,mood:carry.mood,mod:Array(18).fill(0),bd:Array.from({length:18},()=>Math.floor(Math.random()*8)),pm:Array(18).fill(0),inc:carry.inc||0,sched:[],rec:{},restMin:0,acclog:[],log:[],done:0,miss:0,over:false};
+ S={no:carry.stage,dbl:Array(18).fill(1),m:0,ev:Array(18).fill(null),busy:null,st:carry.st,rest:false,nr:.02+Math.random()*.17,lv:carry.lv,mood:carry.mood,mod:Array(18).fill(0),bd:Array.from({length:18},()=>Math.floor(Math.random()*8)),pm:Array(18).fill(0),inc:carry.inc||0,sched:[],rec:{},restMin:0,acclog:[],log:[],done:0,miss:0,over:false};
  for(let k=0;k<18;k++){[{t:60+k*6.5,i:k,type:"meal"},{t:240+k*3.5,i:k,type:"med"},{t:840+k*5,i:k,type:"meal"}].forEach(s=>{if(Math.random()<carry.ratio*(.6+.133*S.lv[k]))S.sched.push(s)})}
  $("grid").innerHTML=names.map((n,i)=>`<div class="c" data-i="${i}"><span class="bd"></span><div class="h"><span class="f">${i%2?"👴":"👵"}</span>${n}</div><div class="lv">認知症度${LVN[S.lv[i]]}</div><div class="e"></div><div class="bar"><i></i></div></div>`).join("");
  document.querySelectorAll(".c").forEach(c=>c.onclick=()=>tap(+c.dataset.i));
  say(`第${carry.stage}夜勤 開始。食事・服薬の対象は約${Math.round(carry.ratio*100)}%の方。`);
 }
 function say(s){S.log.unshift(s);S.log=S.log.slice(0,4);$("log").innerHTML=S.log.map(x=>"・"+x).join("<br>")}
-function give(i,type){if(S.ev[i])return false;S.ev[i]={type,left:T[type].dl};return true}
+function give(i,type){if(S.ev[i])return false;S.ev[i]={type,left:T[type].dl};if(type==="sleepless"){const o=S.mood[i];o.u=Math.min(100,o.u+20);S.dbl[i]=2}return true}
 function pick(ri){const m=S.m,night=m>=360&&m<840,L=S.lv[ri];const hr=hrOf(m);
  const w=night?{toilet:28,wander:26,listen:16,escape:8,viol:12}:{toilet:20,wander:12,listen:25,escape:5,viol:12};
  w.intrude=w.pica=w.delus=w.delir=8;w.nurse=10;w.odd=3;K.forEach((q,j)=>w[q]*=(night?LN:LD)[L][j]);w.toilet*=TH[hr]||1;
@@ -123,7 +123,7 @@ function pick(ri){const m=S.m,night=m>=360&&m<840,L=S.lv[ri];const hr=hrOf(m);
  {const o=S.mood[ri],fa=1+o.a/35,fu=1+o.u/35;w.viol*=fa;w.listen*=1+(o.a+o.u)/70;["wander","escape","gohome"].forEach(q=>w[q]*=fu)}
  ["wander","escape","intrude","fall","gohome"].forEach(q=>w[q]*=MOB[S.bd[ri]]);
  let r=Math.random()*Object.values(w).reduce((a,b)=>a+b),k;for(k in w){if((r-=w[k])<0)break}return k}
-function pickRes(){const b=S.lv.map(v=>1+(v-3)*.0417),B=b.reduce((a,c)=>a+c);let r=Math.random()*B;for(let i=0;i<18;i++){if((r-=b[i]*ACT[S.bd[i]]*[1,.2,3][S.mod[i]]*(1+(S.mood[i].a+S.mood[i].u)/60))<0)return i}return -1}
+function pickRes(){const b=S.lv.map(v=>1+(v-3)*.0417),B=b.reduce((a,c)=>a+c);let r=Math.random()*B;for(let i=0;i<18;i++){if((r-=b[i]*ACT[S.bd[i]]*[1,.2,6][S.mod[i]]*S.dbl[i]*(1+(S.mood[i].a+S.mood[i].u)/60))<0)return i}return -1}
 function tap(i){if(S.over||!S.ev[i]||S.ev[i].doing)return;
  if(S.busy){say("いま別の方に対応中です！");return}
  rs(false);S.ev[i].doing=true;const ty=S.ev[i].type,d=(ty==="patrol"?.25:1)*Math.max(.2,T[ty].d*(["meal","med","toilet"].includes(ty)?1+.1*Math.max(0,S.lv[i]-2):1)+Math.random()*1.75-.5);S.busy={i,left:d,tot:d}}
